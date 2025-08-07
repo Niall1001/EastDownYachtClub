@@ -1,0 +1,317 @@
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+
+/* Premium Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap');
+
+/* Premium Base Styles */
+@layer base {
+  * {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-elegant text-maritime-slate-700 antialiased;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-medium;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* Premium Components */
+@layer components {
+  /* Luxury Button Styles */
+  .btn-primary-luxury {
+    @apply relative overflow-hidden bg-maritime-gold-500 text-white font-semibold px-8 py-4 rounded-xl;
+    @apply shadow-premium hover:shadow-luxury transition-all duration-500 ease-out;
+    @apply border border-maritime-gold-400 hover:border-maritime-gold-300;
+    background: linear-gradient(135deg, #D69E2E 0%, #F6C577 100%);
+    box-shadow: 0 10px 25px rgba(214, 158, 46, 0.25);
+  }
+  
+  .btn-primary-luxury:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(214, 158, 46, 0.35);
+  }
+  
+  .btn-primary-luxury::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: all 0.6s ease;
+  }
+  
+  .btn-primary-luxury:hover::before {
+    @apply opacity-20;
+    animation: shimmer 0.6s ease;
+  }
+  
+  .btn-secondary-luxury {
+    @apply relative overflow-hidden bg-white text-maritime-deep-navy font-semibold px-8 py-4 rounded-xl;
+    @apply shadow-elegant hover:shadow-premium transition-all duration-500 ease-out;
+    @apply border border-maritime-silver hover:border-maritime-gold-300;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
+    backdrop-filter: blur(10px);
+  }
+  
+  .btn-secondary-luxury:hover {
+    transform: translateY(-2px);
+    @apply text-maritime-gold-600 border-maritime-gold-400;
+  }
+  
+  /* Premium Card Styles */
+  .card-luxury {
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-elegant;
+    @apply border border-maritime-silver/50 hover:border-maritime-gold-200;
+    @apply transition-all duration-500 ease-out hover:shadow-premium;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
+  }
+  
+  .card-luxury:hover {
+    transform: translateY(-8px);
+  }
+  
+  .card-luxury-dark {
+    @apply bg-maritime-deep-navy/90 backdrop-blur-sm rounded-2xl shadow-luxury;
+    @apply border border-maritime-royal/30 hover:border-maritime-gold-400/50;
+    @apply transition-all duration-500 ease-out;
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.95) 0%, rgba(44, 82, 130, 0.9) 100%);
+  }
+  
+  .card-luxury-dark:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 30px rgba(214, 158, 46, 0.1);
+  }
+  
+  /* Glass Morphism Effect */
+  .glass-luxury {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Premium Text Gradients */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #D69E2E 0%, #F6C577 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-gradient-ocean {
+    background: linear-gradient(135deg, #1E3A5F 0%, #3182CE 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Premium Hover Effects */
+  .hover-lift {
+    @apply transition-all duration-500 ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-5px);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(65, 153, 225, 0.4);
+  }
+  
+  .hover-gold-glow:hover {
+    box-shadow: 0 0 30px rgba(214, 158, 46, 0.4);
+  }
+}
+
+/* Premium Utilities */
+@layer utilities {
+  /* Scroll Animations */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .animate-on-scroll.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Wave Card Reveal Animations */
+  .wave-reveal-card {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .wave-reveal-card.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  
+  .wave-reveal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg, 
+      transparent, 
+      rgba(65, 153, 225, 0.1) 20%, 
+      rgba(65, 153, 225, 0.2) 50%, 
+      rgba(65, 153, 225, 0.1) 80%, 
+      transparent
+    );
+    z-index: 1;
+    pointer-events: none;
+    transition: left 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .wave-reveal-card.revealed::before {
+    left: 100%;
+  }
+  
+  /* Wave Animation Variants */
+  .wave-reveal-left {
+    opacity: 0;
+    transform: translateX(-60px) rotateY(-15deg);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .wave-reveal-left.revealed {
+    opacity: 1;
+    transform: translateX(0) rotateY(0);
+  }
+  
+  .wave-reveal-right {
+    opacity: 0;
+    transform: translateX(60px) rotateY(15deg);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .wave-reveal-right.revealed {
+    opacity: 1;
+    transform: translateX(0) rotateY(0);
+  }
+  
+  /* Wave Ripple Effect */
+  .wave-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .wave-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(
+      circle, 
+      rgba(65, 153, 225, 0.15) 0%, 
+      rgba(65, 153, 225, 0.1) 30%,
+      rgba(65, 153, 225, 0.05) 50%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .wave-ripple.ripple-active::after {
+    width: 200%;
+    height: 200%;
+  }
+  
+  /* Staggered Wave Animations */
+  .wave-stagger-1 {
+    animation-delay: 0.1s;
+  }
+  
+  .wave-stagger-2 {
+    animation-delay: 0.2s;
+  }
+  
+  .wave-stagger-3 {
+    animation-delay: 0.3s;
+  }
+  
+  .wave-stagger-4 {
+    animation-delay: 0.4s;
+  }
+  
+  .wave-stagger-5 {
+    animation-delay: 0.5s;
+  }
+  
+  /* Premium Text Shadows */
+  .text-shadow-luxury {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+  
+  .text-shadow-gold {
+    text-shadow: 0 2px 4px rgba(214, 158, 46, 0.3);
+  }
+  
+  /* Background Overlays */
+  .bg-overlay-dark {
+    background: linear-gradient(135deg, rgba(11, 20, 38, 0.8) 0%, rgba(30, 58, 95, 0.9) 100%);
+  }
+  
+  .bg-overlay-luxury {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(30, 58, 95, 0.8) 100%);
+  }
+  
+  /* Premium Borders */
+  .border-gradient-gold {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #D69E2E, #F6C577) border-box;
+  }
+  
+  /* Responsive Text Scaling */
+  .text-responsive-xl {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  
+  .text-responsive-lg {
+    font-size: clamp(1.875rem, 3.5vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Custom Scrollbar */
+  .scrollbar-luxury::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollbar-luxury::-webkit-scrollbar-track {
+    @apply bg-maritime-slate-100 rounded-full;
+  }
+  
+  .scrollbar-luxury::-webkit-scrollbar-thumb {
+    @apply bg-maritime-gold-400 rounded-full hover:bg-maritime-gold-500;
+  }
+}

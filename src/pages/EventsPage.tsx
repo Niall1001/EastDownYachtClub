@@ -1,0 +1,1370 @@
+import React, { useState } from 'react';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, Filter, ChevronDown, ChevronRight, Calendar as CalendarLucide, ChevronLeft, Sailboat, LifeBuoy, Trophy, GraduationCap, Anchor, ArrowRight, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
+const EventsPage = () => {
+  const [activeSection, setActiveSection] = useState('overview');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [calendarView, setCalendarView] = useState(false);
+  const [showMiniCalendar, setShowMiniCalendar] = useState(false);
+  const categories = ['All', 'Racing', 'Training', 'Social', 'Cruising', 'Committee'];
+  // Mock data for events
+  const upcomingEvents = [{
+    id: 1,
+    title: 'Weekend Racing Series',
+    description: 'Join us for our weekly club racing series. All classes welcome with separate starts for cruisers, dinghies, and keelboats.',
+    date: 'September 16, 2023',
+    dateObj: new Date(2023, 8, 16),
+    time: '10:00 AM - 4:00 PM',
+    location: 'Strangford Lough, Main Race Area',
+    category: 'Racing',
+    image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: true,
+    resultsUrl: 'https://hallsailing.com/results/event1',
+    isRecurring: false
+  }, {
+    id: 2,
+    title: 'Junior Sailing Program',
+    description: 'Our popular junior sailing program continues with sessions for beginners, improvers and advanced young sailors aged 8-16.',
+    date: 'September 17, 2023',
+    dateObj: new Date(2023, 8, 17),
+    time: '9:00 AM - 1:00 PM',
+    location: 'East Down YC Training Area',
+    category: 'Training',
+    image: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: false,
+    isRecurring: false
+  }, {
+    id: 3,
+    title: 'End of Summer BBQ',
+    description: 'Join us for our traditional end of summer celebration with food, drinks, live music and awards presentation for the summer series.',
+    date: 'September 23, 2023',
+    dateObj: new Date(2023, 8, 23),
+    time: '6:00 PM - 10:00 PM',
+    location: 'EDYC Clubhouse',
+    category: 'Social',
+    image: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: false,
+    isRecurring: false
+  }, {
+    id: 4,
+    title: 'Adult Improver Course',
+    description: 'A four-week course designed for adults who have some sailing experience but want to improve their skills and confidence on the water.',
+    date: 'October 1, 2023',
+    dateObj: new Date(2023, 9, 1),
+    time: '10:00 AM - 3:00 PM',
+    location: 'EDYC Training Area',
+    category: 'Training',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: false,
+    isRecurring: false
+  }, {
+    id: 5,
+    title: 'Autumn Series Racing',
+    description: 'Our popular autumn series begins with racing every Sunday. All classes welcome.',
+    date: 'October 8, 2023',
+    dateObj: new Date(2023, 9, 8),
+    time: '11:00 AM - 3:00 PM',
+    location: 'Strangford Lough, Main Race Area',
+    category: 'Racing',
+    image: 'https://images.unsplash.com/photo-1534437088728-d816f38288a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: true,
+    resultsUrl: 'https://hallsailing.com/results/event5',
+    isRecurring: false
+  }, {
+    id: 6,
+    title: 'Cruising Group Meeting',
+    description: 'Planning meeting for our winter cruising schedule. All members interested in cruising activities are welcome to attend.',
+    date: 'October 12, 2023',
+    dateObj: new Date(2023, 9, 12),
+    time: '7:30 PM - 9:00 PM',
+    location: 'EDYC Clubhouse',
+    category: 'Cruising',
+    image: 'https://images.unsplash.com/photo-1541789094913-f3809a8f3ba5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: false,
+    isRecurring: false
+  },
+  // Adding a "today" event for demonstration purposes
+  {
+    id: 7,
+    title: "Today's Club Racing",
+    description: "Join us for today's club racing event. All members welcome to participate or spectate.",
+    date: new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }),
+    dateObj: new Date(),
+    time: '2:00 PM - 5:00 PM',
+    location: 'Strangford Lough, Main Race Area',
+    category: 'Racing',
+    image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: true,
+    resultsUrl: 'https://hallsailing.com/results/today',
+    isRecurring: false
+  },
+  // Wednesday Club Racing as a recurring event
+  {
+    id: 8,
+    title: 'Wednesday Club Racing',
+    description: 'Our weekly club racing series held every Wednesday evening throughout the sailing season. All classes welcome with separate starts.',
+    date: 'Every Wednesday',
+    dateObj: null,
+    time: '6:30 PM - 9:00 PM',
+    location: 'Strangford Lough, Main Race Area',
+    category: 'Racing',
+    image: 'https://images.unsplash.com/photo-1500627965408-b5f2c5f9168a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    hasResults: true,
+    resultsUrl: 'https://hallsailing.com/results/wednesday',
+    isRecurring: true,
+    noticeOfRacePdf: '/events/wednesday-racing-nor.pdf',
+    sailingInstructionsPdf: '/events/wednesday-racing-si.pdf'
+  }];
+  const recentResults = [{
+    id: 1,
+    title: 'Summer Regatta',
+    date: 'August 15, 2023',
+    classes: [{
+      name: 'IRC Class 1',
+      results: [{
+        position: 1,
+        boat: 'Sea Wolf',
+        skipper: 'John McDowell'
+      }, {
+        position: 2,
+        boat: 'Wild Wind',
+        skipper: 'Sarah Thompson'
+      }, {
+        position: 3,
+        boat: 'Blue Horizon',
+        skipper: 'Mark Anderson'
+      }]
+    }, {
+      name: 'Cruiser Class',
+      results: [{
+        position: 1,
+        boat: 'Blue Jay',
+        skipper: 'Henderson Family'
+      }, {
+        position: 2,
+        boat: 'Serendipity',
+        skipper: 'David Wilson'
+      }, {
+        position: 3,
+        boat: 'Halcyon',
+        skipper: 'Emma Roberts'
+      }]
+    }]
+  }, {
+    id: 2,
+    title: 'Wednesday Evening Series',
+    date: 'August 9, 2023',
+    classes: [{
+      name: 'Flying Fifteen',
+      results: [{
+        position: 1,
+        boat: 'Frequent Flyer',
+        skipper: 'Robert Brown'
+      }, {
+        position: 2,
+        boat: 'Full Flight',
+        skipper: 'James Davis'
+      }, {
+        position: 3,
+        boat: 'Firefly',
+        skipper: 'Lisa Murphy'
+      }]
+    }, {
+      name: 'Laser Class',
+      results: [{
+        position: 1,
+        boat: 'Laser 209871',
+        skipper: 'Michael Johnson'
+      }, {
+        position: 2,
+        boat: 'Laser 198342',
+        skipper: 'Thomas White'
+      }, {
+        position: 3,
+        boat: 'Laser 204567',
+        skipper: 'Rebecca Green'
+      }]
+    }]
+  }];
+  const trainingPrograms = [{
+    id: 1,
+    title: 'RYA Level 1 & 2 - Start Sailing',
+    description: 'Our beginner course covers the basics of sailing, from rigging to steering and basic maneuvers.',
+    duration: '4 days',
+    nextDates: 'October 14-15 & 21-22',
+    price: '£220 members / £280 non-members',
+    image: 'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+  }, {
+    id: 2,
+    title: 'RYA Level 3 - Better Sailing',
+    description: 'For those who have completed Level 2, this course develops your skills and introduces sailing theory.',
+    duration: '2 days',
+    nextDates: 'October 28-29',
+    price: '£150 members / £190 non-members',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+  }, {
+    id: 3,
+    title: 'Junior Sailing Program',
+    description: 'Our structured program for young sailors aged 8-16, covering all aspects of dinghy sailing.',
+    duration: 'Weekly sessions',
+    nextDates: 'Every Sunday morning',
+    price: '£15 per session (members only)',
+    image: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+  }];
+  // Find today's events
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+  const todaysEvents = upcomingEvents.filter(event => {
+    if (event.isRecurring) {
+      // For recurring events, check if today is the recurring day
+      // For Wednesday Club Racing
+      return today.getDay() === 3; // 3 is Wednesday
+    } else {
+      const eventDate = new Date(event.dateObj);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate.getTime() === today.getTime();
+    }
+  });
+  // Filter events based on category and selected date
+  const filteredEvents = upcomingEvents.filter(event => {
+    const matchesCategory = activeCategory === 'All' || event.category === activeCategory;
+    if (calendarView) {
+      if (event.isRecurring) {
+        // For recurring events, check if selected date matches the recurring pattern
+        // For Wednesday Club Racing
+        const selectedDay = new Date(selectedDate).getDay();
+        return matchesCategory && selectedDay === 3; // 3 is Wednesday
+      } else if (event.dateObj) {
+        const eventDate = new Date(event.dateObj);
+        eventDate.setHours(0, 0, 0, 0);
+        const selectedDateCopy = new Date(selectedDate);
+        selectedDateCopy.setHours(0, 0, 0, 0);
+        return matchesCategory && eventDate.getTime() === selectedDateCopy.getTime();
+      }
+    }
+    return matchesCategory;
+  });
+  // Calendar functions
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+  const getFirstDayOfMonth = (year: number, month: number) => {
+    return new Date(year, month, 1).getDay();
+  };
+  const handlePrevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+  };
+  const handleNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  };
+  const renderCalendar = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDayOfMonth = getFirstDayOfMonth(year, month);
+    const monthName = currentMonth.toLocaleString('default', {
+      month: 'long'
+    });
+    // Create array of dates with events
+    const datesWithEvents = upcomingEvents.map(event => {
+      if (event.isRecurring) {
+        // For Wednesday Club Racing, mark all Wednesdays
+        return null; // We'll handle this separately
+      } else if (event.dateObj) {
+        const date = new Date(event.dateObj);
+        return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      }
+      return null;
+    }).filter(Boolean);
+    // Generate calendar grid
+    const days = [];
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      days.push(<div key={`empty-${i}`} className="h-12 border border-gray-100"></div>);
+    }
+    // Add cells for each day of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dateStr = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      // Check if this date has events
+      const hasEvent = datesWithEvents.includes(dateStr);
+      // Check if this is a Wednesday (for recurring Wednesday Club Racing)
+      const isWednesday = date.getDay() === 3;
+      const hasRecurringEvent = isWednesday;
+      const isSelected = date.getDate() === selectedDate.getDate() && date.getMonth() === selectedDate.getMonth() && date.getFullYear() === selectedDate.getFullYear();
+      const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+      days.push(<div key={day} className={`h-12 border border-gray-100 relative flex items-center justify-center cursor-pointer
+            ${hasEvent || hasRecurringEvent ? 'bg-blue-50' : ''}
+            ${isSelected ? 'bg-[#1e3a8a] text-white' : ''}
+            ${isToday && !isSelected ? 'border-2 border-[#0284c7]' : ''}
+            hover:bg-gray-50
+          `} onClick={() => {
+        if (hasEvent || hasRecurringEvent) {
+          setSelectedDate(new Date(year, month, day));
+          setCalendarView(true);
+        }
+      }}>
+          <span className="text-sm">{day}</span>
+          {(hasEvent || hasRecurringEvent) && <div className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-[#0284c7]'}`}></div>}
+        </div>);
+    }
+    return <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-[#1e3a8a]">Event Calendar</h2>
+          <div className="flex items-center">
+            <button onClick={handlePrevMonth} className="p-1 rounded-full hover:bg-gray-100">
+              <ChevronLeft size={20} />
+            </button>
+            <span className="mx-2 font-medium">
+              {monthName} {year}
+            </span>
+            <button onClick={handleNextMonth} className="p-1 rounded-full hover:bg-gray-100">
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="h-8 flex items-center justify-center font-medium text-sm text-gray-500">
+              {day}
+            </div>)}
+        </div>
+        <div className="grid grid-cols-7 gap-1">{days}</div>
+        <div className="mt-4 flex justify-between">
+          <button onClick={() => {
+          setCalendarView(false);
+          setSelectedDate(new Date());
+        }} className="text-sm text-[#0284c7] hover:text-blue-800">
+            Show all events
+          </button>
+          <div className="flex items-center text-xs text-gray-500">
+            <div className="flex items-center mr-4">
+              <div className="w-2 h-2 bg-blue-50 border border-gray-200 mr-1"></div>
+              <span>Event day</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-2 h-2 border-2 border-[#0284c7] mr-1"></div>
+              <span>Today</span>
+            </div>
+          </div>
+        </div>
+      </div>;
+  };
+  return <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+      {/* Premium Hero Section */}
+      <div className="relative bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#0284c7] text-white overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="sailing-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M10 2L18 18L2 18Z" fill="currentColor" opacity="0.3"/>
+              </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#sailing-pattern)"/>
+          </svg>
+        </div>
+        
+        <div className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-32 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Premium Badge */}
+            <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-white/20">
+              <Anchor className="w-5 h-5 mr-2" />
+              <span className="text-sm font-medium">East Down Yacht Club</span>
+            </div>
+            
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 leading-tight px-2">
+              On The <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Water</span>
+            </h1>
+            
+            <p className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 text-white/90 max-w-3xl mx-auto leading-relaxed px-4">
+              Discover racing events, training programs, and sailing opportunities at Ireland's premier yacht club
+            </p>
+            
+            {/* Premium Quick Stats with Animations */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+              <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative z-10">
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{upcomingEvents.length}</div>
+                  <div className="text-xs md:text-sm text-white/90 font-medium">Upcoming Events</div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+              </div>
+              
+              <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative z-10">
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{recentResults.length}</div>
+                  <div className="text-xs md:text-sm text-white/90 font-medium">Recent Results</div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+              </div>
+              
+              <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative z-10">
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{trainingPrograms.length}</div>
+                  <div className="text-xs md:text-sm text-white/90 font-medium">Training Programs</div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+              </div>
+              
+              <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative z-10">
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">15+</div>
+                  <div className="text-xs md:text-sm text-white/90 font-medium">Club Boats</div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Modern Wave Decoration */}
+        <div className="absolute bottom-0 left-0 right-0 h-20">
+          <svg viewBox="0 0 1440 120" className="w-full h-full" preserveAspectRatio="none">
+            <path fill="#f8fafc" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,112C1200,117,1320,107,1380,101.3L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"/>
+          </svg>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 sm:px-6 -mt-8 sm:-mt-12 relative z-20">
+        {/* Today's Events - Premium Featured Section */}
+        {todaysEvents.length > 0 && (
+          <div className="mb-12 sm:mb-16">
+            <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+              <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center">
+                    <div className="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
+                      <CalendarIcon size={20} className="text-white sm:hidden" />
+                      <CalendarIcon size={24} className="text-white hidden sm:block" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Today's Events</h2>
+                      <p className="text-sm sm:text-base text-white/80">Don't miss what's happening today</p>
+                    </div>
+                  </div>
+                  <div className="bg-white/20 rounded-full px-3 sm:px-4 py-1 sm:py-2 self-start sm:self-auto">
+                    <span className="text-white font-semibold text-sm sm:text-base">{todaysEvents.length} Event{todaysEvents.length !== 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  {todaysEvents.map(event => (
+                    <div key={`today-${event.id}`} className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3 sm:gap-0">
+                        <div className="bg-[#1e3a8a] text-white px-3 py-1 rounded-full text-sm font-medium self-start">
+                          {event.category}
+                        </div>
+                        {event.hasResults && (
+                          <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium self-start">
+                            Results Available
+                          </div>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-lg sm:text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-[#0284c7] transition-colors leading-tight">
+                        {event.title}
+                      </h3>
+                      
+                      <div className="space-y-3 mb-6">
+                        <div className="flex items-center text-gray-600">
+                          <Clock size={18} className="mr-3 text-[#0284c7] flex-shrink-0" />
+                          <span className="text-sm font-medium">{event.time}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <MapPin size={18} className="mr-3 text-[#0284c7] flex-shrink-0" />
+                          <span className="text-sm font-medium">{event.location}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Link 
+                          to={`/events/${event.id}`} 
+                          className="flex-1 bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium text-center transition-all duration-300 hover:shadow-lg min-h-[44px] flex items-center justify-center"
+                        >
+                          View Details
+                        </Link>
+                        {event.hasResults && (
+                          <a 
+                            href={event.resultsUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="bg-[#1e3a8a] hover:bg-blue-900 text-white px-4 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg min-h-[44px] flex items-center justify-center"
+                          >
+                            Results
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Premium Quick Access Cards */}
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] text-center mb-8 sm:mb-12 px-4">What Would You Like To Do?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            {/* Upcoming Events Card */}
+            <button 
+              onClick={() => setActiveSection('upcoming')} 
+              className={`group relative bg-white rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border-2 overflow-hidden ${
+                activeSection === 'upcoming' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/20 shadow-2xl' : 'border-transparent hover:border-[#0284c7]/30'
+              }`}
+            >
+              {/* Premium Background Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              {/* Animated Ripple Effect */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute top-1/2 left-1/2 w-0 h-0 bg-[#0284c7]/10 rounded-full group-hover:w-96 group-hover:h-96 group-hover:-translate-x-48 group-hover:-translate-y-48 transition-all duration-700 ease-out"></div>
+              </div>
+              
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-[#1e3a8a] to-[#0284c7] rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                  <CalendarIcon size={28} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-[#0284c7] transition-colors duration-300">Upcoming Events</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">Browse and discover upcoming sailing events, races, and social gatherings</p>
+                <div className="flex items-center justify-between">
+                  <span className="bg-gradient-to-r from-blue-100 to-blue-200 text-[#0284c7] px-4 py-2 rounded-full text-sm font-semibold shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                    {upcomingEvents.length} events
+                  </span>
+                  <div className="flex items-center text-[#0284c7] group-hover:text-[#1e3a8a] transition-colors duration-300">
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                  </div>
+                </div>
+              </div>
+            </button>
+            
+            {/* Race Results Card */}
+            <button 
+              onClick={() => setActiveSection('results')} 
+              className={`group relative bg-white rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border-2 overflow-hidden ${
+                activeSection === 'results' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/20 shadow-2xl' : 'border-transparent hover:border-[#0284c7]/30'
+              }`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/50 to-orange-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute top-1/2 left-1/2 w-0 h-0 bg-yellow-400/10 rounded-full group-hover:w-96 group-hover:h-96 group-hover:-translate-x-48 group-hover:-translate-y-48 transition-all duration-700 ease-out"></div>
+              </div>
+              
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                  <Trophy size={28} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-yellow-600 transition-colors duration-300">Race Results</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">View recent race results and performance statistics from our competitions</p>
+                <div className="flex items-center justify-between">
+                  <span className="bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                    {recentResults.length} recent
+                  </span>
+                  <div className="flex items-center text-[#0284c7] group-hover:text-yellow-600 transition-colors duration-300">
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                  </div>
+                </div>
+              </div>
+            </button>
+            
+            {/* Training Programs Card */}
+            <button 
+              onClick={() => setActiveSection('training')} 
+              className={`group relative bg-white rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border-2 overflow-hidden ${
+                activeSection === 'training' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/20 shadow-2xl' : 'border-transparent hover:border-[#0284c7]/30'
+              }`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-emerald-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute top-1/2 left-1/2 w-0 h-0 bg-green-400/10 rounded-full group-hover:w-96 group-hover:h-96 group-hover:-translate-x-48 group-hover:-translate-y-48 transition-all duration-700 ease-out"></div>
+              </div>
+              
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                  <GraduationCap size={28} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-green-600 transition-colors duration-300">Training Programs</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">Discover RYA-certified courses and improve your sailing skills with expert instruction</p>
+                <div className="flex items-center justify-between">
+                  <span className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                    {trainingPrograms.length} courses
+                  </span>
+                  <div className="flex items-center text-[#0284c7] group-hover:text-green-600 transition-colors duration-300">
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                  </div>
+                </div>
+              </div>
+            </button>
+            
+            {/* Book Boats Card */}
+            <button 
+              onClick={() => setActiveSection('booking')} 
+              className={`group relative bg-white rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border-2 overflow-hidden ${
+                activeSection === 'booking' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/20 shadow-2xl' : 'border-transparent hover:border-[#0284c7]/30'
+              }`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute top-1/2 left-1/2 w-0 h-0 bg-purple-400/10 rounded-full group-hover:w-96 group-hover:h-96 group-hover:-translate-x-48 group-hover:-translate-y-48 transition-all duration-700 ease-out"></div>
+              </div>
+              
+              <div className="relative z-10">
+                <div className="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                  <Sailboat size={28} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-purple-600 transition-colors duration-300">Book Club Boats</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">Reserve club boats for training, practice, or recreational sailing adventures</p>
+                <div className="flex items-center justify-between">
+                  <span className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                    15+ boats
+                  </span>
+                  <div className="flex items-center text-[#0284c7] group-hover:text-purple-600 transition-colors duration-300">
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+        
+        {/* Overview Section - Default Landing */}
+        {activeSection === 'overview' && (
+          <div className="space-y-8 animate-in fade-in-50 duration-500">
+            {/* Quick Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+                <div className="bg-[#0284c7] rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <CalendarIcon size={24} className="text-white" />
+                </div>
+                <div className="text-2xl font-bold text-[#1e3a8a]">{upcomingEvents.length}</div>
+                <div className="text-sm text-gray-600">Upcoming Events</div>
+              </div>
+              <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+                <div className="bg-yellow-500 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <Trophy size={24} className="text-white" />
+                </div>
+                <div className="text-2xl font-bold text-[#1e3a8a]">{recentResults.length}</div>
+                <div className="text-sm text-gray-600">Recent Results</div>
+              </div>
+              <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+                <div className="bg-green-500 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <GraduationCap size={24} className="text-white" />
+                </div>
+                <div className="text-2xl font-bold text-[#1e3a8a]">{trainingPrograms.length}</div>
+                <div className="text-sm text-gray-600">Training Courses</div>
+              </div>
+              <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+                <div className="bg-purple-500 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <Sailboat size={24} className="text-white" />
+                </div>
+                <div className="text-2xl font-bold text-[#1e3a8a]">15+</div>
+                <div className="text-sm text-gray-600">Club Boats</div>
+              </div>
+            </div>
+            
+            {/* Next Few Events Preview */}
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <h3 className="text-2xl font-bold text-[#1e3a8a] mb-6">Coming Up Next</h3>
+              <div className="space-y-4">
+                {upcomingEvents.slice(0, 3).map(event => (
+                  <div key={event.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                    <div className="bg-[#0284c7] rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                      <CalendarIcon size={20} className="text-white" />
+                    </div>
+                    <div className="flex-grow">
+                      <h4 className="font-semibold text-[#1e3a8a]">{event.title}</h4>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-1">
+                        <span>{event.date}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>{event.time}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>{event.category}</span>
+                      </div>
+                    </div>
+                    <Link 
+                      to={`/events/${event.id}`} 
+                      className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors self-start sm:self-auto"
+                    >
+                      Details
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center mt-6">
+                <button 
+                  onClick={() => setActiveSection('upcoming')} 
+                  className="bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                >
+                  View All Events
+                </button>
+              </div>
+            </div>
+            
+            {/* Call to Action */}
+            <div className="text-center mt-16">
+              <h3 className="text-2xl font-bold text-[#1e3a8a] mb-4">Ready to Get On The Water?</h3>
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                Whether you're looking to race, learn, or simply enjoy time on the water, East Down Yacht Club has something for every sailor.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <button 
+                  onClick={() => setActiveSection('upcoming')} 
+                  className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                >
+                  Browse Events
+                </button>
+                <button 
+                  onClick={() => setActiveSection('training')} 
+                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                >
+                  Start Learning
+                </button>
+                <button 
+                  onClick={() => setActiveSection('booking')} 
+                  className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                >
+                  Book a Boat
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Section Header with Back Button */}
+        {activeSection !== 'overview' && (
+          <div className="flex items-center gap-4 mb-6 sm:mb-8">
+            <button 
+              onClick={() => setActiveSection('overview')} 
+              className="flex items-center gap-2 text-[#0284c7] hover:text-blue-700 font-medium transition-colors py-2 px-1 -ml-1 min-h-[44px]"
+            >
+              <ChevronLeft size={20} className="flex-shrink-0" />
+              <span className="text-sm sm:text-base">Back to Overview</span>
+            </button>
+          </div>
+        )}
+        
+        {/* Upcoming Events Section */}
+        {activeSection === 'upcoming' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a] mb-2">Upcoming Events</h2>
+                <p className="text-sm sm:text-base text-gray-600">Discover what's coming up at the club</p>
+              </div>
+              
+              {/* Premium Calendar Toggle */}
+              <div className="flex flex-col sm:flex-row gap-3 self-start sm:self-auto">
+                <button 
+                  onClick={() => setShowMiniCalendar(!showMiniCalendar)} 
+                  className={`group flex items-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 ${
+                    showMiniCalendar 
+                      ? 'bg-gradient-to-r from-[#0284c7] to-[#1e3a8a] text-white' 
+                      : 'bg-gradient-to-r from-gray-100 to-gray-200 text-[#1e3a8a] hover:from-blue-50 hover:to-indigo-50'
+                  }`}
+                >
+                  <div className={`rounded-full p-1 ${showMiniCalendar ? 'bg-white/20' : 'bg-[#0284c7]/10'} group-hover:scale-110 transition-transform duration-300`}>
+                    <CalendarIcon size={18} className={showMiniCalendar ? 'text-white' : 'text-[#0284c7]'} />
+                  </div>
+                  <span>{showMiniCalendar ? 'Hide Calendar' : 'Show Calendar'}</span>
+                </button>
+                
+                {/* View Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                  <button 
+                    onClick={() => setCalendarView(false)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                      !calendarView 
+                        ? 'bg-white text-[#1e3a8a] shadow-sm' 
+                        : 'text-gray-600 hover:text-[#1e3a8a]'
+                    }`}
+                  >
+                    All Events
+                  </button>
+                  <button 
+                    onClick={() => setCalendarView(true)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                      calendarView 
+                        ? 'bg-white text-[#1e3a8a] shadow-sm' 
+                        : 'text-gray-600 hover:text-[#1e3a8a]'
+                    }`}
+                  >
+                    By Date
+                  </button>
+                </div>
+              </div>
+            </div>
+            {/* Premium Mini Calendar - Only show when requested */}
+            {showMiniCalendar && (
+              <div className="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-lg animate-in slide-in-from-top-4 duration-500">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50">
+                  {renderCalendar()}
+                </div>
+              </div>
+            )}
+            {/* Filter Bar */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center">
+                <button onClick={() => setShowFilters(!showFilters)} className="flex items-center text-sm font-medium text-gray-600 hover:text-[#1e3a8a]">
+                  <Filter size={16} className="mr-2" />
+                  Filter Events
+                  <ChevronDown size={16} className={`ml-1 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                </button>
+                <div className="flex items-center">
+                  <button onClick={() => setCalendarView(!calendarView)} className={`flex items-center text-sm font-medium ${calendarView ? 'text-[#1e3a8a]' : 'text-gray-600 hover:text-[#1e3a8a]'}`}>
+                    {calendarView ? 'Filtered by date' : 'All upcoming events'}
+                  </button>
+                </div>
+              </div>
+              {showFilters && <div className="flex flex-wrap gap-2 mt-4">
+                  {categories.map(category => <button key={category} onClick={() => setActiveCategory(category)} className={`px-3 py-1 rounded-full text-sm ${activeCategory === category ? 'bg-[#1e3a8a] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                      {category}
+                    </button>)}
+                </div>}
+            </div>
+            {calendarView && filteredEvents.length === 0 ? <div className="text-center py-12">
+                <CalendarLucide size={48} className="mx-auto text-gray-300 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  No events on this day
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  There are no events scheduled for the selected date.
+                </p>
+                <button onClick={() => setCalendarView(false)} className="text-[#0284c7] font-medium hover:text-blue-700">
+                  View all upcoming events
+                </button>
+              </div> : <>
+                {/* Featured Event - Premium Design */}
+                {filteredEvents.length > 0 && (
+                  <div className="mb-12">
+                    <div className="flex items-center gap-3 mb-8">
+                      <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] rounded-full p-2">
+                        <Star size={20} className="text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-[#1e3a8a]">
+                        {calendarView ? 'Events on Selected Date' : 'Featured Event'}
+                      </h3>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl overflow-hidden border border-white/50">
+                      <div className="lg:flex">
+                        <div className="lg:w-1/2 relative">
+                          <img 
+                            src={filteredEvents[0]?.image} 
+                            alt={filteredEvents[0]?.title} 
+                            className="w-full h-80 lg:h-full object-cover" 
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                          <div className="absolute top-4 left-4">
+                            <span className="bg-[#1e3a8a] text-white px-3 py-1 rounded-full text-sm font-medium">
+                              {filteredEvents[0]?.category}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="lg:w-1/2 p-8 lg:p-10">
+                          <h4 className="text-3xl font-bold text-[#1e3a8a] mb-4 leading-tight">
+                            {filteredEvents[0]?.title}
+                          </h4>
+                          
+                          <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+                            {filteredEvents[0]?.description}
+                          </p>
+                          
+                          <div className="space-y-4 mb-8">
+                            <div className="flex items-center text-gray-700">
+                              <div className="bg-[#0284c7] rounded-full p-2 mr-3">
+                                <CalendarIcon size={16} className="text-white" />
+                              </div>
+                              <span className="font-medium">
+                                {filteredEvents[0]?.isRecurring ? filteredEvents[0]?.date : filteredEvents[0]?.date}
+                              </span>
+                            </div>
+                            <div className="flex items-center text-gray-700">
+                              <div className="bg-[#0284c7] rounded-full p-2 mr-3">
+                                <Clock size={16} className="text-white" />
+                              </div>
+                              <span className="font-medium">{filteredEvents[0]?.time}</span>
+                            </div>
+                            <div className="flex items-center text-gray-700">
+                              <div className="bg-[#0284c7] rounded-full p-2 mr-3">
+                                <MapPin size={16} className="text-white" />
+                              </div>
+                              <span className="font-medium">{filteredEvents[0]?.location}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-4">
+                            <Link 
+                              to={`/events/${filteredEvents[0]?.id}`} 
+                              className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                            >
+                              View Event Details
+                            </Link>
+                            {filteredEvents[0]?.hasResults && (
+                              <a 
+                                href={filteredEvents[0]?.resultsUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                              >
+                                View Results
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {/* Premium Events Grid */}
+                {filteredEvents.length > 1 && (
+                  <div>
+                    <h3 className="text-2xl font-bold text-[#1e3a8a] mb-8">More Upcoming Events</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+                      {filteredEvents.slice(1).map(event => (
+                        <div 
+                          key={event.id} 
+                          className="group relative bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 cursor-pointer"
+                        >
+                          {/* Premium Background Effect */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-indigo-50/0 group-hover:from-blue-50/30 group-hover:to-indigo-50/30 transition-all duration-500 rounded-3xl"></div>
+                          
+                          <div className="relative overflow-hidden rounded-t-3xl">
+                            <img 
+                              src={event.image} 
+                              alt={event.title} 
+                              className="w-full h-56 object-cover group-hover:scale-110 transition-all duration-700 ease-out" 
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent group-hover:from-black/50 transition-all duration-500" />
+                            
+                            {/* Category Badge */}
+                            <div className="absolute top-4 right-4 transform group-hover:scale-110 transition-transform duration-300">
+                              <span className="bg-[#1e3a8a]/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                                {event.category}
+                              </span>
+                            </div>
+                            
+                            {/* Results Badge */}
+                            {event.hasResults && (
+                              <div className="absolute top-4 left-4 transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+                                <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center">
+                                  <Trophy size={12} className="mr-1" />
+                                  Results Available
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* Hover Overlay */}
+                            <div className="absolute inset-0 bg-[#0284c7]/0 group-hover:bg-[#0284c7]/10 transition-all duration-500"></div>
+                          </div>
+                          
+                          <div className="relative p-6 md:p-8">
+                            <h4 className="text-xl font-bold text-[#1e3a8a] mb-4 group-hover:text-[#0284c7] transition-colors duration-300">
+                              {event.title}
+                            </h4>
+                            
+                            <div className="space-y-3 mb-6">
+                              <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                                <div className="bg-[#0284c7]/10 rounded-full p-2 mr-3 group-hover:bg-[#0284c7]/20 group-hover:scale-110 transition-all duration-300">
+                                  <CalendarIcon size={14} className="text-[#0284c7]" />
+                                </div>
+                                <span className="text-sm font-medium">
+                                  {event.isRecurring ? event.date : event.date}
+                                </span>
+                              </div>
+                              <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                                <div className="bg-[#0284c7]/10 rounded-full p-2 mr-3 group-hover:bg-[#0284c7]/20 group-hover:scale-110 transition-all duration-300">
+                                  <Clock size={14} className="text-[#0284c7]" />
+                                </div>
+                                <span className="text-sm font-medium">{event.time}</span>
+                              </div>
+                              <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                                <div className="bg-[#0284c7]/10 rounded-full p-2 mr-3 group-hover:bg-[#0284c7]/20 group-hover:scale-110 transition-all duration-300">
+                                  <MapPin size={14} className="text-[#0284c7]" />
+                                </div>
+                                <span className="text-sm font-medium">{event.location}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex gap-3">
+                              <Link 
+                                to={`/events/${event.id}`} 
+                                className="flex-1 bg-gradient-to-r from-[#0284c7] to-[#0369a1] hover:from-[#0369a1] hover:to-[#1e40af] text-white px-4 py-3 rounded-xl font-semibold text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group-hover:scale-105"
+                              >
+                                View Details
+                              </Link>
+                              {event.hasResults && (
+                                <a 
+                                  href={event.resultsUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] hover:from-[#1e40af] hover:to-[#3730a3] text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group-hover:scale-105 flex items-center"
+                                >
+                                  <Trophy size={16} className="mr-1" />
+                                  Results
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Subtle glow effect on hover */}
+                          <div className="absolute -inset-1 bg-gradient-to-r from-[#0284c7]/0 via-[#0284c7]/0 to-[#0284c7]/0 group-hover:from-[#0284c7]/20 group-hover:via-[#0284c7]/10 group-hover:to-[#0284c7]/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>}
+            {/* Premium Calendar Download */}
+            <div className="mt-12 bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] rounded-2xl p-8 text-center text-white">
+              <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                <CalendarIcon size={28} className="text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3">
+                Never Miss an Event
+              </h3>
+              <p className="mb-6 text-white/90 max-w-md mx-auto">
+                Download our complete event calendar and sync it with your personal calendar app
+              </p>
+              <button className="bg-white hover:bg-gray-100 text-[#1e3a8a] px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 inline-flex items-center">
+                <CalendarIcon size={20} className="mr-2" />
+                Download Calendar
+              </button>
+            </div>
+          </div>}
+        {/* Race Results Section */}
+        {activeSection === 'results' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full p-3">
+                <Trophy size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-[#1e3a8a] mb-1">Race Results</h2>
+                <p className="text-gray-600">View recent race results and performance statistics</p>
+              </div>
+            </div>
+            <div className="space-y-8">
+              {recentResults.map(event => <div key={event.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="bg-[#1e3a8a]/10 p-4 border-b border-gray-200">
+                    <h3 className="text-xl font-semibold text-[#1e3a8a]">
+                      {event.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm">{event.date}</p>
+                  </div>
+                  <div className="p-4">
+                    {event.classes.map((classItem, index) => <div key={index} className="mb-6 last:mb-0">
+                        <h4 className="font-semibold text-lg text-[#0284c7] mb-3">
+                          {classItem.name}
+                        </h4>
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full">
+                            <thead>
+                              <tr className="bg-gray-50">
+                                <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Position
+                                </th>
+                                <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Boat
+                                </th>
+                                <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Skipper
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {classItem.results.map((result, i) => <tr key={i} className={i === 0 ? 'bg-yellow-50' : ''}>
+                                  <td className="py-3 px-4 whitespace-nowrap">
+                                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full ${i === 0 ? 'bg-yellow-100 text-yellow-800' : i === 1 ? 'bg-gray-100 text-gray-800' : i === 2 ? 'bg-orange-100 text-orange-800' : 'bg-white text-gray-800 border border-gray-200'}`}>
+                                      {result.position}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-4 whitespace-nowrap font-medium">
+                                    {result.boat}
+                                  </td>
+                                  <td className="py-3 px-4 whitespace-nowrap">
+                                    {result.skipper}
+                                  </td>
+                                </tr>)}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>)}
+                  </div>
+                  <div className="bg-gray-50 p-4 border-t border-gray-200 text-right">
+                    <Link to={`/results/${event.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
+                      View Full Results
+                      <ChevronRight size={16} className="ml-1" />
+                    </Link>
+                  </div>
+                </div>)}
+            </div>
+            {/* Hall Sailing Integration */}
+            <div className="mt-12 bg-blue-50 rounded-lg p-6 border border-blue-100">
+              <div className="md:flex items-center justify-between">
+                <div className="md:w-3/4 mb-4 md:mb-0 md:pr-6">
+                  <h3 className="text-xl font-semibold text-[#1e3a8a] mb-2">
+                    Hall Sailing Results
+                  </h3>
+                  <p className="text-gray-600">
+                    View comprehensive race results, statistics, and performance
+                    analysis for all East Down Yacht Club events through our
+                    Hall Sailing integration.
+                  </p>
+                </div>
+                <div className="md:w-1/4 text-center">
+                  <a href="https://hallsailing.com/club/eastdownyc" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-4 py-2 rounded transition-colors">
+                    View All Results
+                  </a>
+                </div>
+              </div>
+            </div>
+            {/* Results Archive */}
+            <div className="mt-12 text-center">
+              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-4">
+                Looking for older results?
+              </h3>
+              <Link to="/results/archive" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded transition-colors">
+                Visit Our Results Archive
+              </Link>
+            </div>
+          </div>}
+        {/* Training Programs Section */}
+        {activeSection === 'training' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-3">
+                <GraduationCap size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-[#1e3a8a] mb-1">Training Programs</h2>
+                <p className="text-gray-600">RYA-certified courses for all ages and skill levels</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+              {trainingPrograms.map(program => (
+                <div key={program.id} className="group bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg border border-green-100 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={program.image} 
+                      alt={program.title} 
+                      className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        RYA Certified
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-green-700 transition-colors">
+                      {program.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 leading-relaxed">{program.description}</p>
+                    
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center">
+                        <Clock size={16} className="mr-3 text-green-500" />
+                        <div>
+                          <span className="font-medium text-gray-700 text-sm">Duration: </span>
+                          <span className="text-gray-600 text-sm">{program.duration}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <CalendarIcon size={16} className="mr-3 text-green-500" />
+                        <div>
+                          <span className="font-medium text-gray-700 text-sm">Next Dates: </span>
+                          <span className="text-gray-600 text-sm">{program.nextDates}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <Users size={16} className="mr-3 text-green-500" />
+                        <div>
+                          <span className="font-medium text-gray-700 text-sm">Price: </span>
+                          <span className="text-green-700 font-semibold text-sm">{program.price}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Link 
+                      to={`/training/${program.id}`} 
+                      className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-xl font-semibold text-center block shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    >
+                      Enroll Now
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Training Information */}
+            <div className="bg-blue-50 rounded-lg p-6 border border-blue-100">
+              <div className="md:flex items-center">
+                <div className="md:w-3/4 mb-4 md:mb-0 md:pr-6">
+                  <h3 className="text-xl font-semibold text-[#1e3a8a] mb-2">
+                    Become an RYA Instructor
+                  </h3>
+                  <p className="text-gray-600">
+                    East Down Yacht Club also offers instructor training courses
+                    for those looking to take their sailing to the next level.
+                    Our instructor development program provides a pathway to
+                    becoming a qualified RYA instructor.
+                  </p>
+                </div>
+                <div className="md:w-1/4 text-center">
+                  <Link to="/training/instructor" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-4 py-2 rounded transition-colors">
+                    Learn More
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>}
+        {/* Book Club Boats Section */}
+        {activeSection === 'booking' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-3">
+                <Sailboat size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-[#1e3a8a] mb-1">Book Club Boats</h2>
+                <p className="text-gray-600">Reserve club boats for training, practice, and recreational sailing</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+              <div className="md:flex">
+                <div className="md:w-1/2">
+                  <img src="https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Club boats" className="w-full h-64 md:h-full object-cover" />
+                </div>
+                <div className="md:w-1/2 p-6 md:p-8">
+                  <h3 className="text-2xl font-bold text-[#1e3a8a] mb-4">
+                    Book Online with PlainSailing
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    We've partnered with PlainSailing to provide an easy-to-use
+                    online booking system for our club boats. The system allows
+                    you to check availability, make reservations, and manage
+                    your bookings.
+                  </p>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start">
+                      <Sailboat size={18} className="mr-2 text-[#0284c7] mt-1 flex-shrink-0" />
+                      <span className="text-gray-600">
+                        View our fleet of available boats
+                      </span>
+                    </div>
+                    <div className="flex items-start">
+                      <CalendarIcon size={18} className="mr-2 text-[#0284c7] mt-1 flex-shrink-0" />
+                      <span className="text-gray-600">
+                        Check real-time availability
+                      </span>
+                    </div>
+                    <div className="flex items-start">
+                      <LifeBuoy size={18} className="mr-2 text-[#0284c7] mt-1 flex-shrink-0" />
+                      <span className="text-gray-600">
+                        Book safety boats for events
+                      </span>
+                    </div>
+                  </div>
+                  <a href="https://www.itsplainsailing.com/org/edyc" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-3 rounded transition-colors">
+                    Book Now
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h3 className="font-semibold text-lg text-[#1e3a8a] mb-3">
+                  Available Fleet
+                </h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>RS Quests (4)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Laser/ILCA Dinghies (3)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Toppers (6)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Safety RIBs (2)</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h3 className="font-semibold text-lg text-[#1e3a8a] mb-3">
+                  Booking Requirements
+                </h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Club membership required</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Appropriate qualification for boat type</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Safety briefing completion</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Booking at least 24 hours in advance</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h3 className="font-semibold text-lg text-[#1e3a8a] mb-3">
+                  Rental Fees
+                </h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Half day: £15 - £25</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Full day: £25 - £40</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Weekend: £45 - £70</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-[#0284c7] mr-2">•</span>
+                    <span>Training boats: Discounted rates</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 text-center">
+              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+                Need Help?
+              </h3>
+              <p className="text-gray-600 mb-4">
+                If you have any questions about boat bookings or need
+                assistance, please contact our Boat Officer.
+              </p>
+              <a href="mailto:boats@eastdownyc.co.uk" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-4 py-2 rounded transition-colors">
+                Contact Boat Officer
+              </a>
+            </div>
+          </div>}
+      </div>
+    </div>;
+};
+export default EventsPage;
