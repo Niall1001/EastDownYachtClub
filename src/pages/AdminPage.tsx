@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, X, Eye, Calendar, User, ArrowLeft, MapPin, Clock, Sailboat, FileText, Trophy, Wind, Thermometer, Users, Trash2, Edit, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Save, X, Eye, Calendar, User, ArrowLeft, MapPin, Clock, Sailboat, FileText, Trophy, Trash2, Edit } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Story {
@@ -11,6 +11,14 @@ interface Story {
   category: string;
   date: string;
   image: string;
+}
+
+interface BoatEntry {
+  id: string;
+  boat: string;
+  skipper: string;
+  sailNumber: string;
+  class: string;
 }
 
 interface Event {
@@ -28,57 +36,50 @@ interface Event {
   isRecurring: boolean;
   noticeOfRacePdf?: string;
   sailingInstructionsPdf?: string;
+  boatEntries: BoatEntry[];
 }
 
 // Race Results interfaces (matching RaceResultsPage)
 interface RaceResult {
-  position: number;
   boat: string;
   skipper: string;
   sailNumber?: string;
-  points?: number;
   finishTime?: string;
   correctedTime?: string;
+  dnf: boolean;
   note?: string;
 }
 
 interface RaceClass {
   name: string;
   results: RaceResult[];
-  startTime?: string;
-  course?: string;
-  distance?: number;
-  finishers?: number;
 }
 
-interface WeatherConditions {
-  windSpeed: number;
-  windDirection: string;
-  temperature: number;
-  visibility: string;
-  conditions: string;
-}
 
 interface RaceResultEvent {
   id: number;
-  title: string;
   date: string;
-  location: string;
-  eventId: number; // Links back to the original event
-  classes: RaceClass[];
-  weather?: WeatherConditions;
   organizer: string;
   officer?: string;
-  startTime: string;
-  participants: number;
-  type: 'Championship' | 'Series' | 'Fun Race' | 'Regatta';
-  status: 'Completed' | 'Provisional' | 'Cancelled' | 'Postponed';
+  classes: RaceClass[];
   documents?: {
     results?: string;
     photos?: string;
     report?: string;
   };
 }
+
+// Predefined sailing classes for consistent classification across the application
+const SAILING_CLASSES = [
+  'IRC Class 1',
+  'IRC Class 2', 
+  'IRC Class 3',
+  'Cruiser Class',
+  'Dinghy Class',
+  'Multihull Class',
+  'Classic Class',
+  'J24 Class'
+];
 
 const AdminPage = () => {
   const { user } = useAuth();
@@ -112,14 +113,60 @@ const AdminPage = () => {
     }
   ]);
 
-  // Load race results from localStorage
+  // Load race results from localStorage with migration
   const loadRaceResults = (): RaceResultEvent[] => {
     try {
       const stored = localStorage.getItem('adminRaceResults');
-      return stored ? JSON.parse(stored) : [];
+      if (!stored) return [];
+      
+      const results = JSON.parse(stored);
+      
+      // Migrate old race results format
+      return results.map((result: any) => ({
+        ...result,
+        classes: result.classes.map((raceClass: any) => ({
+          ...raceClass,
+          results: raceClass.results.map((raceResult: any) => ({
+            boat: raceResult.boat || '',
+            skipper: raceResult.skipper || '',
+            sailNumber: raceResult.sailNumber || '',
+            finishTime: raceResult.finishTime || '',
+            correctedTime: raceResult.correctedTime || '',
+            dnf: raceResult.dnf !== undefined ? raceResult.dnf : false,
+            note: raceResult.note || ''
+          }))
+        }))
+      }));
     } catch (error) {
       console.error('Error loading race results:', error);
       return [];
+    }
+  };
+
+  // Load events from localStorage with migration
+  const loadEvents = (): Event[] => {
+    try {
+      const stored = localStorage.getItem('adminEvents');
+      if (!stored) return [];
+      
+      const events = JSON.parse(stored);
+      
+      // Migrate old event format
+      return events.map((event: any) => ({
+        ...event,
+        boatEntries: event.boatEntries || []
+      }));
+    } catch (error) {
+      console.error('Error loading events:', error);
+      return [];
+    }
+  };
+
+  const saveEvents = (events: Event[]) => {
+    try {
+      localStorage.setItem('adminEvents', JSON.stringify(events));
+    } catch (error) {
+      console.error('Error saving events:', error);
     }
   };
 
@@ -134,41 +181,128 @@ const AdminPage = () => {
   // Race results state
   const [raceResults, setRaceResults] = useState<RaceResultEvent[]>(loadRaceResults);
 
-  // Events state
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: 1,
-      title: 'Weekend Racing Series',
-      description: 'Join us for our weekly club racing series. All classes welcome with separate starts for cruisers, dinghies, and keelboats.',
-      date: 'September 16, 2023',
-      dateObj: new Date(2023, 8, 16),
-      time: '10:00 AM - 4:00 PM',
-      location: 'Strangford Lough, Main Race Area',
-      category: 'Racing',
-      image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-      hasResults: true,
-      resultsUrl: 'https://hallsailing.com/results/event1',
-      isRecurring: false
-    },
-    {
-      id: 2,
-      title: 'Junior Sailing Program',
-      description: 'Our popular junior sailing program continues with sessions for beginners, improvers and advanced young sailors aged 8-16.',
-      date: 'September 17, 2023',
-      dateObj: new Date(2023, 8, 17),
-      time: '9:00 AM - 1:00 PM',
-      location: 'East Down YC Training Area',
-      category: 'Training',
-      image: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-      hasResults: false,
-      isRecurring: false
+  // Initialize events from localStorage or use default
+  const initializeEvents = (): Event[] => {
+    const storedEvents = loadEvents();
+    if (storedEvents.length > 0) {
+      return storedEvents;
     }
-  ]);
+    
+    // Default events with comprehensive dummy data
+    return [
+      {
+        id: 1,
+        title: 'Strangford Lough Championship',
+        description: 'Annual championship race featuring multiple classes. Premium racing event with IRC rated boats, cruisers, and dinghies competing across Strangford Lough.',
+        date: 'August 15, 2024',
+        dateObj: new Date(2024, 7, 15),
+        time: '10:00 AM - 5:00 PM',
+        location: 'Strangford Lough, Main Race Area',
+        category: 'Racing',
+        image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        hasResults: true,
+        resultsUrl: 'https://hallsailing.com/results/event1',
+        isRecurring: false,
+        boatEntries: [
+          // IRC Class 1
+          { id: '1', boat: 'Storm Petrel', skipper: 'James Morrison', sailNumber: 'IRL4217', class: 'IRC Class 1' },
+          { id: '2', boat: 'Checkmate', skipper: 'Sarah Thompson', sailNumber: 'IRL3845', class: 'IRC Class 1' },
+          { id: '3', boat: 'Wild Spirit', skipper: 'Michael O\'Brien', sailNumber: 'IRL5621', class: 'IRC Class 1' },
+          { id: '4', boat: 'Artemis', skipper: 'David Wilson', sailNumber: 'IRL2978', class: 'IRC Class 1' },
+          
+          // IRC Class 2
+          { id: '5', boat: 'Sea Dreams', skipper: 'Emma Clarke', sailNumber: 'IRL1234', class: 'IRC Class 2' },
+          { id: '6', boat: 'Celtic Warrior', skipper: 'Patrick Kelly', sailNumber: 'IRL5678', class: 'IRC Class 2' },
+          { id: '7', boat: 'Northern Light', skipper: 'Rachel Hughes', sailNumber: 'IRL9012', class: 'IRC Class 2' },
+          { id: '8', boat: 'Maverick', skipper: 'Thomas Reid', sailNumber: 'IRL3456', class: 'IRC Class 2' },
+          { id: '9', boat: 'Windchaser', skipper: 'Jennifer Adams', sailNumber: 'IRL7890', class: 'IRC Class 2' },
+          
+          // Cruiser Class
+          { id: '10', boat: 'Morning Mist', skipper: 'Robert Anderson', sailNumber: 'IRL246', class: 'Cruiser Class' },
+          { id: '11', boat: 'Serendipity', skipper: 'Catherine Murphy', sailNumber: 'IRL135', class: 'Cruiser Class' },
+          { id: '12', boat: 'Blue Horizon', skipper: 'Mark Stewart', sailNumber: 'IRL579', class: 'Cruiser Class' },
+          { id: '13', boat: 'Ocean Breeze', skipper: 'Lisa Campbell', sailNumber: 'IRL864', class: 'Cruiser Class' }
+        ]
+      },
+      {
+        id: 2,
+        title: 'Wednesday Evening Series',
+        description: 'Weekly club racing series every Wednesday evening. Mixed fleet racing with handicap starts for all classes.',
+        date: 'Every Wednesday',
+        dateObj: null,
+        time: '6:30 PM - 9:00 PM',
+        location: 'Strangford Lough, Club Waters',
+        category: 'Racing',
+        image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        hasResults: false,
+        isRecurring: true,
+        boatEntries: [
+          // IRC Class 2
+          { id: '14', boat: 'Seaspray', skipper: 'Alan Foster', sailNumber: 'IRL4321', class: 'IRC Class 2' },
+          { id: '15', boat: 'Mistral', skipper: 'Helen Douglas', sailNumber: 'IRL8765', class: 'IRC Class 2' },
+          
+          // Cruiser Class  
+          { id: '16', boat: 'Fair Winds', skipper: 'George Patterson', sailNumber: 'IRL975', class: 'Cruiser Class' },
+          { id: '17', boat: 'Tranquility', skipper: 'Mary O\'Connor', sailNumber: 'IRL531', class: 'Cruiser Class' },
+          { id: '18', boat: 'Starlight', skipper: 'Kevin Brady', sailNumber: 'IRL642', class: 'Cruiser Class' },
+          
+          // Dinghy Class
+          { id: '19', boat: 'Lightning', skipper: 'Sophie Turner', sailNumber: '14257', class: 'Dinghy Class' },
+          { id: '20', boat: 'Quicksilver', skipper: 'Jamie Collins', sailNumber: '16834', class: 'Dinghy Class' },
+          { id: '21', boat: 'Zephyr', skipper: 'Alex Murray', sailNumber: '19246', class: 'Dinghy Class' }
+        ]
+      },
+      {
+        id: 3,
+        title: 'Junior Sailing Program',
+        description: 'Our popular junior sailing program continues with sessions for beginners, improvers and advanced young sailors aged 8-16.',
+        date: 'September 17, 2024',
+        dateObj: new Date(2024, 8, 17),
+        time: '9:00 AM - 1:00 PM',
+        location: 'East Down YC Training Area',
+        category: 'Training',
+        image: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        hasResults: false,
+        isRecurring: false,
+        boatEntries: []
+      },
+      {
+        id: 4,
+        title: 'Classic Yacht Regatta',
+        description: 'Special regatta for classic and vintage yachts. A celebration of traditional sailing with boats built before 1975.',
+        date: 'July 20, 2024',
+        dateObj: new Date(2024, 6, 20),
+        time: '11:00 AM - 6:00 PM',
+        location: 'Strangford Lough, Heritage Waters',
+        category: 'Racing',
+        image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        hasResults: true,
+        resultsUrl: 'https://hallsailing.com/results/classic2024',
+        isRecurring: false,
+        boatEntries: [
+          // Classic Class
+          { id: '22', boat: 'Shamrock', skipper: 'Declan O\'Sullivan', sailNumber: 'IRL1947', class: 'Classic Class' },
+          { id: '23', boat: 'Erin\'s Dream', skipper: 'Brendan Fitzgerald', sailNumber: 'IRL1962', class: 'Classic Class' },
+          { id: '24', boat: 'Heritage', skipper: 'Norah McBride', sailNumber: 'IRL1955', class: 'Classic Class' },
+          { id: '25', boat: 'Vintage Rose', skipper: 'Conor Gallagher', sailNumber: 'IRL1968', class: 'Classic Class' },
+          { id: '26', boat: 'Celtic Cross', skipper: 'Siobhan Walsh', sailNumber: 'IRL1971', class: 'Classic Class' }
+        ]
+      }
+    ];
+  };
+
+  // Events state
+  const [events, setEvents] = useState<Event[]>(initializeEvents);
 
   // Save race results to localStorage when state changes
   useEffect(() => {
     saveRaceResults(raceResults);
   }, [raceResults]);
+
+  // Save events to localStorage when state changes
+  useEffect(() => {
+    saveEvents(events);
+  }, [events]);
 
   // Story form state
   const [storyFormData, setStoryFormData] = useState({
@@ -193,28 +327,16 @@ const AdminPage = () => {
     resultsUrl: '',
     isRecurring: false,
     noticeOfRacePdf: '',
-    sailingInstructionsPdf: ''
+    sailingInstructionsPdf: '',
+    boatEntries: [] as BoatEntry[]
   });
 
   // Race results form state
   const [resultFormData, setResultFormData] = useState({
-    title: '',
     date: '',
-    location: '',
-    eventId: 0,
     organizer: 'East Down Yacht Club',
     officer: '',
-    startTime: '',
-    participants: 0,
-    type: 'Racing' as 'Championship' | 'Series' | 'Fun Race' | 'Regatta',
-    status: 'Completed' as 'Completed' | 'Provisional' | 'Cancelled' | 'Postponed',
-    weather: {
-      windSpeed: 0,
-      windDirection: '',
-      temperature: 0,
-      visibility: '',
-      conditions: ''
-    },
+    eventId: null as number | null,
     classes: [] as RaceClass[],
     documents: {
       results: '',
@@ -226,22 +348,17 @@ const AdminPage = () => {
   // Current class being edited
   const [currentClass, setCurrentClass] = useState<RaceClass>({
     name: '',
-    results: [],
-    startTime: '',
-    course: '',
-    distance: 0,
-    finishers: 0
+    results: []
   });
 
   // Current result being edited
   const [currentResult, setCurrentResult] = useState<RaceResult>({
-    position: 1,
     boat: '',
     skipper: '',
     sailNumber: '',
-    points: 1,
     finishTime: '',
     correctedTime: '',
+    dnf: false,
     note: ''
   });
 
@@ -250,11 +367,19 @@ const AdminPage = () => {
   const [editingClassIndex, setEditingClassIndex] = useState<number | null>(null);
   const [editingResultIndex, setEditingResultIndex] = useState<number | null>(null);
 
+  // Boat entry management state
+  const [showBoatEntryForm, setShowBoatEntryForm] = useState(false);
+  const [currentBoatEntry, setCurrentBoatEntry] = useState<BoatEntry>({
+    id: '',
+    boat: '',
+    skipper: '',
+    sailNumber: '',
+    class: ''
+  });
+  const [editingBoatEntryIndex, setEditingBoatEntryIndex] = useState<number | null>(null);
+
   const storyCategories = ['Club News', 'Racing', 'Training', 'Social', 'Announcements'];
   const eventCategories = ['Racing', 'Training', 'Social', 'Cruising', 'Committee'];
-  const resultTypes: ('Championship' | 'Series' | 'Fun Race' | 'Regatta')[] = ['Championship', 'Series', 'Fun Race', 'Regatta'];
-  const resultStatuses: ('Completed' | 'Provisional' | 'Cancelled' | 'Postponed')[] = ['Completed', 'Provisional', 'Cancelled', 'Postponed'];
-  const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
   const resetStoryForm = () => {
     setStoryFormData({
@@ -280,29 +405,26 @@ const AdminPage = () => {
       resultsUrl: '',
       isRecurring: false,
       noticeOfRacePdf: '',
-      sailingInstructionsPdf: ''
+      sailingInstructionsPdf: '',
+      boatEntries: []
     });
+    setShowBoatEntryForm(false);
+    setCurrentBoatEntry({
+      id: '',
+      boat: '',
+      skipper: '',
+      sailNumber: '',
+      class: ''
+    });
+    setEditingBoatEntryIndex(null);
   };
 
   const resetResultForm = () => {
     setResultFormData({
-      title: '',
       date: '',
-      location: '',
-      eventId: 0,
       organizer: 'East Down Yacht Club',
       officer: '',
-      startTime: '',
-      participants: 0,
-      type: 'Regatta',
-      status: 'Completed',
-      weather: {
-        windSpeed: 0,
-        windDirection: '',
-        temperature: 0,
-        visibility: '',
-        conditions: ''
-      },
+      eventId: null,
       classes: [],
       documents: {
         results: '',
@@ -312,20 +434,15 @@ const AdminPage = () => {
     });
     setCurrentClass({
       name: '',
-      results: [],
-      startTime: '',
-      course: '',
-      distance: 0,
-      finishers: 0
+      results: []
     });
     setCurrentResult({
-      position: 1,
       boat: '',
       skipper: '',
       sailNumber: '',
-      points: 1,
       finishTime: '',
       correctedTime: '',
+      dnf: false,
       note: ''
     });
     setShowClassForm(false);
@@ -383,8 +500,16 @@ const AdminPage = () => {
 
   const handleEventSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('handleEventSubmit called with:', { eventFormData, editingEvent });
     
     if (!eventFormData.title || !eventFormData.description || !eventFormData.date || !eventFormData.time || !eventFormData.location) {
+      console.error('Form validation failed:', {
+        title: eventFormData.title,
+        description: eventFormData.description,
+        date: eventFormData.date,
+        time: eventFormData.time,
+        location: eventFormData.location
+      });
       alert('Please fill in all required fields');
       return;
     }
@@ -412,12 +537,20 @@ const AdminPage = () => {
       resultsUrl: eventFormData.resultsUrl || undefined,
       isRecurring: eventFormData.isRecurring,
       noticeOfRacePdf: eventFormData.noticeOfRacePdf || undefined,
-      sailingInstructionsPdf: eventFormData.sailingInstructionsPdf || undefined
+      sailingInstructionsPdf: eventFormData.sailingInstructionsPdf || undefined,
+      boatEntries: eventFormData.boatEntries
     };
-
+    
+    console.log('Created newEvent:', newEvent);
     if (editingEvent) {
-      setEvents(prev => prev.map(event => event.id === editingEvent.id ? newEvent : event));
+      console.log('Updating existing event with id:', editingEvent.id);
+      setEvents(prev => {
+        const updated = prev.map(event => event.id === editingEvent.id ? newEvent : event);
+        console.log('Updated events array:', updated);
+        return updated;
+      });
     } else {
+      console.log('Creating new event');
       setEvents(prev => [newEvent, ...prev]);
     }
 
@@ -436,26 +569,54 @@ const AdminPage = () => {
       category: story.category,
       image: story.image
     });
+    setActiveTab('stories'); // Ensure we're on the stories tab
     setActiveSection('edit');
   };
 
   const handleEditEvent = (event: Event) => {
+    console.log('handleEditEvent called with event:', event);
     setEditingEvent(event);
-    const dateValue = event.isRecurring ? event.date : (event.dateObj ? event.dateObj.toISOString().split('T')[0] : '');
-    setEventFormData({
-      title: event.title,
-      description: event.description,
+    
+    // Improved date handling with better fallbacks
+    let dateValue = '';
+    if (event.isRecurring) {
+      dateValue = event.date || '';
+    } else if (event.dateObj && event.dateObj instanceof Date) {
+      dateValue = event.dateObj.toISOString().split('T')[0];
+    } else if (event.date && !event.isRecurring) {
+      // Try to parse the display date back to YYYY-MM-DD format
+      try {
+        const parsedDate = new Date(event.date);
+        if (!isNaN(parsedDate.getTime())) {
+          dateValue = parsedDate.toISOString().split('T')[0];
+        } else {
+          dateValue = '';
+        }
+      } catch (error) {
+        console.warn('Could not parse event date:', event.date);
+        dateValue = '';
+      }
+    }
+    
+    const formData = {
+      title: event.title || '',
+      description: event.description || '',
       date: dateValue,
-      time: event.time,
-      location: event.location,
-      category: event.category,
-      image: event.image,
-      hasResults: event.hasResults,
+      time: event.time || '',
+      location: event.location || '',
+      category: event.category || 'Racing',
+      image: event.image || '',
+      hasResults: event.hasResults || false,
       resultsUrl: event.resultsUrl || '',
-      isRecurring: event.isRecurring,
+      isRecurring: event.isRecurring || false,
       noticeOfRacePdf: event.noticeOfRacePdf || '',
-      sailingInstructionsPdf: event.sailingInstructionsPdf || ''
-    });
+      sailingInstructionsPdf: event.sailingInstructionsPdf || '',
+      boatEntries: event.boatEntries || []
+    };
+    
+    console.log('Setting eventFormData:', formData);
+    setEventFormData(formData);
+    setActiveTab('events'); // Ensure we're on the events tab
     setActiveSection('edit');
   };
 
@@ -473,18 +634,9 @@ const AdminPage = () => {
 
   // Race Results handlers
   const handleResultInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     
-    if (name.startsWith('weather.')) {
-      const weatherField = name.split('.')[1];
-      setResultFormData(prev => ({
-        ...prev,
-        weather: {
-          ...prev.weather,
-          [weatherField]: type === 'number' ? parseFloat(value) || 0 : value
-        }
-      }));
-    } else if (name.startsWith('documents.')) {
+    if (name.startsWith('documents.')) {
       const docField = name.split('.')[1];
       setResultFormData(prev => ({
         ...prev,
@@ -493,33 +645,68 @@ const AdminPage = () => {
           [docField]: value
         }
       }));
+    } else if (name === 'eventId') {
+      const eventId = value ? parseInt(value) : null;
+      setResultFormData(prev => ({ ...prev, [name]: eventId }));
+      
+      // Auto-populate classes with boats from selected event
+      if (eventId) {
+        handleEventSelection(eventId);
+      }
     } else {
-      const processedValue = type === 'number' ? parseFloat(value) || 0 : value;
-      setResultFormData(prev => ({ ...prev, [name]: processedValue }));
+      setResultFormData(prev => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleEventSelection = (eventId: number) => {
+    const selectedEvent = events.find(event => event.id === eventId);
+    if (!selectedEvent || !selectedEvent.boatEntries.length) {
+      return;
+    }
+
+    // Group boats by class
+    const classesByName = selectedEvent.boatEntries.reduce((acc, entry) => {
+      if (!acc[entry.class]) {
+        acc[entry.class] = {
+          name: entry.class,
+          results: []
+        };
+      }
+      
+      // Create a result entry for each boat (with empty times, not DNF by default)
+      acc[entry.class].results.push({
+        boat: entry.boat,
+        skipper: entry.skipper,
+        sailNumber: entry.sailNumber || '',
+        finishTime: '',
+        correctedTime: '',
+        dnf: false,
+        note: ''
+      });
+      
+      return acc;
+    }, {} as { [key: string]: RaceClass });
+
+    const populatedClasses = Object.values(classesByName);
+    setResultFormData(prev => ({
+      ...prev,
+      classes: populatedClasses
+    }));
   };
 
   const handleResultSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!resultFormData.title || !resultFormData.date || !resultFormData.location) {
+    if (!resultFormData.date || !resultFormData.organizer) {
       alert('Please fill in all required fields');
       return;
     }
 
     const newResult: RaceResultEvent = {
       id: editingResult ? editingResult.id : Date.now(),
-      title: resultFormData.title,
       date: resultFormData.date,
-      location: resultFormData.location,
-      eventId: resultFormData.eventId,
       organizer: resultFormData.organizer,
       officer: resultFormData.officer,
-      startTime: resultFormData.startTime,
-      participants: resultFormData.participants,
-      type: resultFormData.type,
-      status: resultFormData.status,
-      weather: resultFormData.weather.windSpeed > 0 ? resultFormData.weather : undefined,
       classes: resultFormData.classes,
       documents: {
         results: resultFormData.documents.results || undefined,
@@ -542,23 +729,10 @@ const AdminPage = () => {
   const handleEditResult = (result: RaceResultEvent) => {
     setEditingResult(result);
     setResultFormData({
-      title: result.title,
       date: result.date,
-      location: result.location,
-      eventId: result.eventId,
       organizer: result.organizer,
       officer: result.officer || '',
-      startTime: result.startTime,
-      participants: result.participants,
-      type: result.type,
-      status: result.status,
-      weather: result.weather || {
-        windSpeed: 0,
-        windDirection: '',
-        temperature: 0,
-        visibility: '',
-        conditions: ''
-      },
+      eventId: null, // Can't determine original event from result
       classes: result.classes,
       documents: {
         results: result.documents?.results || '',
@@ -566,6 +740,7 @@ const AdminPage = () => {
         report: result.documents?.report || ''
       }
     });
+    setActiveTab('results'); // Ensure we're on the results tab
     setActiveSection('edit');
   };
 
@@ -577,9 +752,8 @@ const AdminPage = () => {
 
   // Class management handlers
   const handleClassInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const processedValue = type === 'number' ? parseFloat(value) || 0 : value;
-    setCurrentClass(prev => ({ ...prev, [name]: processedValue }));
+    const { name, value } = e.target;
+    setCurrentClass(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddClass = () => {
@@ -602,11 +776,7 @@ const AdminPage = () => {
 
     setCurrentClass({
       name: '',
-      results: [],
-      startTime: '',
-      course: '',
-      distance: 0,
-      finishers: 0
+      results: []
     });
     setShowClassForm(false);
   };
@@ -628,8 +798,13 @@ const AdminPage = () => {
   // Result management handlers
   const handleResultItemInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    const processedValue = type === 'number' ? parseFloat(value) || 0 : value;
-    setCurrentResult(prev => ({ ...prev, [name]: processedValue }));
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setCurrentResult(prev => ({ ...prev, [name]: checked }));
+    } else {
+      const processedValue = type === 'number' ? parseFloat(value) || 0 : value;
+      setCurrentResult(prev => ({ ...prev, [name]: processedValue }));
+    }
   };
 
   const handleAddResult = (classIndex: number) => {
@@ -644,30 +819,17 @@ const AdminPage = () => {
       updatedClasses[classIndex].results[editingResultIndex] = { ...currentResult };
       setEditingResultIndex(null);
     } else {
-      // Auto-assign position based on existing results
-      const nextPosition = updatedClasses[classIndex].results.length + 1;
-      updatedClasses[classIndex].results.push({ 
-        ...currentResult, 
-        position: currentResult.position || nextPosition,
-        points: currentResult.points || nextPosition
-      });
+      updatedClasses[classIndex].results.push({ ...currentResult });
     }
-
-    // Sort results by position
-    updatedClasses[classIndex].results.sort((a, b) => a.position - b.position);
-    
-    // Update finishers count
-    updatedClasses[classIndex].finishers = updatedClasses[classIndex].results.length;
     
     setResultFormData(prev => ({ ...prev, classes: updatedClasses }));
     setCurrentResult({
-      position: 1,
       boat: '',
       skipper: '',
       sailNumber: '',
-      points: 1,
       finishTime: '',
       correctedTime: '',
+      dnf: false,
       note: ''
     });
     setShowResultForm(false);
@@ -684,17 +846,60 @@ const AdminPage = () => {
     if (window.confirm('Are you sure you want to delete this result?')) {
       const updatedClasses = [...resultFormData.classes];
       updatedClasses[classIndex].results.splice(resultIndex, 1);
-      
-      // Reassign positions
-      updatedClasses[classIndex].results.forEach((result, index) => {
-        result.position = index + 1;
-        result.points = index + 1;
-      });
-      
-      // Update finishers count
-      updatedClasses[classIndex].finishers = updatedClasses[classIndex].results.length;
-      
       setResultFormData(prev => ({ ...prev, classes: updatedClasses }));
+    }
+  };
+
+  // Boat entry handlers
+  const handleBoatEntryInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setCurrentBoatEntry(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddBoatEntry = () => {
+    if (!currentBoatEntry.boat || !currentBoatEntry.skipper || !currentBoatEntry.class) {
+      alert('Please fill in boat name, skipper, and class');
+      return;
+    }
+
+    const newEntry: BoatEntry = {
+      ...currentBoatEntry,
+      id: editingBoatEntryIndex !== null ? currentBoatEntry.id : Date.now().toString()
+    };
+
+    if (editingBoatEntryIndex !== null) {
+      const updatedEntries = [...eventFormData.boatEntries];
+      updatedEntries[editingBoatEntryIndex] = newEntry;
+      setEventFormData(prev => ({ ...prev, boatEntries: updatedEntries }));
+      setEditingBoatEntryIndex(null);
+    } else {
+      setEventFormData(prev => ({
+        ...prev,
+        boatEntries: [...prev.boatEntries, newEntry]
+      }));
+    }
+
+    setCurrentBoatEntry({
+      id: '',
+      boat: '',
+      skipper: '',
+      sailNumber: '',
+      class: ''
+    });
+    setShowBoatEntryForm(false);
+  };
+
+  const handleEditBoatEntry = (index: number) => {
+    const entryToEdit = eventFormData.boatEntries[index];
+    setCurrentBoatEntry({ ...entryToEdit });
+    setEditingBoatEntryIndex(index);
+    setShowBoatEntryForm(true);
+  };
+
+  const handleDeleteBoatEntry = (index: number) => {
+    if (window.confirm('Are you sure you want to delete this boat entry?')) {
+      const updatedEntries = eventFormData.boatEntries.filter((_, i) => i !== index);
+      setEventFormData(prev => ({ ...prev, boatEntries: updatedEntries }));
     }
   };
 
@@ -949,50 +1154,32 @@ const AdminPage = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-3">
-                        <span className={`text-sm px-3 py-1 rounded-full ${
-                          result.type === 'Championship' ? 'bg-yellow-100 text-yellow-800' :
-                          result.type === 'Series' ? 'bg-blue-100 text-blue-800' :
-                          result.type === 'Fun Race' ? 'bg-green-100 text-green-800' :
-                          'bg-purple-100 text-purple-800'
-                        }`}>
-                          {result.type}
-                        </span>
-                        <span className={`text-sm px-3 py-1 rounded-full ${
-                          result.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                          result.status === 'Provisional' ? 'bg-yellow-100 text-yellow-800' :
-                          result.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {result.status}
-                        </span>
                         <div className="flex items-center text-sm text-gray-500">
                           <Calendar size={14} className="mr-1" />
                           {result.date}
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
-                          <Clock size={14} className="mr-1" />
-                          {result.startTime}
+                          <User size={14} className="mr-1" />
+                          {result.organizer}
                         </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Users size={14} className="mr-1" />
-                          {result.participants} participants
-                        </div>
+                        {result.officer && (
+                          <div className="flex items-center text-sm text-gray-500">
+                            <User size={14} className="mr-1" />
+                            Officer: {result.officer}
+                          </div>
+                        )}
                       </div>
-                      <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{result.title}</h3>
-                      <div className="flex items-center text-sm text-gray-500 mb-2">
-                        <MapPin size={14} className="mr-1" />
-                        {result.location}
-                      </div>
+                      <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">
+                        Race Results - {new Date(result.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </h3>
                       <div className="flex items-center text-sm text-gray-600">
                         <Trophy size={14} className="mr-1" />
                         {result.classes.length} classes • {result.classes.reduce((sum, cls) => sum + cls.results.length, 0)} total results
                       </div>
-                      {result.weather && (
-                        <div className="flex items-center text-sm text-gray-500 mt-2">
-                          <Wind size={14} className="mr-1" />
-                          {result.weather.windSpeed}kt {result.weather.windDirection} • {result.weather.temperature}°C
-                        </div>
-                      )}
                     </div>
                   </div>
                   
@@ -1153,13 +1340,25 @@ const AdminPage = () => {
         )}
 
         {/* Event Form */}
-        {(activeSection === 'new' || activeSection === 'edit') && activeTab === 'events' && (
+        {(() => {
+          console.log('Event Form Render Check:', {
+            activeSection,
+            activeTab,
+            editingEvent,
+            shouldRender: (activeSection === 'new' || activeSection === 'edit') && activeTab === 'events'
+          });
+          return (activeSection === 'new' || activeSection === 'edit') && activeTab === 'events';
+        })() && (
           <div className="bg-white rounded-lg shadow-sm p-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               {editingEvent ? 'Edit Event' : 'Create New Event'}
             </h2>
             
             <form onSubmit={handleEventSubmit} className="space-y-6">
+              {(() => {
+                console.log('Event Form Fields - eventFormData:', eventFormData);
+                return null;
+              })()}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Event Title *
@@ -1340,6 +1539,172 @@ const AdminPage = () => {
                 </label>
               </div>
 
+              {/* Boat Entries Section */}
+              <div className="bg-blue-50 p-6 rounded-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-800 flex items-center">
+                    <Sailboat className="mr-2" size={20} />
+                    Boat Entries ({eventFormData.boatEntries.length})
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowBoatEntryForm(!showBoatEntryForm)}
+                    className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center text-sm"
+                  >
+                    <Plus size={16} className="mr-1" />
+                    {editingBoatEntryIndex !== null ? 'Edit Entry' : 'Add Boat'}
+                  </button>
+                </div>
+
+                {/* Boat Entry Form */}
+                {showBoatEntryForm && (
+                  <div className="bg-white p-4 rounded-lg border-2 border-blue-200 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Boat Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="boat"
+                          value={currentBoatEntry.boat}
+                          onChange={handleBoatEntryInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g., Sea Sprite"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Skipper *
+                        </label>
+                        <input
+                          type="text"
+                          name="skipper"
+                          value={currentBoatEntry.skipper}
+                          onChange={handleBoatEntryInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          placeholder="Skipper name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Sail Number
+                        </label>
+                        <input
+                          type="text"
+                          name="sailNumber"
+                          value={currentBoatEntry.sailNumber}
+                          onChange={handleBoatEntryInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g., IRL123"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Class *
+                        </label>
+                        <select
+                          name="class"
+                          value={currentBoatEntry.class}
+                          onChange={handleBoatEntryInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="">Select a class</option>
+                          {SAILING_CLASSES.map(sailingClass => (
+                            <option key={sailingClass} value={sailingClass}>
+                              {sailingClass}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleAddBoatEntry}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+                      >
+                        {editingBoatEntryIndex !== null ? 'Update Entry' : 'Add Entry'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowBoatEntryForm(false);
+                          setEditingBoatEntryIndex(null);
+                          setCurrentBoatEntry({
+                            id: '',
+                            boat: '',
+                            skipper: '',
+                            sailNumber: '',
+                            class: ''
+                          });
+                        }}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Boat Entries Table */}
+                {eventFormData.boatEntries.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Boat</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Skipper</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Sail Number</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Class</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {eventFormData.boatEntries.map((entry, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="px-3 py-2 font-medium">{entry.boat}</td>
+                            <td className="px-3 py-2">{entry.skipper}</td>
+                            <td className="px-3 py-2">{entry.sailNumber || '-'}</td>
+                            <td className="px-3 py-2">{entry.class}</td>
+                            <td className="px-3 py-2">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditBoatEntry(index)}
+                                  className="text-blue-600 hover:text-blue-700"
+                                >
+                                  <Edit size={12} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteBoatEntry(index)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {eventFormData.boatEntries.length === 0 && !showBoatEntryForm && (
+                  <div className="text-center py-8">
+                    <Sailboat size={48} className="mx-auto text-gray-400 mb-4" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">No boats entered yet</h4>
+                    <p className="text-gray-500">Add boats that have entered this event in advance.</p>
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center gap-4 pt-6 border-t">
                 <button
                   type="submit"
@@ -1372,43 +1737,31 @@ const AdminPage = () => {
               <div className="bg-gray-50 p-6 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-800 mb-4">Event Information</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Event Title *
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={resultFormData.title}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter event title..."
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Link to Event
+                      Link to Event (Optional)
                     </label>
                     <select
                       name="eventId"
-                      value={resultFormData.eventId}
+                      value={resultFormData.eventId || ''}
                       onChange={handleResultInputChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value={0}>Select an event (optional)</option>
-                      {events.map(event => (
-                        <option key={event.id} value={event.id}>
-                          {event.title}
-                        </option>
-                      ))}
+                      <option value="">Select an event (optional)</option>
+                      {events
+                        .filter(event => event.boatEntries && event.boatEntries.length > 0)
+                        .map(event => (
+                          <option key={event.id} value={event.id}>
+                            {event.title} ({event.date})
+                          </option>
+                        ))}
                     </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select an event to auto-populate boats that entered
+                    </p>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Date *
@@ -1425,89 +1778,7 @@ const AdminPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Start Time *
-                    </label>
-                    <input
-                      type="text"
-                      name="startTime"
-                      value={resultFormData.startTime}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., 10:00 AM"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Participants
-                    </label>
-                    <input
-                      type="number"
-                      name="participants"
-                      value={resultFormData.participants}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      min="0"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location *
-                  </label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={resultFormData.location}
-                    onChange={handleResultInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Event location..."
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Type
-                    </label>
-                    <select
-                      name="type"
-                      value={resultFormData.type}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {resultTypes.map(type => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Status
-                    </label>
-                    <select
-                      name="status"
-                      value={resultFormData.status}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {resultStatuses.map(status => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Organizer
+                      Organizer *
                     </label>
                     <input
                       type="text"
@@ -1516,6 +1787,7 @@ const AdminPage = () => {
                       onChange={handleResultInputChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Event organizer..."
+                      required
                     />
                   </div>
 
@@ -1533,94 +1805,28 @@ const AdminPage = () => {
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Weather Conditions */}
-              <div className="bg-blue-50 p-6 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center">
-                  <Wind className="mr-2" size={20} />
-                  Weather Conditions
-                </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Wind Speed (knots)
-                    </label>
-                    <input
-                      type="number"
-                      name="weather.windSpeed"
-                      value={resultFormData.weather.windSpeed}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      min="0"
-                    />
+                {resultFormData.eventId && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-start">
+                      <Sailboat className="text-blue-600 mr-3 mt-1 flex-shrink-0" size={20} />
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-900 mb-2">Auto-populated from selected event</h4>
+                        <p className="text-sm text-blue-800 mb-3">
+                          All boat entries have been loaded automatically from the selected event. 
+                          You can now add finish times, corrected times, and DNF status for each boat.
+                        </p>
+                        {resultFormData.classes.length > 0 && (
+                          <div className="text-sm text-blue-700">
+                            <strong>Classes loaded:</strong> {resultFormData.classes.map(cls => cls.name).join(', ')}
+                            <br />
+                            <strong>Total boats:</strong> {resultFormData.classes.reduce((sum, cls) => sum + cls.results.length, 0)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Wind Direction
-                    </label>
-                    <select
-                      name="weather.windDirection"
-                      value={resultFormData.weather.windDirection}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select direction</option>
-                      {windDirections.map(direction => (
-                        <option key={direction} value={direction}>
-                          {direction}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Temperature (°C)
-                    </label>
-                    <input
-                      type="number"
-                      name="weather.temperature"
-                      value={resultFormData.weather.temperature}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Visibility
-                    </label>
-                    <select
-                      name="weather.visibility"
-                      value={resultFormData.weather.visibility}
-                      onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select visibility</option>
-                      <option value="Excellent">Excellent</option>
-                      <option value="Good">Good</option>
-                      <option value="Moderate">Moderate</option>
-                      <option value="Poor">Poor</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Conditions Description
-                  </label>
-                  <textarea
-                    name="weather.conditions"
-                    value={resultFormData.weather.conditions}
-                    onChange={handleResultInputChange}
-                    rows={2}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Brief description of conditions..."
-                  />
-                </div>
+                )}
               </div>
 
               {/* Race Classes */}
@@ -1643,63 +1849,25 @@ const AdminPage = () => {
                 {/* Class Form */}
                 {showClassForm && (
                   <div className="bg-white p-4 rounded-lg border-2 border-green-200 mb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-1 gap-4 mb-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Class Name *
                         </label>
-                        <input
-                          type="text"
+                        <select
                           name="name"
                           value={currentClass.name}
                           onChange={handleClassInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
-                          placeholder="e.g., IRC Class 1"
                           required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Start Time
-                        </label>
-                        <input
-                          type="text"
-                          name="startTime"
-                          value={currentClass.startTime}
-                          onChange={handleClassInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
-                          placeholder="e.g., 10:00 AM"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Course
-                        </label>
-                        <input
-                          type="text"
-                          name="course"
-                          value={currentClass.course}
-                          onChange={handleClassInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
-                          placeholder="e.g., Windward/Leeward"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Distance (nm)
-                        </label>
-                        <input
-                          type="number"
-                          name="distance"
-                          value={currentClass.distance}
-                          onChange={handleClassInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
-                          step="0.1"
-                          min="0"
-                        />
+                        >
+                          <option value="">Select a class</option>
+                          {SAILING_CLASSES.map(sailingClass => (
+                            <option key={sailingClass} value={sailingClass}>
+                              {sailingClass}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -1718,11 +1886,7 @@ const AdminPage = () => {
                           setEditingClassIndex(null);
                           setCurrentClass({
                             name: '',
-                            results: [],
-                            startTime: '',
-                            course: '',
-                            distance: 0,
-                            finishers: 0
+                            results: []
                           });
                         }}
                         className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm"
@@ -1733,20 +1897,23 @@ const AdminPage = () => {
                   </div>
                 )}
 
-                {/* Classes List */}
+                {/* Classes List - Improved UX with better organization */}
                 <div className="space-y-4">
                   {resultFormData.classes.map((raceClass, classIndex) => (
-                    <div key={classIndex} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                      <div className="bg-gray-50 px-4 py-3 border-b">
+                    <div key={classIndex} className="bg-white rounded-lg border-2 border-green-200 shadow-sm overflow-hidden">
+                      <div className="bg-gradient-to-r from-green-50 to-blue-50 px-4 py-3 border-b border-green-200">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium text-gray-900">{raceClass.name}</h4>
-                            <p className="text-sm text-gray-500">
-                              {raceClass.startTime && `Start: ${raceClass.startTime}`}
-                              {raceClass.course && ` • Course: ${raceClass.course}`}
-                              {raceClass.distance && ` • Distance: ${raceClass.distance}nm`}
-                              {` • ${raceClass.results.length} results`}
-                            </p>
+                          <div className="flex items-center">
+                            <Trophy className="text-green-600 mr-3" size={20} />
+                            <div>
+                              <h4 className="text-lg font-semibold text-gray-900">{raceClass.name}</h4>
+                              <p className="text-sm text-gray-600">
+                                {raceClass.results.length} boat{raceClass.results.length !== 1 ? 's' : ''} entered
+                                {raceClass.results.filter(r => r.finishTime || r.dnf).length > 0 && (
+                                  <span className="ml-2 text-green-600">• {raceClass.results.filter(r => r.finishTime || r.dnf).length} results recorded</span>
+                                )}
+                              </p>
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <button
@@ -1754,13 +1921,12 @@ const AdminPage = () => {
                               onClick={() => {
                                 setShowResultForm(!showResultForm);
                                 setCurrentResult({
-                                  position: raceClass.results.length + 1,
                                   boat: '',
                                   skipper: '',
                                   sailNumber: '',
-                                  points: raceClass.results.length + 1,
                                   finishTime: '',
                                   correctedTime: '',
+                                  dnf: false,
                                   note: ''
                                 });
                               }}
@@ -1792,22 +1958,7 @@ const AdminPage = () => {
                       {/* Results Form */}
                       {showResultForm && (
                         <div className="bg-blue-50 p-4 border-b">
-                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-3">
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                Position *
-                              </label>
-                              <input
-                                type="number"
-                                name="position"
-                                value={currentResult.position}
-                                onChange={handleResultItemInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                min="1"
-                                required
-                              />
-                            </div>
-
+                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-3">
                             <div>
                               <label className="block text-xs font-medium text-gray-700 mb-1">
                                 Boat Name *
@@ -1851,7 +2002,7 @@ const AdminPage = () => {
 
                             <div>
                               <label className="block text-xs font-medium text-gray-700 mb-1">
-                                Finish Time
+                                Finish Time {currentResult.dnf ? '' : '*'}
                               </label>
                               <input
                                 type="text"
@@ -1860,21 +2011,25 @@ const AdminPage = () => {
                                 onChange={handleResultItemInputChange}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                                 placeholder="HH:MM:SS"
+                                disabled={currentResult.dnf}
+                                required={!currentResult.dnf}
                               />
                             </div>
 
                             <div>
                               <label className="block text-xs font-medium text-gray-700 mb-1">
-                                Points
+                                DNF
                               </label>
-                              <input
-                                type="number"
-                                name="points"
-                                value={currentResult.points}
-                                onChange={handleResultItemInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                min="0"
-                              />
+                              <label className="flex items-center mt-1">
+                                <input
+                                  type="checkbox"
+                                  name="dnf"
+                                  checked={currentResult.dnf}
+                                  onChange={handleResultItemInputChange}
+                                  className="mr-2"
+                                />
+                                <span className="text-xs">Did Not Finish</span>
+                              </label>
                             </div>
                           </div>
 
@@ -1890,6 +2045,7 @@ const AdminPage = () => {
                                 onChange={handleResultItemInputChange}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                                 placeholder="HH:MM:SS"
+                                disabled={currentResult.dnf}
                               />
                             </div>
 
@@ -1922,13 +2078,12 @@ const AdminPage = () => {
                                 setShowResultForm(false);
                                 setEditingResultIndex(null);
                                 setCurrentResult({
-                                  position: 1,
                                   boat: '',
                                   skipper: '',
                                   sailNumber: '',
-                                  points: 1,
                                   finishTime: '',
                                   correctedTime: '',
+                                  dnf: false,
                                   note: ''
                                 });
                               }}
@@ -1940,52 +2095,102 @@ const AdminPage = () => {
                         </div>
                       )}
 
-                      {/* Results Table */}
-                      {raceClass.results.length > 0 && (
+                      {/* Results Table - Enhanced UX with better styling */}
+                      {raceClass.results.length > 0 ? (
                         <div className="overflow-x-auto">
-                          <table className="w-full text-sm">
-                            <thead className="bg-gray-50">
+                          <table className="w-full">
+                            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                               <tr>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Pos</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Boat</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Skipper</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Sail</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Finish</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Points</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Boat</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Skipper</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Sail #</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Finish Time</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Corrected Time</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Notes</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                              {raceClass.results.map((result, resultIndex) => (
-                                <tr key={resultIndex} className="hover:bg-gray-50">
-                                  <td className="px-3 py-2 font-medium">{result.position}</td>
-                                  <td className="px-3 py-2">{result.boat}</td>
-                                  <td className="px-3 py-2">{result.skipper}</td>
-                                  <td className="px-3 py-2">{result.sailNumber || '-'}</td>
-                                  <td className="px-3 py-2">{result.finishTime || result.correctedTime || '-'}</td>
-                                  <td className="px-3 py-2">{result.points}</td>
-                                  <td className="px-3 py-2">
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEditResultItem(classIndex, resultIndex)}
-                                        className="text-blue-600 hover:text-blue-700"
-                                      >
-                                        <Edit size={12} />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleDeleteResultItem(classIndex, resultIndex)}
-                                        className="text-red-600 hover:text-red-700"
-                                      >
-                                        <Trash2 size={12} />
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
+                              {raceClass.results.map((result, resultIndex) => {
+                                const hasResult = result.finishTime || result.dnf;
+                                return (
+                                  <tr key={resultIndex} className={`hover:bg-blue-50 transition-colors ${
+                                    hasResult ? 'bg-green-25' : 'bg-yellow-25'
+                                  }`}>
+                                    <td className="px-4 py-3">
+                                      <div className="flex items-center">
+                                        <Sailboat className="text-blue-500 mr-2" size={14} />
+                                        <span className="font-medium text-gray-900">{result.boat}</span>
+                                      </div>
+                                    </td>
+                                    <td className="px-4 py-3 text-gray-700">{result.skipper}</td>
+                                    <td className="px-4 py-3 text-gray-600 font-mono text-sm">{result.sailNumber || '-'}</td>
+                                    <td className="px-4 py-3">
+                                      {result.dnf ? (
+                                        <span className="text-gray-400">-</span>
+                                      ) : result.finishTime ? (
+                                        <span className="font-mono text-sm text-gray-900">{result.finishTime}</span>
+                                      ) : (
+                                        <span className="text-yellow-600 text-sm italic">Not recorded</span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      {result.dnf ? (
+                                        <span className="text-gray-400">-</span>
+                                      ) : result.correctedTime ? (
+                                        <span className="font-mono text-sm text-green-700 font-medium">{result.correctedTime}</span>
+                                      ) : (
+                                        <span className="text-gray-400">-</span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      {result.dnf ? (
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                          DNF
+                                        </span>
+                                      ) : result.finishTime ? (
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                          Finished
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                          Pending
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-gray-500">{result.note || '-'}</td>
+                                    <td className="px-4 py-3">
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleEditResultItem(classIndex, resultIndex)}
+                                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 p-1 rounded transition-colors"
+                                          title="Edit result"
+                                        >
+                                          <Edit size={14} />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteResultItem(classIndex, resultIndex)}
+                                          className="text-red-600 hover:text-red-800 hover:bg-red-100 p-1 rounded transition-colors"
+                                          title="Delete result"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
+                        </div>
+                      ) : (
+                        <div className="p-8 text-center">
+                          <Sailboat size={48} className="mx-auto text-gray-400 mb-4" />
+                          <h5 className="text-lg font-medium text-gray-900 mb-2">No boats in this class yet</h5>
+                          <p className="text-gray-500">Add boats to this class by selecting an event with entries or manually adding results.</p>
                         </div>
                       )}
                     </div>
