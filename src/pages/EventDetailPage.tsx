@@ -136,13 +136,26 @@ const EventDetailPage = () => {
                   <h3 className="font-semibold text-[#1e3a8a] mb-2">
                     Race Results
                   </h3>
-                  <p className="text-gray-600 mb-3">
-                    View the latest results for this event on Hall Sailing.
+                  <p className="text-gray-600 mb-4">
+                    View the latest results for this event with detailed standings, weather conditions, and performance statistics.
                   </p>
-                  <a href={eventData.resultsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-[#0284c7] font-medium hover:text-blue-700">
-                    View Results
-                    <ExternalLink size={16} className="ml-1" />
-                  </a>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link 
+                      to={`/results?event=${encodeURIComponent(eventData.title)}`}
+                      className="inline-flex items-center justify-center px-4 py-2 bg-[#1e3a8a] text-white font-medium rounded-lg hover:bg-blue-900 transition-colors duration-200"
+                    >
+                      View Race Results
+                    </Link>
+                    <a 
+                      href={eventData.resultsUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center justify-center px-4 py-2 text-[#0284c7] font-medium border border-[#0284c7] rounded-lg hover:bg-[#0284c7] hover:text-white transition-colors duration-200"
+                    >
+                      Hall Sailing
+                      <ExternalLink size={16} className="ml-2" />
+                    </a>
+                  </div>
                 </div>}
               {/* Wednesday Racing Special Section */}
               {isWednesdayRacing && <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">

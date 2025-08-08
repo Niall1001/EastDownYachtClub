@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, MapPin, Users, Filter, ChevronDown, ChevronRight, Calendar as CalendarLucide, ChevronLeft, Sailboat, LifeBuoy, Trophy, GraduationCap, Anchor, ArrowRight, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, ChevronLeft, ChevronRight, Sailboat, LifeBuoy, Trophy, GraduationCap, Anchor, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 const EventsPage = () => {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [calendarView, setCalendarView] = useState(false);
-  const [showMiniCalendar, setShowMiniCalendar] = useState(false);
-  const categories = ['All', 'Racing', 'Training', 'Social', 'Cruising', 'Committee'];
   // Mock data for events
   const upcomingEvents = [{
     id: 1,
@@ -226,31 +221,14 @@ const EventsPage = () => {
       // For recurring events, check if today is the recurring day
       // For Wednesday Club Racing
       return today.getDay() === 3; // 3 is Wednesday
-    } else {
+    } else if (event.dateObj) {
       const eventDate = new Date(event.dateObj);
       eventDate.setHours(0, 0, 0, 0);
       return eventDate.getTime() === today.getTime();
     }
+    return false;
   });
-  // Filter events based on category and selected date
-  const filteredEvents = upcomingEvents.filter(event => {
-    const matchesCategory = activeCategory === 'All' || event.category === activeCategory;
-    if (calendarView) {
-      if (event.isRecurring) {
-        // For recurring events, check if selected date matches the recurring pattern
-        // For Wednesday Club Racing
-        const selectedDay = new Date(selectedDate).getDay();
-        return matchesCategory && selectedDay === 3; // 3 is Wednesday
-      } else if (event.dateObj) {
-        const eventDate = new Date(event.dateObj);
-        eventDate.setHours(0, 0, 0, 0);
-        const selectedDateCopy = new Date(selectedDate);
-        selectedDateCopy.setHours(0, 0, 0, 0);
-        return matchesCategory && eventDate.getTime() === selectedDateCopy.getTime();
-      }
-    }
-    return matchesCategory;
-  });
+
   // Calendar functions
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -298,21 +276,35 @@ const EventsPage = () => {
       // Check if this is a Wednesday (for recurring Wednesday Club Racing)
       const isWednesday = date.getDay() === 3;
       const hasRecurringEvent = isWednesday;
-      const isSelected = date.getDate() === selectedDate.getDate() && date.getMonth() === selectedDate.getMonth() && date.getFullYear() === selectedDate.getFullYear();
       const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
       days.push(<div key={day} className={`h-12 border border-gray-100 relative flex items-center justify-center cursor-pointer
             ${hasEvent || hasRecurringEvent ? 'bg-blue-50' : ''}
-            ${isSelected ? 'bg-[#1e3a8a] text-white' : ''}
-            ${isToday && !isSelected ? 'border-2 border-[#0284c7]' : ''}
+            ${isToday ? 'border-2 border-[#0284c7]' : ''}
             hover:bg-gray-50
           `} onClick={() => {
         if (hasEvent || hasRecurringEvent) {
-          setSelectedDate(new Date(year, month, day));
-          setCalendarView(true);
+          // Find the event for this date and navigate to its detail page
+          const clickedDate = new Date(year, month, day);
+          const eventsForDate = upcomingEvents.filter(event => {
+            if (event.isRecurring && clickedDate.getDay() === 3) {
+              return true; // Wednesday Club Racing
+            } else if (event.dateObj) {
+              const eventDate = new Date(event.dateObj);
+              eventDate.setHours(0, 0, 0, 0);
+              clickedDate.setHours(0, 0, 0, 0);
+              return eventDate.getTime() === clickedDate.getTime();
+            }
+            return false;
+          });
+          
+          if (eventsForDate.length > 0) {
+            // Navigate to the first event's detail page
+            navigate(`/events/${eventsForDate[0].id}`);
+          }
         }
       }}>
           <span className="text-sm">{day}</span>
-          {(hasEvent || hasRecurringEvent) && <div className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-[#0284c7]'}`}></div>}
+          {(hasEvent || hasRecurringEvent) && <div className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0284c7]`}></div>}
         </div>);
     }
     return <div className="mb-8">
@@ -336,17 +328,11 @@ const EventsPage = () => {
             </div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">{days}</div>
-        <div className="mt-4 flex justify-between">
-          <button onClick={() => {
-          setCalendarView(false);
-          setSelectedDate(new Date());
-        }} className="text-sm text-[#0284c7] hover:text-blue-800">
-            Show all events
-          </button>
+        <div className="mt-4 flex justify-end">
           <div className="flex items-center text-xs text-gray-500">
             <div className="flex items-center mr-4">
               <div className="w-2 h-2 bg-blue-50 border border-gray-200 mr-1"></div>
-              <span>Event day</span>
+              <span>Event day (clickable)</span>
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 border-2 border-[#0284c7] mr-1"></div>
@@ -384,20 +370,11 @@ const EventsPage = () => {
             </h1>
             
             <p className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 text-white/90 max-w-3xl mx-auto leading-relaxed px-4">
-              Discover racing events, training programs, and sailing opportunities at Ireland's premier yacht club
+              Discover racing events, training programs, and sailing opportunities
             </p>
             
             {/* Premium Quick Stats with Animations */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-              <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{upcomingEvents.length}</div>
-                  <div className="text-xs md:text-sm text-white/90 font-medium">Upcoming Events</div>
-                </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
-              </div>
-              
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12">
               <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
@@ -448,12 +425,18 @@ const EventsPage = () => {
                       <CalendarIcon size={24} className="text-white hidden sm:block" />
                     </div>
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Today's Events</h2>
-                      <p className="text-sm sm:text-base text-white/80">Don't miss what's happening today</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
+                        Today's Events
+                      </h2>
+                      <p className="text-sm sm:text-base text-white/80">
+                        Don't miss what's happening today
+                      </p>
                     </div>
                   </div>
                   <div className="bg-white/20 rounded-full px-3 sm:px-4 py-1 sm:py-2 self-start sm:self-auto">
-                    <span className="text-white font-semibold text-sm sm:text-base">{todaysEvents.length} Event{todaysEvents.length !== 1 ? 's' : ''}</span>
+                    <span className="text-white font-semibold text-sm sm:text-base">
+                      {todaysEvents.length} Event{todaysEvents.length !== 1 ? 's' : ''}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -461,7 +444,7 @@ const EventsPage = () => {
               <div className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   {todaysEvents.map(event => (
-                    <div key={`today-${event.id}`} className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div key={`featured-${event.id}`} className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3 sm:gap-0">
                         <div className="bg-[#1e3a8a] text-white px-3 py-1 rounded-full text-sm font-medium self-start">
                           {event.category}
@@ -478,6 +461,12 @@ const EventsPage = () => {
                       </h3>
                       
                       <div className="space-y-3 mb-6">
+                        <div className="flex items-center text-gray-600">
+                          <CalendarIcon size={18} className="mr-3 text-[#0284c7] flex-shrink-0" />
+                          <span className="text-sm font-medium">
+                            {event.isRecurring ? event.date : event.date}
+                          </span>
+                        </div>
                         <div className="flex items-center text-gray-600">
                           <Clock size={18} className="mr-3 text-[#0284c7] flex-shrink-0" />
                           <span className="text-sm font-medium">{event.time}</span>
@@ -496,14 +485,12 @@ const EventsPage = () => {
                           View Details
                         </Link>
                         {event.hasResults && (
-                          <a 
-                            href={event.resultsUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
+                          <Link
+                            to={`/results?event=${encodeURIComponent(event.title)}`}
                             className="bg-[#1e3a8a] hover:bg-blue-900 text-white px-4 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg min-h-[44px] flex items-center justify-center"
                           >
-                            Results
-                          </a>
+                            View Results
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -513,41 +500,39 @@ const EventsPage = () => {
             </div>
           </div>
         )}
-        {/* Premium Quick Access Cards */}
+
+        {/* Calendar Section */}
         <div className="mb-12 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] text-center mb-8 sm:mb-12 px-4">What Would You Like To Do?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {/* Upcoming Events Card */}
-            <button 
-              onClick={() => setActiveSection('upcoming')} 
-              className={`group relative bg-white rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border-2 overflow-hidden ${
-                activeSection === 'upcoming' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/20 shadow-2xl' : 'border-transparent hover:border-[#0284c7]/30'
-              }`}
-            >
-              {/* Premium Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              {/* Animated Ripple Effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="absolute top-1/2 left-1/2 w-0 h-0 bg-[#0284c7]/10 rounded-full group-hover:w-96 group-hover:h-96 group-hover:-translate-x-48 group-hover:-translate-y-48 transition-all duration-700 ease-out"></div>
-              </div>
-              
-              <div className="relative z-10">
-                <div className="bg-gradient-to-br from-[#1e3a8a] to-[#0284c7] rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                  <CalendarIcon size={28} className="text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-[#0284c7] transition-colors duration-300">Upcoming Events</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">Browse and discover upcoming sailing events, races, and social gatherings</p>
-                <div className="flex items-center justify-between">
-                  <span className="bg-gradient-to-r from-blue-100 to-blue-200 text-[#0284c7] px-4 py-2 rounded-full text-sm font-semibold shadow-sm group-hover:shadow-md transition-shadow duration-300">
-                    {upcomingEvents.length} events
-                  </span>
-                  <div className="flex items-center text-[#0284c7] group-hover:text-[#1e3a8a] transition-colors duration-300">
-                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+          <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center">
+                  <div className="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
+                    <CalendarIcon size={20} className="text-white sm:hidden" />
+                    <CalendarIcon size={24} className="text-white hidden sm:block" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Event Calendar</h2>
+                    <p className="text-sm sm:text-base text-white/80">View all upcoming events</p>
                   </div>
                 </div>
               </div>
-            </button>
+            </div>
+            
+            <div className="p-4 sm:p-6">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-lg">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50">
+                  {renderCalendar()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Premium Quick Access Cards */}
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] text-center mb-8 sm:mb-12 px-4">What Would You Like To Do?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             
             {/* Race Results Card */}
             <button 
@@ -642,14 +627,7 @@ const EventsPage = () => {
         {activeSection === 'overview' && (
           <div className="space-y-8 animate-in fade-in-50 duration-500">
             {/* Quick Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-                <div className="bg-[#0284c7] rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
-                  <CalendarIcon size={24} className="text-white" />
-                </div>
-                <div className="text-2xl font-bold text-[#1e3a8a]">{upcomingEvents.length}</div>
-                <div className="text-sm text-gray-600">Upcoming Events</div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
                 <div className="bg-yellow-500 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
                   <Trophy size={24} className="text-white" />
@@ -673,43 +651,6 @@ const EventsPage = () => {
               </div>
             </div>
             
-            {/* Next Few Events Preview */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold text-[#1e3a8a] mb-6">Coming Up Next</h3>
-              <div className="space-y-4">
-                {upcomingEvents.slice(0, 3).map(event => (
-                  <div key={event.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <div className="bg-[#0284c7] rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
-                      <CalendarIcon size={20} className="text-white" />
-                    </div>
-                    <div className="flex-grow">
-                      <h4 className="font-semibold text-[#1e3a8a]">{event.title}</h4>
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-1">
-                        <span>{event.date}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span>{event.time}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span>{event.category}</span>
-                      </div>
-                    </div>
-                    <Link 
-                      to={`/events/${event.id}`} 
-                      className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors self-start sm:self-auto"
-                    >
-                      Details
-                    </Link>
-                  </div>
-                ))}
-              </div>
-              <div className="text-center mt-6">
-                <button 
-                  onClick={() => setActiveSection('upcoming')} 
-                  className="bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
-                >
-                  View All Events
-                </button>
-              </div>
-            </div>
             
             {/* Call to Action */}
             <div className="text-center mt-16">
@@ -718,12 +659,6 @@ const EventsPage = () => {
                 Whether you're looking to race, learn, or simply enjoy time on the water, East Down Yacht Club has something for every sailor.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <button 
-                  onClick={() => setActiveSection('upcoming')} 
-                  className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
-                >
-                  Browse Events
-                </button>
                 <button 
                   onClick={() => setActiveSection('training')} 
                   className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl"
@@ -754,294 +689,6 @@ const EventsPage = () => {
           </div>
         )}
         
-        {/* Upcoming Events Section */}
-        {activeSection === 'upcoming' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a] mb-2">Upcoming Events</h2>
-                <p className="text-sm sm:text-base text-gray-600">Discover what's coming up at the club</p>
-              </div>
-              
-              {/* Premium Calendar Toggle */}
-              <div className="flex flex-col sm:flex-row gap-3 self-start sm:self-auto">
-                <button 
-                  onClick={() => setShowMiniCalendar(!showMiniCalendar)} 
-                  className={`group flex items-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 ${
-                    showMiniCalendar 
-                      ? 'bg-gradient-to-r from-[#0284c7] to-[#1e3a8a] text-white' 
-                      : 'bg-gradient-to-r from-gray-100 to-gray-200 text-[#1e3a8a] hover:from-blue-50 hover:to-indigo-50'
-                  }`}
-                >
-                  <div className={`rounded-full p-1 ${showMiniCalendar ? 'bg-white/20' : 'bg-[#0284c7]/10'} group-hover:scale-110 transition-transform duration-300`}>
-                    <CalendarIcon size={18} className={showMiniCalendar ? 'text-white' : 'text-[#0284c7]'} />
-                  </div>
-                  <span>{showMiniCalendar ? 'Hide Calendar' : 'Show Calendar'}</span>
-                </button>
-                
-                {/* View Toggle */}
-                <div className="flex items-center bg-gray-100 rounded-xl p-1">
-                  <button 
-                    onClick={() => setCalendarView(false)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                      !calendarView 
-                        ? 'bg-white text-[#1e3a8a] shadow-sm' 
-                        : 'text-gray-600 hover:text-[#1e3a8a]'
-                    }`}
-                  >
-                    All Events
-                  </button>
-                  <button 
-                    onClick={() => setCalendarView(true)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                      calendarView 
-                        ? 'bg-white text-[#1e3a8a] shadow-sm' 
-                        : 'text-gray-600 hover:text-[#1e3a8a]'
-                    }`}
-                  >
-                    By Date
-                  </button>
-                </div>
-              </div>
-            </div>
-            {/* Premium Mini Calendar - Only show when requested */}
-            {showMiniCalendar && (
-              <div className="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-lg animate-in slide-in-from-top-4 duration-500">
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50">
-                  {renderCalendar()}
-                </div>
-              </div>
-            )}
-            {/* Filter Bar */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center">
-                <button onClick={() => setShowFilters(!showFilters)} className="flex items-center text-sm font-medium text-gray-600 hover:text-[#1e3a8a]">
-                  <Filter size={16} className="mr-2" />
-                  Filter Events
-                  <ChevronDown size={16} className={`ml-1 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-                </button>
-                <div className="flex items-center">
-                  <button onClick={() => setCalendarView(!calendarView)} className={`flex items-center text-sm font-medium ${calendarView ? 'text-[#1e3a8a]' : 'text-gray-600 hover:text-[#1e3a8a]'}`}>
-                    {calendarView ? 'Filtered by date' : 'All upcoming events'}
-                  </button>
-                </div>
-              </div>
-              {showFilters && <div className="flex flex-wrap gap-2 mt-4">
-                  {categories.map(category => <button key={category} onClick={() => setActiveCategory(category)} className={`px-3 py-1 rounded-full text-sm ${activeCategory === category ? 'bg-[#1e3a8a] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                      {category}
-                    </button>)}
-                </div>}
-            </div>
-            {calendarView && filteredEvents.length === 0 ? <div className="text-center py-12">
-                <CalendarLucide size={48} className="mx-auto text-gray-300 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  No events on this day
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  There are no events scheduled for the selected date.
-                </p>
-                <button onClick={() => setCalendarView(false)} className="text-[#0284c7] font-medium hover:text-blue-700">
-                  View all upcoming events
-                </button>
-              </div> : <>
-                {/* Featured Event - Premium Design */}
-                {filteredEvents.length > 0 && (
-                  <div className="mb-12">
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] rounded-full p-2">
-                        <Star size={20} className="text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-[#1e3a8a]">
-                        {calendarView ? 'Events on Selected Date' : 'Featured Event'}
-                      </h3>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl overflow-hidden border border-white/50">
-                      <div className="lg:flex">
-                        <div className="lg:w-1/2 relative">
-                          <img 
-                            src={filteredEvents[0]?.image} 
-                            alt={filteredEvents[0]?.title} 
-                            className="w-full h-80 lg:h-full object-cover" 
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                          <div className="absolute top-4 left-4">
-                            <span className="bg-[#1e3a8a] text-white px-3 py-1 rounded-full text-sm font-medium">
-                              {filteredEvents[0]?.category}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="lg:w-1/2 p-8 lg:p-10">
-                          <h4 className="text-3xl font-bold text-[#1e3a8a] mb-4 leading-tight">
-                            {filteredEvents[0]?.title}
-                          </h4>
-                          
-                          <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-                            {filteredEvents[0]?.description}
-                          </p>
-                          
-                          <div className="space-y-4 mb-8">
-                            <div className="flex items-center text-gray-700">
-                              <div className="bg-[#0284c7] rounded-full p-2 mr-3">
-                                <CalendarIcon size={16} className="text-white" />
-                              </div>
-                              <span className="font-medium">
-                                {filteredEvents[0]?.isRecurring ? filteredEvents[0]?.date : filteredEvents[0]?.date}
-                              </span>
-                            </div>
-                            <div className="flex items-center text-gray-700">
-                              <div className="bg-[#0284c7] rounded-full p-2 mr-3">
-                                <Clock size={16} className="text-white" />
-                              </div>
-                              <span className="font-medium">{filteredEvents[0]?.time}</span>
-                            </div>
-                            <div className="flex items-center text-gray-700">
-                              <div className="bg-[#0284c7] rounded-full p-2 mr-3">
-                                <MapPin size={16} className="text-white" />
-                              </div>
-                              <span className="font-medium">{filteredEvents[0]?.location}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-wrap gap-4">
-                            <Link 
-                              to={`/events/${filteredEvents[0]?.id}`} 
-                              className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                            >
-                              View Event Details
-                            </Link>
-                            {filteredEvents[0]?.hasResults && (
-                              <a 
-                                href={filteredEvents[0]?.resultsUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                              >
-                                View Results
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {/* Premium Events Grid */}
-                {filteredEvents.length > 1 && (
-                  <div>
-                    <h3 className="text-2xl font-bold text-[#1e3a8a] mb-8">More Upcoming Events</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-                      {filteredEvents.slice(1).map(event => (
-                        <div 
-                          key={event.id} 
-                          className="group relative bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 cursor-pointer"
-                        >
-                          {/* Premium Background Effect */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-indigo-50/0 group-hover:from-blue-50/30 group-hover:to-indigo-50/30 transition-all duration-500 rounded-3xl"></div>
-                          
-                          <div className="relative overflow-hidden rounded-t-3xl">
-                            <img 
-                              src={event.image} 
-                              alt={event.title} 
-                              className="w-full h-56 object-cover group-hover:scale-110 transition-all duration-700 ease-out" 
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent group-hover:from-black/50 transition-all duration-500" />
-                            
-                            {/* Category Badge */}
-                            <div className="absolute top-4 right-4 transform group-hover:scale-110 transition-transform duration-300">
-                              <span className="bg-[#1e3a8a]/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                                {event.category}
-                              </span>
-                            </div>
-                            
-                            {/* Results Badge */}
-                            {event.hasResults && (
-                              <div className="absolute top-4 left-4 transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
-                                <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center">
-                                  <Trophy size={12} className="mr-1" />
-                                  Results Available
-                                </span>
-                              </div>
-                            )}
-                            
-                            {/* Hover Overlay */}
-                            <div className="absolute inset-0 bg-[#0284c7]/0 group-hover:bg-[#0284c7]/10 transition-all duration-500"></div>
-                          </div>
-                          
-                          <div className="relative p-6 md:p-8">
-                            <h4 className="text-xl font-bold text-[#1e3a8a] mb-4 group-hover:text-[#0284c7] transition-colors duration-300">
-                              {event.title}
-                            </h4>
-                            
-                            <div className="space-y-3 mb-6">
-                              <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                                <div className="bg-[#0284c7]/10 rounded-full p-2 mr-3 group-hover:bg-[#0284c7]/20 group-hover:scale-110 transition-all duration-300">
-                                  <CalendarIcon size={14} className="text-[#0284c7]" />
-                                </div>
-                                <span className="text-sm font-medium">
-                                  {event.isRecurring ? event.date : event.date}
-                                </span>
-                              </div>
-                              <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                                <div className="bg-[#0284c7]/10 rounded-full p-2 mr-3 group-hover:bg-[#0284c7]/20 group-hover:scale-110 transition-all duration-300">
-                                  <Clock size={14} className="text-[#0284c7]" />
-                                </div>
-                                <span className="text-sm font-medium">{event.time}</span>
-                              </div>
-                              <div className="flex items-center text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                                <div className="bg-[#0284c7]/10 rounded-full p-2 mr-3 group-hover:bg-[#0284c7]/20 group-hover:scale-110 transition-all duration-300">
-                                  <MapPin size={14} className="text-[#0284c7]" />
-                                </div>
-                                <span className="text-sm font-medium">{event.location}</span>
-                              </div>
-                            </div>
-                            
-                            <div className="flex gap-3">
-                              <Link 
-                                to={`/events/${event.id}`} 
-                                className="flex-1 bg-gradient-to-r from-[#0284c7] to-[#0369a1] hover:from-[#0369a1] hover:to-[#1e40af] text-white px-4 py-3 rounded-xl font-semibold text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group-hover:scale-105"
-                              >
-                                View Details
-                              </Link>
-                              {event.hasResults && (
-                                <a 
-                                  href={event.resultsUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] hover:from-[#1e40af] hover:to-[#3730a3] text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group-hover:scale-105 flex items-center"
-                                >
-                                  <Trophy size={16} className="mr-1" />
-                                  Results
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Subtle glow effect on hover */}
-                          <div className="absolute -inset-1 bg-gradient-to-r from-[#0284c7]/0 via-[#0284c7]/0 to-[#0284c7]/0 group-hover:from-[#0284c7]/20 group-hover:via-[#0284c7]/10 group-hover:to-[#0284c7]/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>}
-            {/* Premium Calendar Download */}
-            <div className="mt-12 bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] rounded-2xl p-8 text-center text-white">
-              <div className="bg-white/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                <CalendarIcon size={28} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3">
-                Never Miss an Event
-              </h3>
-              <p className="mb-6 text-white/90 max-w-md mx-auto">
-                Download our complete event calendar and sync it with your personal calendar app
-              </p>
-              <button className="bg-white hover:bg-gray-100 text-[#1e3a8a] px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 inline-flex items-center">
-                <CalendarIcon size={20} className="mr-2" />
-                Download Calendar
-              </button>
-            </div>
-          </div>}
         {/* Race Results Section */}
         {activeSection === 'results' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
             <div className="flex items-center gap-3 mb-8">
@@ -1101,7 +748,7 @@ const EventsPage = () => {
                       </div>)}
                   </div>
                   <div className="bg-gray-50 p-4 border-t border-gray-200 text-right">
-                    <Link to={`/results/${event.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
+                    <Link to={`/results?event=${encodeURIComponent(event.title)}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
                       View Full Results
                       <ChevronRight size={16} className="ml-1" />
                     </Link>
@@ -1131,11 +778,16 @@ const EventsPage = () => {
             {/* Results Archive */}
             <div className="mt-12 text-center">
               <h3 className="text-xl font-semibold text-[#1e3a8a] mb-4">
-                Looking for older results?
+                Looking for more results?
               </h3>
-              <Link to="/results/archive" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded transition-colors">
-                Visit Our Results Archive
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/results" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded transition-colors">
+                  View All Race Results
+                </Link>
+                <a href="https://hallsailing.com/club/eastdownyc" target="_blank" rel="noopener noreferrer" className="inline-block bg-white border border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white px-6 py-3 rounded transition-colors">
+                  Hall Sailing Archive
+                </a>
+              </div>
             </div>
           </div>}
         {/* Training Programs Section */}

@@ -45,67 +45,6 @@ const HomePage: React.FC = () => {
       {/* Premium Hero Section */}
       <HeroSection />
 
-      {/* Club Excellence Overview */}
-      <section className="py-24 bg-gradient-to-b from-white to-maritime-mist/20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            {/* Section Header */}
-            <div className="text-center mb-16 animate-fade-in">
-              <div className="inline-flex items-center gap-2 glass-luxury rounded-full px-6 py-3 mb-6">
-                <Trophy size={18} className="text-maritime-gold-500" />
-                <span className="text-sm font-medium text-maritime-deep-navy">Excellence in Every Detail</span>
-              </div>
-              <h2 className="font-display text-display-md font-bold text-maritime-midnight mb-6">
-                Where Maritime 
-                <span className="text-gradient-gold"> Tradition</span> Thrives
-              </h2>
-              <p className="text-lg text-maritime-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Discover the pinnacle of sailing excellence on the pristine waters of Strangford Lough. 
-                Our club combines rich maritime heritage with modern luxury and world-class facilities.
-              </p>
-            </div>
-
-            {/* Premium Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="card-luxury p-8 text-center hover-lift">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-maritime-gradient rounded-2xl mb-6">
-                  <Target size={28} className="text-white" />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-maritime-midnight mb-4">
-                  Championship Racing
-                </h3>
-                <p className="text-maritime-slate-600 leading-relaxed">
-                  Compete at the highest level with our championship racing program, featuring weekly series and prestigious regattas.
-                </p>
-              </div>
-
-              <div className="card-luxury p-8 text-center hover-lift">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gold-gradient rounded-2xl mb-6">
-                  <Shield size={28} className="text-white" />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-maritime-midnight mb-4">
-                  RYA Training Centre
-                </h3>
-                <p className="text-maritime-slate-600 leading-relaxed">
-                  Learn from certified instructors at our prestigious RYA training centre, offering courses from beginner to advanced levels.
-                </p>
-              </div>
-
-              <div className="card-luxury p-8 text-center hover-lift">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-maritime-gradient rounded-2xl mb-6">
-                  <Users size={28} className="text-white" />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-maritime-midnight mb-4">
-                  Exclusive Community
-                </h3>
-                <p className="text-maritime-slate-600 leading-relaxed">
-                  Join a distinguished community of sailing enthusiasts who share your passion for maritime excellence and adventure.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Latest News & Updates */}
       <section className="py-24 bg-gradient-to-b from-maritime-mist/20 to-white">

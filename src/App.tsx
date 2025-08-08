@@ -6,6 +6,7 @@ import Footer from './layouts/Footer';
 import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
+import RaceResultsPage from './pages/RaceResultsPage';
 import ClubPage from './pages/ClubPage';
 import NewsPage from './pages/NewsPage';
 import NewsletterPage from './pages/NewsletterPage';
@@ -25,6 +26,7 @@ export function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/events" element={<EventsPage />} />
               <Route path="/events/:id" element={<EventDetailPage />} />
+              <Route path="/results" element={<RaceResultsPage />} />
               <Route path="/club" element={<ClubPage />} />
               <Route path="/news" element={<NewsPage />} />
               <Route path="/newsletters/:id" element={<NewsletterPage />} />

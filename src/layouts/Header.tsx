@@ -62,6 +62,9 @@ const Header = () => {
             <NavLink to="/events" className={navLinkClasses}>
               On The Water
             </NavLink>
+            <NavLink to="/results" className={navLinkClasses}>
+              Race Results
+            </NavLink>
             <NavLink to="/club" className={navLinkClasses}>
               Our Heritage
             </NavLink>
@@ -124,6 +127,9 @@ const Header = () => {
             </NavLink>
             <NavLink to="/events" className={navLinkClasses} onClick={toggleMenu}>
               On The Water
+            </NavLink>
+            <NavLink to="/results" className={navLinkClasses} onClick={toggleMenu}>
+              Race Results
             </NavLink>
             <NavLink to="/club" className={navLinkClasses} onClick={toggleMenu}>
               Our Heritage
