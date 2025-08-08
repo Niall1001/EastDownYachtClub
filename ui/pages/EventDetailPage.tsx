@@ -1,50 +1,64 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar as CalendarIcon, Clock, MapPin, ChevronLeft, FileText, ExternalLink, Share2 } from 'lucide-react';
+import { useEvent } from '../hooks/useEvents';
+
 const EventDetailPage = () => {
-  const {
-    id
-  } = useParams();
-  // In a real application, this would fetch data from an API
-  // For this example, we'll use mock data
+  const { id } = useParams();
+  const { event, isLoading, error } = useEvent(id);
+
+  // Fallbacks for custom fields not in API
+  const fallbackSchedule = [
+    { time: '9:00 AM', activity: 'Registration opens' },
+    { time: '10:00 AM', activity: 'Briefing' },
+    { time: '11:00 AM', activity: 'First warning signal' },
+    { time: '4:00 PM', activity: 'No warning signal after this time' },
+    { time: '5:00 PM', activity: 'Prize giving' },
+  ];
+  const fallbackClasses = [
+    'IRC Racing', 'NHC Cruisers', 'Flying Fifteen', 'Laser/ILCA', 'RS200/400', 'Dinghy Handicap'
+  ];
+  const fallbackAdditionalInfo = 'This event is part of our seasonal racing series. Points will count towards the club championship. Light refreshments will be available in the clubhouse after racing.';
+  const fallbackNoticeOfRacePdf = '/events/racing-nor.pdf';
+  const fallbackSailingInstructionsPdf = '/events/racing-si.pdf';
+  const fallbackResultsUrl = 'https://hallsailing.com/results/event1';
+  const fallbackOrganizer = 'Racing Committee';
+  const fallbackContact = 'racing@eastdownyc.co.uk';
+  const fallbackEntryFee = '£15 per boat';
+  const fallbackImage = 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+  const fallbackCategory = 'Racing';
+
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-8 text-center">Loading event details...</div>;
+  }
+  if (error || !event) {
+    return <div className="container mx-auto px-4 py-8 text-center text-red-600">{error || 'Event not found.'}</div>;
+  }
+
+  // Map API fields to UI fields
   const eventData = {
-    id: parseInt(id || '0'),
-    title: id === '8' ? 'Wednesday Club Racing' : 'Weekend Racing Series',
-    description: id === '8' ? 'Our weekly club racing series held every Wednesday evening throughout the sailing season. All classes welcome with separate starts for cruisers, dinghies, and keelboats. This is a great opportunity for members to participate in competitive sailing in a friendly atmosphere.' : 'Join us for our weekend club racing series. All classes welcome with separate starts for cruisers, dinghies, and keelboats. This event is part of our seasonal racing calendar and counts towards the club championship.',
-    date: id === '8' ? 'Every Wednesday' : 'September 16, 2023',
-    time: id === '8' ? '6:30 PM - 9:00 PM' : '10:00 AM - 4:00 PM',
-    location: 'Strangford Lough, Main Race Area',
-    category: 'Racing',
-    image: id === '8' ? 'https://images.unsplash.com/photo-1500627965408-b5f2c5f9168a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' : 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    id: event.id,
+    title: event.title,
+    description: event.description || 'No description available.',
+    date: event.startDate ? new Date(event.startDate).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) : '',
+    time: event.startTime || 'Time TBD',
+    location: event.location || 'Location TBD',
+    category: event.eventType ? event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1) : fallbackCategory,
+    image: fallbackImage,
     hasResults: true,
-    resultsUrl: 'https://hallsailing.com/results/event1',
-    isRecurring: id === '8',
-    noticeOfRacePdf: '/events/racing-nor.pdf',
-    sailingInstructionsPdf: '/events/racing-si.pdf',
-    organizer: 'Racing Committee', 
-    contact: 'racing@eastdownyc.co.uk',
-    entryFee: id === '8' ? 'Free for members / £10 for visitors' : '£15 per boat',
-    schedule: [{
-      time: id === '8' ? '6:00 PM' : '9:00 AM',
-      activity: 'Registration opens'
-    }, {
-      time: id === '8' ? '6:30 PM' : '10:00 AM',
-      activity: 'Briefing'
-    }, {
-      time: id === '8' ? '7:00 PM' : '11:00 AM',
-      activity: 'First warning signal'
-    }, {
-      time: id === '8' ? '9:00 PM' : '4:00 PM',
-      activity: 'No warning signal after this time'
-    }, {
-      time: id === '8' ? '9:30 PM' : '5:00 PM',
-      activity: 'Prize giving'
-    }],
-    classes: ['IRC Racing', 'NHC Cruisers', 'Flying Fifteen', 'Laser/ILCA', 'RS200/400', 'Dinghy Handicap'],
-    additionalInfo: id === '8' ? 'Wednesday Club Racing runs throughout the sailing season from April to September. Races are typically windward-leeward courses with separate starts for keelboats and dinghies.' : 'This event is part of our seasonal racing series. Points will count towards the club championship. Light refreshments will be available in the clubhouse after racing.'
+    resultsUrl: fallbackResultsUrl,
+    isRecurring: false,
+    noticeOfRacePdf: fallbackNoticeOfRacePdf,
+    sailingInstructionsPdf: fallbackSailingInstructionsPdf,
+    organizer: fallbackOrganizer,
+    contact: fallbackContact,
+    entryFee: fallbackEntryFee,
+    schedule: fallbackSchedule,
+    classes: fallbackClasses,
+    additionalInfo: fallbackAdditionalInfo,
   };
   // Check if we're showing the Wednesday Club Racing page
-  const isWednesdayRacing = id === '8';
+  const isWednesdayRacing = false; // API does not provide this
   return <div className="bg-white">
       {/* Page Header */}
       <div className="bg-cover bg-center h-64 md:h-96 relative" style={{
