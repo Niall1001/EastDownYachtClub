@@ -21,7 +21,7 @@ const EventDetailPage = () => {
     isRecurring: id === '8',
     noticeOfRacePdf: '/events/racing-nor.pdf',
     sailingInstructionsPdf: '/events/racing-si.pdf',
-    organizer: 'Racing Committee',
+    organizer: 'Racing Committee', 
     contact: 'racing@eastdownyc.co.uk',
     entryFee: id === '8' ? 'Free for members / £10 for visitors' : '£15 per boat',
     schedule: [{

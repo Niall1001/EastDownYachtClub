@@ -3,13 +3,14 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface NewsCardProps {
-  id: number;
+  id: number | string;
   title: string;
   excerpt: string;
   date: string;
   category: string;
   image: string;
   readTime?: number;
+  slug?: string;
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({ 
@@ -19,7 +20,8 @@ const NewsCard: React.FC<NewsCardProps> = ({
   date, 
   category, 
   image, 
-  readTime = 3 
+  readTime = 3,
+  slug 
 }) => {
   return (
     <article className="group card-luxury overflow-hidden hover-lift">
@@ -72,7 +74,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
         
         {/* Premium CTA */}
         <Link 
-          to={`/news/${id}`}
+          to={slug ? `/news/${slug}` : `/news/${id}`}
           className="inline-flex items-center gap-2 text-maritime-gold-600 hover:text-maritime-gold-700 font-medium text-sm transition-all duration-300 group/link"
         >
           <span>Read Full Story</span>

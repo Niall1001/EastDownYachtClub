@@ -1,44 +1,47 @@
 import React from 'react';
 import { 
-  Anchor, Award, Trophy, Target, Users, Calendar, 
-  MapPin, Wind, Thermometer, Eye, ArrowRight, 
+  Anchor, Award, Calendar, 
+  Wind, Thermometer, Eye, ArrowRight, 
   Shield, Star, Compass, Navigation
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeroSection from '../components/home/HeroSection';
 import NewsCard from '../components/home/NewsCard';
+import { useStories } from '../hooks/useStories';
+import { useEvents } from '../hooks/useEvents';
 
 const HomePage: React.FC = () => {
-  // Premium news data
-  const featuredNews = [
-    {
-      id: 1,
-      title: 'East Down Yacht Club Hosts Spectacular Strangford Lough Regatta',
-      excerpt: "This year's Strangford Lough Regatta was a tremendous success with record participation and perfect sailing conditions throughout the weekend.",
-      date: 'August 15, 2023',
-      category: 'Racing',
-      image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-      readTime: 4
-    },
-    {
-      id: 2,
-      title: 'New Training Courses Announced for Spring Season',
-      excerpt: "We're excited to announce our comprehensive spring training schedule, featuring courses for all skill levels from beginners to advanced racers.",
-      date: 'August 10, 2023',
-      category: 'Training',
-      image: 'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-      readTime: 3
-    },
-    {
-      id: 3,
-      title: 'Clubhouse Renovation Complete - Grand Reopening',
-      excerpt: 'After months of work, our clubhouse renovation is finally complete. Join us for the grand reopening celebration.',
-      date: 'August 5, 2023',
-      category: 'Club News',
-      image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-      readTime: 2
-    }
-  ];
+  // Fetch real stories and events data
+  const { stories, isLoading: storiesLoading, error: storiesError } = useStories({ 
+    published: true, 
+    limit: 3,
+    type: 'news'
+  });
+  
+  const { events, isLoading: eventsLoading, error: eventsError } = useEvents({ 
+    limit: 3,
+    startDate: new Date().toISOString().split('T')[0] // Today and future events
+  });
+
+  // Transform stories to match the expected format (only if stories are loaded)
+  const featuredNews = stories?.map((story, index) => ({
+    id: story.id,
+    title: story.title,
+    excerpt: story.excerpt || story.content.substring(0, 150) + '...',
+    date: new Date(story.createdAt).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }),
+    category: story.storyType.charAt(0).toUpperCase() + story.storyType.slice(1),
+    image: story.featuredImageUrl || `https://images.unsplash.com/photo-${
+      index === 0 ? '1565194481104-39d1ee1b8bcc' : 
+      index === 1 ? '1534438097545-a2c22c57f2ad' : 
+      '1540541338287-41700207dee6'
+    }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+    readTime: Math.max(1, Math.ceil(story.content.length / 1000)), // Rough reading time calculation
+    slug: story.slug
+  })) || [];
 
   return (
     <div className="min-h-screen bg-white">
@@ -71,9 +74,23 @@ const HomePage: React.FC = () => {
 
             {/* Premium News Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-              {featuredNews.map((article) => (
-                <NewsCard key={article.id} {...article} />
-              ))}
+              {storiesLoading ? (
+                <div className="col-span-full text-center py-12">
+                  <div className="text-maritime-slate-600">Loading latest stories...</div>
+                </div>
+              ) : storiesError ? (
+                <div className="col-span-full text-center py-12">
+                  <div className="text-red-600">Failed to load stories. Please try again later.</div>
+                </div>
+              ) : featuredNews.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <div className="text-maritime-slate-600">No published stories available.</div>
+                </div>
+              ) : (
+                featuredNews.map((article) => (
+                  <NewsCard key={article.id} {...article} />
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -93,29 +110,35 @@ const HomePage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-3 glass-luxury rounded-lg">
-                    <div className="w-2 h-2 bg-maritime-gold-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm mb-1">Weekend Racing Series</h4>
-                      <p className="text-maritime-silver/80 text-xs">September 16, 2023</p>
+                  {eventsLoading ? (
+                    <div className="text-maritime-silver/80 text-sm text-center py-4">
+                      Loading events...
                     </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-3 glass-luxury rounded-lg">
-                    <div className="w-2 h-2 bg-maritime-gold-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm mb-1">Junior Sailing Program</h4>
-                      <p className="text-maritime-silver/80 text-xs">September 17, 2023</p>
+                  ) : eventsError ? (
+                    <div className="text-red-400 text-sm text-center py-4">
+                      Failed to load events
                     </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-3 glass-luxury rounded-lg">
-                    <div className="w-2 h-2 bg-maritime-gold-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm mb-1">End of Summer BBQ</h4>
-                      <p className="text-maritime-silver/80 text-xs">September 23, 2023</p>
+                  ) : events.length === 0 ? (
+                    <div className="text-maritime-silver/80 text-sm text-center py-4">
+                      No upcoming events
                     </div>
-                  </div>
+                  ) : (
+                    events.slice(0, 3).map((event) => (
+                      <div key={event.id} className="flex items-start gap-3 p-3 glass-luxury rounded-lg">
+                        <div className="w-2 h-2 bg-maritime-gold-400 rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm mb-1">{event.title}</h4>
+                          <p className="text-maritime-silver/80 text-xs">
+                            {new Date(event.startDate).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
                 
                 <Link 

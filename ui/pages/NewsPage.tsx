@@ -1,66 +1,48 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Calendar, Search, Filter, ChevronRight, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useStories } from '../hooks/useStories';
 const NewsPage = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const categories = ['All', 'Club News', 'Racing', 'Training', 'Social', 'Announcements'];
-  const featuredArticle = {
-    id: 1,
-    title: 'East Down Yacht Club Hosts Successful Strangford Lough Regatta',
-    excerpt: "This year's Strangford Lough Regatta was a tremendous success with record participation and perfect sailing conditions throughout the weekend. Over 50 boats competed across multiple classes.",
-    content: "This year's Strangford Lough Regatta was a tremendous success with record participation and perfect sailing conditions throughout the weekend. Over 50 boats competed across multiple classes, with sailors traveling from across Ireland to participate in one of the most anticipated events in the Northern Irish sailing calendar.\n\nThe event kicked off on Saturday morning with a skipper's briefing, followed by three races throughout the day. Sunday saw an additional two races before the prize-giving ceremony at the clubhouse.\n\nIn the competitive IRC class, 'Sea Wolf' skippered by John McDowell took top honors, while 'Blue Jay' with the Henderson family claimed victory in the family cruiser category.",
-    date: 'August 15, 2023',
-    author: 'Sarah Thompson',
-    category: 'Racing',
-    image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  };
-  const newsArticles = [{
-    id: 2,
-    title: 'New Training Courses Announced for Spring Season',
-    excerpt: "We're excited to announce our spring training schedule, featuring courses for all skill levels from beginners to advanced racers.",
-    date: 'August 10, 2023',
-    category: 'Training',
-    image: 'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  }, {
-    id: 3,
-    title: 'Clubhouse Renovation Complete',
-    excerpt: 'After months of work, our clubhouse renovation is finally complete. Come join us for the grand reopening celebration.',
-    date: 'August 5, 2023',
-    category: 'Club News',
-    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  }, {
-    id: 4,
-    title: 'Junior Sailors Shine at Regional Championships',
-    excerpt: 'Our junior sailing team brought home multiple trophies from the Regional Youth Championships held last weekend.',
-    date: 'July 28, 2023',
-    category: 'Racing',
-    image: 'https://images.unsplash.com/photo-1532384748853-8f54a8f476e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  }, {
-    id: 5,
-    title: "Annual Commodore's Dinner Set for September",
-    excerpt: "Join us for our annual Commodore's Dinner, a celebration of the season's achievements and camaraderie.",
-    date: 'July 20, 2023',
-    category: 'Social',
-    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  }, {
-    id: 6,
-    title: 'Safety Equipment Inspection Day Scheduled',
-    excerpt: 'Ensure your boat is ready for the season with our comprehensive safety equipment inspection day.',
-    date: 'July 15, 2023',
-    category: 'Announcements',
-    image: 'https://images.unsplash.com/photo-1500627965408-b5f2c5f9168a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  }, {
-    id: 7,
-    title: 'New Committee Members Elected',
-    excerpt: "We're pleased to announce the results of our recent committee elections. Meet the team who will lead the club forward.",
-    date: 'July 10, 2023',
-    category: 'Club News',
-    image: 'https://images.unsplash.com/photo-1533558587600-b2f7f7a75518?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-  }];
+  const categories = ['All', 'News', 'Racing', 'Training', 'Social', 'Announcements'];
+
+  // Fetch real stories data
+  const { stories, isLoading, error } = useStories({ 
+    published: true,
+    limit: 50
+  });
+  // Transform stories to match expected format
+  const transformStory = (story: any) => ({
+    id: story.id,
+    title: story.title,
+    excerpt: story.excerpt || story.content.substring(0, 200) + '...',
+    content: story.content,
+    date: new Date(story.createdAt).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long', 
+      day: 'numeric'
+    }),
+    author: story.authorName || 'Club Admin',
+    category: story.storyType.charAt(0).toUpperCase() + story.storyType.slice(1),
+    image: story.featuredImageUrl || `https://images.unsplash.com/photo-${
+      story.storyType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
+      story.storyType === 'training' ? '1534438097545-a2c22c57f2ad' :
+      story.storyType === 'social' ? '1511578314322-379afb476865' :
+      story.storyType === 'announcements' ? '1500627965408-b5f2c5f9168a' :
+      '1540541338287-41700207dee6'
+    }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+    slug: story.slug
+  });
+
+  const transformedStories = stories?.map(transformStory) || [];
+  const featuredArticle = transformedStories.length > 0 ? transformedStories[0] : null;
+  const newsArticles = transformedStories.slice(1); // All except the first one (featured)
   const filteredArticles = newsArticles.filter(article => {
-    const matchesCategory = activeCategory === 'All' || article.category === activeCategory;
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'All' || 
+      article.category.toLowerCase() === activeCategory.toLowerCase();
+    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
   const newsletters = [{
@@ -84,6 +66,49 @@ const NewsPage = () => {
     date: 'September 2022',
     image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
   }];
+  // Loading and Error states
+  if (isLoading) {
+    return (
+      <div className="bg-white min-h-screen">
+        <div className="bg-[#1e3a8a] text-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Sailing Stories</h1>
+              <p className="text-lg md:text-xl mb-12">Loading the latest stories...</p>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-12 text-center">
+          <div className="text-maritime-slate-600">Please wait while we fetch the latest stories.</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white min-h-screen">
+        <div className="bg-[#1e3a8a] text-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Sailing Stories</h1>
+              <p className="text-lg md:text-xl mb-12">Error loading stories</p>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-12 text-center">
+          <div className="text-red-600 mb-4">Failed to load stories. Please try again later.</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-maritime-deep-navy hover:bg-maritime-royal text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return <div className="bg-white">
       {/* Page Header - Moved wave down for better visibility */}
       <div className="bg-[#1e3a8a] text-white py-16">
@@ -107,35 +132,37 @@ const NewsPage = () => {
       </div>
       <div className="container mx-auto px-4 py-12">
         {/* Featured Article */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6">
-            Featured Story
-          </h2>
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="md:flex">
-              <div className="md:w-1/2">
-                <img src={featuredArticle.image} alt={featuredArticle.title} className="w-full h-64 md:h-full object-cover" />
-              </div>
-              <div className="md:w-1/2 p-6 md:p-8">
-                <div className="flex items-center text-sm text-gray-500 mb-3">
-                  <Calendar size={14} className="mr-1" />
-                  <span>{featuredArticle.date}</span>
-                  <span className="mx-2">•</span>
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                    {featuredArticle.category}
-                  </span>
+        {featuredArticle && (
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6">
+              Featured Story
+            </h2>
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="md:flex">
+                <div className="md:w-1/2">
+                  <img src={featuredArticle.image} alt={featuredArticle.title} className="w-full h-64 md:h-full object-cover" />
                 </div>
-                <h3 className="text-2xl font-bold text-[#1e3a8a] mb-3">
-                  {featuredArticle.title}
-                </h3>
-                <p className="text-gray-600 mb-4">{featuredArticle.excerpt}</p>
-                <Link to={`/news/${featuredArticle.id}`} className="inline-block bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
-                  Read Full Story
-                </Link>
+                <div className="md:w-1/2 p-6 md:p-8">
+                  <div className="flex items-center text-sm text-gray-500 mb-3">
+                    <Calendar size={14} className="mr-1" />
+                    <span>{featuredArticle.date}</span>
+                    <span className="mx-2">•</span>
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                      {featuredArticle.category}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#1e3a8a] mb-3">
+                    {featuredArticle.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4">{featuredArticle.excerpt}</p>
+                  <Link to={featuredArticle.slug ? `/news/${featuredArticle.slug}` : `/news/${featuredArticle.id}`} className="inline-block bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
+                    Read Full Story
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
         {/* Search and Filters */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -153,7 +180,16 @@ const NewsPage = () => {
         </div>
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {filteredArticles.map(article => <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-md">
+          {filteredArticles.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <div className="text-gray-500">
+                {searchQuery || activeCategory !== 'All' 
+                  ? 'No stories match your search criteria.' 
+                  : 'No stories available at the moment.'}
+              </div>
+            </div>
+          ) : (
+            filteredArticles.map(article => <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-md">
               <div className="aspect-w-16 aspect-h-9">
                 <img src={article.image} alt={article.title} className="w-full h-48 object-cover" />
               </div>
@@ -173,12 +209,13 @@ const NewsPage = () => {
                 <p className="text-gray-600 mb-4 line-clamp-3">
                   {article.excerpt}
                 </p>
-                <Link to={`/news/${article.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
+                <Link to={article.slug ? `/news/${article.slug}` : `/news/${article.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
                   Read More
                   <ChevronRight size={16} className="ml-1" />
                 </Link>
               </div>
-            </div>)}
+            </div>)
+          )}
         </div>
         {/* Newsletter Section */}
         <div className="bg-gray-50 rounded-lg p-8 mb-16">

@@ -1,0 +1,29 @@
+services:
+  # Local PostgreSQL database (for local development only)
+  db:
+    profiles: ["local"]
+    image: postgres:17
+    container_name: eastdown_yacht_club_db_local
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: eastdown_yacht_club
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Flyway migrations (for local development only)
+  flyway:
+    profiles: ["local"]
+    image: flyway/flyway:10-alpine
+    command: -url=jdbc:postgresql://db/eastdown_yacht_club -schemas=public -user=user
+      -password=password -connectRetries=5 migrate
+    volumes:
+      - ./database/migrations:/flyway/sql
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

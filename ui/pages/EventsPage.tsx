@@ -1,193 +1,46 @@
-import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, MapPin, Users, ChevronLeft, ChevronRight, Sailboat, LifeBuoy, Trophy, GraduationCap, Anchor, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, ChevronLeft, ChevronRight, Sailboat, LifeBuoy, Trophy, GraduationCap, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useEvents } from '../hooks/useEvents';
 const EventsPage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  // Mock data for events
-  const upcomingEvents = [{
-    id: 1,
-    title: 'Weekend Racing Series',
-    description: 'Join us for our weekly club racing series. All classes welcome with separate starts for cruisers, dinghies, and keelboats.',
-    date: 'September 16, 2023',
-    dateObj: new Date(2023, 8, 16),
-    time: '10:00 AM - 4:00 PM',
-    location: 'Strangford Lough, Main Race Area',
-    category: 'Racing',
-    image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: true,
-    resultsUrl: 'https://hallsailing.com/results/event1',
-    isRecurring: false
-  }, {
-    id: 2,
-    title: 'Junior Sailing Program',
-    description: 'Our popular junior sailing program continues with sessions for beginners, improvers and advanced young sailors aged 8-16.',
-    date: 'September 17, 2023',
-    dateObj: new Date(2023, 8, 17),
-    time: '9:00 AM - 1:00 PM',
-    location: 'East Down YC Training Area',
-    category: 'Training',
-    image: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: false,
-    isRecurring: false
-  }, {
-    id: 3,
-    title: 'End of Summer BBQ',
-    description: 'Join us for our traditional end of summer celebration with food, drinks, live music and awards presentation for the summer series.',
-    date: 'September 23, 2023',
-    dateObj: new Date(2023, 8, 23),
-    time: '6:00 PM - 10:00 PM',
-    location: 'EDYC Clubhouse',
-    category: 'Social',
-    image: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: false,
-    isRecurring: false
-  }, {
-    id: 4,
-    title: 'Adult Improver Course',
-    description: 'A four-week course designed for adults who have some sailing experience but want to improve their skills and confidence on the water.',
-    date: 'October 1, 2023',
-    dateObj: new Date(2023, 9, 1),
-    time: '10:00 AM - 3:00 PM',
-    location: 'EDYC Training Area',
-    category: 'Training',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: false,
-    isRecurring: false
-  }, {
-    id: 5,
-    title: 'Autumn Series Racing',
-    description: 'Our popular autumn series begins with racing every Sunday. All classes welcome.',
-    date: 'October 8, 2023',
-    dateObj: new Date(2023, 9, 8),
-    time: '11:00 AM - 3:00 PM',
-    location: 'Strangford Lough, Main Race Area',
-    category: 'Racing',
-    image: 'https://images.unsplash.com/photo-1534437088728-d816f38288a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: true,
-    resultsUrl: 'https://hallsailing.com/results/event5',
-    isRecurring: false
-  }, {
-    id: 6,
-    title: 'Cruising Group Meeting',
-    description: 'Planning meeting for our winter cruising schedule. All members interested in cruising activities are welcome to attend.',
-    date: 'October 12, 2023',
-    dateObj: new Date(2023, 9, 12),
-    time: '7:30 PM - 9:00 PM',
-    location: 'EDYC Clubhouse',
-    category: 'Cruising',
-    image: 'https://images.unsplash.com/photo-1541789094913-f3809a8f3ba5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: false,
-    isRecurring: false
-  },
-  // Adding a "today" event for demonstration purposes
-  {
-    id: 7,
-    title: "Today's Club Racing",
-    description: "Join us for today's club racing event. All members welcome to participate or spectate.",
-    date: new Date().toLocaleDateString('en-US', {
+  
+  // Fetch real events data
+  const { events, isLoading, error } = useEvents({
+    startDate: new Date().toISOString().split('T')[0], // Today and future events
+    limit: 50
+  });
+
+  // Transform events to match the expected format (only if events are loaded)
+  const upcomingEvents = events?.map((event) => ({
+    id: parseInt(event.id),
+    title: event.title,
+    description: event.description || 'No description available.',
+    date: new Date(event.startDate).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     }),
-    dateObj: new Date(),
-    time: '2:00 PM - 5:00 PM',
-    location: 'Strangford Lough, Main Race Area',
-    category: 'Racing',
-    image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: true,
-    resultsUrl: 'https://hallsailing.com/results/today',
+    dateObj: new Date(event.startDate),
+    time: event.startTime ? `${event.startTime}${event.endDate ? ' - ' + new Date(event.endDate).toLocaleDateString() : ''}` : 'Time TBD',
+    location: event.location || 'Location TBD',
+    category: event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1),
+    image: `https://images.unsplash.com/photo-${
+      event.eventType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
+      event.eventType === 'training' ? '1534438097545-a2c22c57f2ad' :
+      event.eventType === 'social' ? '1470337458703-46ad1756a187' :
+      event.eventType === 'cruising' ? '1541789094913-f3809a8f3ba5' :
+      '1540946485063-a40da27545f8'
+    }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+    hasResults: false, // Will be determined by race data later
+    resultsUrl: '',
     isRecurring: false
-  },
-  // Wednesday Club Racing as a recurring event
-  {
-    id: 8,
-    title: 'Wednesday Club Racing',
-    description: 'Our weekly club racing series held every Wednesday evening throughout the sailing season. All classes welcome with separate starts.',
-    date: 'Every Wednesday',
-    dateObj: null,
-    time: '6:30 PM - 9:00 PM',
-    location: 'Strangford Lough, Main Race Area',
-    category: 'Racing',
-    image: 'https://images.unsplash.com/photo-1500627965408-b5f2c5f9168a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    hasResults: true,
-    resultsUrl: 'https://hallsailing.com/results/wednesday',
-    isRecurring: true,
-    noticeOfRacePdf: '/events/wednesday-racing-nor.pdf',
-    sailingInstructionsPdf: '/events/wednesday-racing-si.pdf'
-  }];
-  const recentResults = [{
-    id: 1,
-    title: 'Summer Regatta',
-    date: 'August 15, 2023',
-    classes: [{
-      name: 'IRC Class 1',
-      results: [{
-        position: 1,
-        boat: 'Sea Wolf',
-        skipper: 'John McDowell'
-      }, {
-        position: 2,
-        boat: 'Wild Wind',
-        skipper: 'Sarah Thompson'
-      }, {
-        position: 3,
-        boat: 'Blue Horizon',
-        skipper: 'Mark Anderson'
-      }]
-    }, {
-      name: 'Cruiser Class',
-      results: [{
-        position: 1,
-        boat: 'Blue Jay',
-        skipper: 'Henderson Family'
-      }, {
-        position: 2,
-        boat: 'Serendipity',
-        skipper: 'David Wilson'
-      }, {
-        position: 3,
-        boat: 'Halcyon',
-        skipper: 'Emma Roberts'
-      }]
-    }]
-  }, {
-    id: 2,
-    title: 'Wednesday Evening Series',
-    date: 'August 9, 2023',
-    classes: [{
-      name: 'Flying Fifteen',
-      results: [{
-        position: 1,
-        boat: 'Frequent Flyer',
-        skipper: 'Robert Brown'
-      }, {
-        position: 2,
-        boat: 'Full Flight',
-        skipper: 'James Davis'
-      }, {
-        position: 3,
-        boat: 'Firefly',
-        skipper: 'Lisa Murphy'
-      }]
-    }, {
-      name: 'Laser Class',
-      results: [{
-        position: 1,
-        boat: 'Laser 209871',
-        skipper: 'Michael Johnson'
-      }, {
-        position: 2,
-        boat: 'Laser 198342',
-        skipper: 'Thomas White'
-      }, {
-        position: 3,
-        boat: 'Laser 204567',
-        skipper: 'Rebecca Green'
-      }]
-    }]
-  }];
+  })) || [];
+
+  // Use real events data with fallback behavior for loading/error states
+  const finalEvents = isLoading || error || upcomingEvents.length === 0 ? [] : upcomingEvents;
   const trainingPrograms = [{
     id: 1,
     title: 'RYA Level 1 & 2 - Start Sailing',
@@ -216,7 +69,7 @@ const EventsPage = () => {
   // Find today's events
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Set to start of day for comparison
-  const todaysEvents = upcomingEvents.filter(event => {
+  const todaysEvents = finalEvents.filter(event => {
     if (event.isRecurring) {
       // For recurring events, check if today is the recurring day
       // For Wednesday Club Racing
@@ -251,7 +104,7 @@ const EventsPage = () => {
       month: 'long'
     });
     // Create array of dates with events
-    const datesWithEvents = upcomingEvents.map(event => {
+    const datesWithEvents = finalEvents.map(event => {
       if (event.isRecurring) {
         // For Wednesday Club Racing, mark all Wednesdays
         return null; // We'll handle this separately
@@ -285,7 +138,7 @@ const EventsPage = () => {
         if (hasEvent || hasRecurringEvent) {
           // Find the event for this date and navigate to its detail page
           const clickedDate = new Date(year, month, day);
-          const eventsForDate = upcomingEvents.filter(event => {
+          const eventsForDate = finalEvents.filter(event => {
             if (event.isRecurring && clickedDate.getDay() === 3) {
               return true; // Wednesday Club Racing
             } else if (event.dateObj) {
@@ -342,6 +195,41 @@ const EventsPage = () => {
         </div>
       </div>;
   };
+  // Loading and Error states
+  if (isLoading) {
+    return (
+      <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-maritime-midnight mb-4">Loading Events...</div>
+            <div className="text-maritime-slate-600">Please wait while we fetch the latest events.</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-red-600 mb-4">Error Loading Events</div>
+            <div className="text-maritime-slate-600 mb-4">
+              Sorry, we couldn't load the events at this time. Please try again later.
+            </div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="bg-maritime-deep-navy hover:bg-maritime-royal text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
       {/* Premium Hero Section */}
       <div className="relative bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#0284c7] text-white overflow-hidden">
@@ -359,12 +247,6 @@ const EventsPage = () => {
         
         <div className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-32 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Premium Badge */}
-            <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-white/20">
-              <Anchor className="w-5 h-5 mr-2" />
-              <span className="text-sm font-medium">East Down Yacht Club</span>
-            </div>
-            
             <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 leading-tight px-2">
               On The <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Water</span>
             </h1>
@@ -378,8 +260,8 @@ const EventsPage = () => {
               <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{recentResults.length}</div>
-                  <div className="text-xs md:text-sm text-white/90 font-medium">Recent Results</div>
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? '...' : finalEvents.length}</div>
+                  <div className="text-xs md:text-sm text-white/90 font-medium">Upcoming Events</div>
                 </div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
               </div>
@@ -532,36 +414,7 @@ const EventsPage = () => {
         {/* Premium Quick Access Cards */}
         <div className="mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] text-center mb-8 sm:mb-12 px-4">What Would You Like To Do?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            
-            {/* Race Results Card */}
-            <button 
-              onClick={() => setActiveSection('results')} 
-              className={`group relative bg-white rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border-2 overflow-hidden ${
-                activeSection === 'results' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/20 shadow-2xl' : 'border-transparent hover:border-[#0284c7]/30'
-              }`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/50 to-orange-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="absolute top-1/2 left-1/2 w-0 h-0 bg-yellow-400/10 rounded-full group-hover:w-96 group-hover:h-96 group-hover:-translate-x-48 group-hover:-translate-y-48 transition-all duration-700 ease-out"></div>
-              </div>
-              
-              <div className="relative z-10">
-                <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                  <Trophy size={28} className="text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1e3a8a] mb-3 group-hover:text-yellow-600 transition-colors duration-300">Race Results</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">View recent race results and performance statistics from our competitions</p>
-                <div className="flex items-center justify-between">
-                  <span className="bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm group-hover:shadow-md transition-shadow duration-300">
-                    {recentResults.length} recent
-                  </span>
-                  <div className="flex items-center text-[#0284c7] group-hover:text-yellow-600 transition-colors duration-300">
-                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
-                  </div>
-                </div>
-              </div>
-            </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             
             {/* Training Programs Card */}
             <button 
@@ -632,8 +485,8 @@ const EventsPage = () => {
                 <div className="bg-yellow-500 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
                   <Trophy size={24} className="text-white" />
                 </div>
-                <div className="text-2xl font-bold text-[#1e3a8a]">{recentResults.length}</div>
-                <div className="text-sm text-gray-600">Recent Results</div>
+                <div className="text-2xl font-bold text-[#1e3a8a]">{isLoading ? '...' : finalEvents.length}</div>
+                <div className="text-sm text-gray-600">Upcoming Events</div>
               </div>
               <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
                 <div className="bg-green-500 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
@@ -689,107 +542,6 @@ const EventsPage = () => {
           </div>
         )}
         
-        {/* Race Results Section */}
-        {activeSection === 'results' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full p-3">
-                <Trophy size={24} className="text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-[#1e3a8a] mb-1">Race Results</h2>
-                <p className="text-gray-600">View recent race results and performance statistics</p>
-              </div>
-            </div>
-            <div className="space-y-8">
-              {recentResults.map(event => <div key={event.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="bg-[#1e3a8a]/10 p-4 border-b border-gray-200">
-                    <h3 className="text-xl font-semibold text-[#1e3a8a]">
-                      {event.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm">{event.date}</p>
-                  </div>
-                  <div className="p-4">
-                    {event.classes.map((classItem, index) => <div key={index} className="mb-6 last:mb-0">
-                        <h4 className="font-semibold text-lg text-[#0284c7] mb-3">
-                          {classItem.name}
-                        </h4>
-                        <div className="overflow-x-auto">
-                          <table className="min-w-full">
-                            <thead>
-                              <tr className="bg-gray-50">
-                                <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Position
-                                </th>
-                                <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Boat
-                                </th>
-                                <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Skipper
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                              {classItem.results.map((result, i) => <tr key={i} className={i === 0 ? 'bg-yellow-50' : ''}>
-                                  <td className="py-3 px-4 whitespace-nowrap">
-                                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full ${i === 0 ? 'bg-yellow-100 text-yellow-800' : i === 1 ? 'bg-gray-100 text-gray-800' : i === 2 ? 'bg-orange-100 text-orange-800' : 'bg-white text-gray-800 border border-gray-200'}`}>
-                                      {result.position}
-                                    </span>
-                                  </td>
-                                  <td className="py-3 px-4 whitespace-nowrap font-medium">
-                                    {result.boat}
-                                  </td>
-                                  <td className="py-3 px-4 whitespace-nowrap">
-                                    {result.skipper}
-                                  </td>
-                                </tr>)}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>)}
-                  </div>
-                  <div className="bg-gray-50 p-4 border-t border-gray-200 text-right">
-                    <Link to={`/results?event=${encodeURIComponent(event.title)}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
-                      View Full Results
-                      <ChevronRight size={16} className="ml-1" />
-                    </Link>
-                  </div>
-                </div>)}
-            </div>
-            {/* Hall Sailing Integration */}
-            <div className="mt-12 bg-blue-50 rounded-lg p-6 border border-blue-100">
-              <div className="md:flex items-center justify-between">
-                <div className="md:w-3/4 mb-4 md:mb-0 md:pr-6">
-                  <h3 className="text-xl font-semibold text-[#1e3a8a] mb-2">
-                    Hall Sailing Results
-                  </h3>
-                  <p className="text-gray-600">
-                    View comprehensive race results, statistics, and performance
-                    analysis for all East Down Yacht Club events through our
-                    Hall Sailing integration.
-                  </p>
-                </div>
-                <div className="md:w-1/4 text-center">
-                  <a href="https://hallsailing.com/club/eastdownyc" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-4 py-2 rounded transition-colors">
-                    View All Results
-                  </a>
-                </div>
-              </div>
-            </div>
-            {/* Results Archive */}
-            <div className="mt-12 text-center">
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-4">
-                Looking for more results?
-              </h3>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/results" className="inline-block bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-3 rounded transition-colors">
-                  View All Race Results
-                </Link>
-                <a href="https://hallsailing.com/club/eastdownyc" target="_blank" rel="noopener noreferrer" className="inline-block bg-white border border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white px-6 py-3 rounded transition-colors">
-                  Hall Sailing Archive
-                </a>
-              </div>
-            </div>
-          </div>}
         {/* Training Programs Section */}
         {activeSection === 'training' && <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-in fade-in-50 slide-in-from-right-4 duration-500">
             <div className="flex items-center gap-3 mb-8">
