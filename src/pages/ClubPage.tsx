@@ -195,22 +195,29 @@ const ClubPage = () => {
   return (
     <div className="bg-white">
       {/* Page Header with Wave Animation */}
-      <div className="bg-maritime-gradient text-white py-16 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#843c5c] via-[#843c5c] to-[#843c5c]/90 text-white py-16 relative overflow-hidden">
         {/* Background Wave Pattern */}
-        <div className="absolute inset-0 bg-wave-pattern opacity-20"></div>
-        
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="club-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M10 2L18 18L2 18Z" fill="currentColor" opacity="0.3"/>
+              </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#club-pattern)"/>
+          </svg>
+        </div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl">
-            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
               Our Heritage
             </h1>
-            <p className="text-lg md:text-xl mb-12 text-maritime-mist/90">
+            <p className="text-lg md:text-xl mb-12 text-white/90">
               Discover the rich history, people, and facilities that make East
               Down Yacht Club special
             </p>
           </div>
         </div>
-
         {/* Enhanced Wave decoration with animation */}
         <div className="relative h-16 mt-12">
           <svg 
@@ -233,8 +240,8 @@ const ClubPage = () => {
           <button 
             className={`py-2 px-4 font-medium text-sm whitespace-nowrap transition-colors ${
               activeTab === 'history' 
-                ? 'text-maritime-deep-navy border-b-2 border-maritime-gold-500' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-[#843c5c] border-b-2 border-[#843c5c]' 
+                : 'text-gray-500 hover:text-[#843c5c]'
             }`} 
             onClick={() => setActiveTab('history')}
           >
@@ -243,8 +250,8 @@ const ClubPage = () => {
           <button 
             className={`py-2 px-4 font-medium text-sm whitespace-nowrap transition-colors ${
               activeTab === 'committee' 
-                ? 'text-maritime-deep-navy border-b-2 border-maritime-gold-500' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-[#843c5c] border-b-2 border-[#843c5c]' 
+                : 'text-gray-500 hover:text-[#843c5c]'
             }`} 
             onClick={() => setActiveTab('committee')}
           >
@@ -253,8 +260,8 @@ const ClubPage = () => {
           <button 
             className={`py-2 px-4 font-medium text-sm whitespace-nowrap transition-colors ${
               activeTab === 'facilities' 
-                ? 'text-maritime-deep-navy border-b-2 border-maritime-gold-500' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-[#843c5c] border-b-2 border-[#843c5c]' 
+                : 'text-gray-500 hover:text-[#843c5c]'
             }`} 
             onClick={() => setActiveTab('facilities')}
           >
@@ -263,8 +270,8 @@ const ClubPage = () => {
           <button 
             className={`py-2 px-4 font-medium text-sm whitespace-nowrap transition-colors ${
               activeTab === 'awards' 
-                ? 'text-maritime-deep-navy border-b-2 border-maritime-gold-500' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-[#843c5c] border-b-2 border-[#843c5c]' 
+                : 'text-gray-500 hover:text-[#843c5c]'
             }`} 
             onClick={() => setActiveTab('awards')}
           >
@@ -278,10 +285,10 @@ const ClubPage = () => {
             <div className="mb-12">
               <div className="md:flex items-center gap-8 mb-8">
                 <div className="md:w-1/2 mb-6 md:mb-0">
-                  <h2 className="font-display text-3xl font-bold text-maritime-midnight mb-4">
+                  <h2 className="text-3xl font-bold text-[#843c5c] mb-4">
                     A Proud Sailing Tradition
                   </h2>
-                  <p className="text-maritime-slate-600 mb-4">
+                  <p className="text-[#843c5c]/80 mb-4">
                     East Down Yacht Club has been at the heart of sailing on
                     Strangford Lough since 1928. From humble beginnings with a
                     handful of enthusiasts, we've grown into one of Northern
@@ -289,7 +296,7 @@ const ClubPage = () => {
                     a rich history of competitive racing, training excellence,
                     and community spirit.
                   </p>
-                  <p className="text-maritime-slate-600">
+                  <p className="text-[#843c5c]/80">
                     Throughout our history, we've maintained our founding
                     principles of promoting sailing, fostering camaraderie among
                     members, and preserving the natural beauty of Strangford
@@ -300,7 +307,7 @@ const ClubPage = () => {
                   <img
                     src="https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
                     alt="Historical sailing photo"
-                    className="w-full h-64 object-cover rounded-lg shadow-luxury"
+                    className="w-full h-64 object-cover rounded-lg shadow-lg"
                   />
                 </div>
               </div>
@@ -308,7 +315,7 @@ const ClubPage = () => {
 
             {/* Enhanced Timeline with Wave Animations */}
             <div className="relative">
-              <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-1 h-full bg-maritime-gold-300 rounded-full"></div>
+              <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-1 h-full bg-[#843c5c]/40 rounded-full"></div>
               
               {historyEvents.map((event, index) => (
                 <div
@@ -330,31 +337,31 @@ const ClubPage = () => {
                   {/* Timeline dot with wave effect */}
                   <div className={`absolute ${
                     index % 2 === 0 ? 'right-0 md:right-[-0.5rem]' : 'left-0 md:left-[-0.5rem]'
-                  } top-8 w-4 h-4 bg-maritime-gold-500 rounded-full border-4 border-white shadow-elegant z-10`}>
+                  } top-8 w-4 h-4 bg-[#843c5c] rounded-full border-4 border-white shadow-lg z-10`}>
                     {visibleSections.includes(index) && (
-                      <div className="absolute inset-0 bg-maritime-gold-400 rounded-full animate-ping"></div>
+                      <div className="absolute inset-0 bg-[#843c5c]/60 rounded-full animate-ping"></div>
                     )}
                   </div>
                   
-                  <div className="card-luxury p-6 ml-8 md:ml-0">
+                  <div className="bg-white rounded-xl shadow-lg p-6 ml-8 md:ml-0 border border-[#843c5c]/10">
                     <div className="flex flex-col md:flex-row gap-6">
                       <div className="md:w-1/3">
                         <img
                           src={event.image}
                           alt={event.title}
-                          className="w-full h-32 object-cover rounded-lg shadow-elegant"
+                          className="w-full h-32 object-cover rounded-lg shadow"
                         />
                       </div>
                       <div className="md:w-2/3">
                         <div className="flex items-center gap-4 mb-3">
-                          <span className="bg-maritime-gold-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                          <span className="bg-[#843c5c] text-white text-sm font-bold px-3 py-1 rounded-full">
                             {event.year}
                           </span>
                         </div>
-                        <h3 className="font-display text-xl font-semibold text-maritime-midnight mb-2">
+                        <h3 className="text-xl font-semibold text-[#843c5c] mb-2">
                           {event.title}
                         </h3>
-                        <p className="text-maritime-slate-600 text-sm leading-relaxed">
+                        <p className="text-[#843c5c]/80 text-sm leading-relaxed">
                           {event.description}
                         </p>
                       </div>
@@ -370,10 +377,10 @@ const ClubPage = () => {
         {activeTab === 'committee' && (
           <div>
             <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold text-maritime-midnight mb-4">
+              <h2 className="text-3xl font-bold text-[#843c5c] mb-4">
                 Leadership Team
               </h2>
-              <p className="text-maritime-slate-600 max-w-3xl">
+              <p className="text-[#843c5c]/80 max-w-3xl">
                 Our dedicated committee members bring years of sailing experience and passion
                 for the sport to guide East Down Yacht Club into the future.
               </p>
@@ -392,16 +399,16 @@ const ClubPage = () => {
                       : 'wave-reveal-card'
                   } ${rippleActiveCards.has(index) ? 'wave-ripple ripple-active' : 'wave-ripple'} wave-stagger-${(index % 5) + 1}`}
                 >
-                  <div className="card-luxury p-6 hover-lift">
+                  <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl border border-[#843c5c]/10">
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-20 h-20 rounded-full mx-auto mb-4 shadow-elegant"
+                      className="w-20 h-20 rounded-full mx-auto mb-4 shadow"
                     />
-                    <h3 className="font-display font-semibold text-maritime-midnight mb-1">
+                    <h3 className="font-semibold text-[#843c5c] mb-1">
                       {member.name}
                     </h3>
-                    <p className="text-maritime-gold-600 text-sm font-medium">
+                    <p className="text-[#843c5c]/80 text-sm font-medium">
                       {member.position}
                     </p>
                   </div>
@@ -415,10 +422,10 @@ const ClubPage = () => {
         {activeTab === 'facilities' && (
           <div>
             <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold text-maritime-midnight mb-4">
+              <h2 className="text-3xl font-bold text-[#843c5c] mb-4">
                 World-Class Facilities
               </h2>
-              <p className="text-maritime-slate-600 max-w-3xl">
+              <p className="text-[#843c5c]/80 max-w-3xl">
                 Our modern facilities provide everything you need for sailing, training,
                 and socializing in a beautiful waterfront setting.
               </p>
@@ -431,23 +438,23 @@ const ClubPage = () => {
                   ref={el => facilityRefs.current[index] = el}
                   data-id={index}
                   data-type="facility"
-                  className={`${
+                  className={`$${
                     visibleSections.includes(index) 
                       ? 'wave-reveal-card revealed' 
                       : 'wave-reveal-card'
                   } ${rippleActiveCards.has(index) ? 'wave-ripple ripple-active' : 'wave-ripple'} wave-stagger-${(index % 4) + 1}`}
                 >
-                  <div className="card-luxury overflow-hidden hover-lift">
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl border border-[#843c5c]/10">
                     <img
                       src={facility.src}
                       alt={facility.alt}
                       className="w-full h-64 object-cover"
                     />
                     <div className="p-6">
-                      <h3 className="font-display text-xl font-semibold text-maritime-midnight mb-2">
+                      <h3 className="text-xl font-semibold text-[#843c5c] mb-2">
                         {facility.title}
                       </h3>
-                      <p className="text-maritime-slate-600 text-sm">
+                      <p className="text-[#843c5c]/80 text-sm">
                         State-of-the-art {facility.title.toLowerCase()} facilities designed for comfort and functionality.
                       </p>
                     </div>
@@ -462,10 +469,10 @@ const ClubPage = () => {
         {activeTab === 'awards' && (
           <div>
             <div className="mb-8">
-              <h2 className="font-display text-3xl font-bold text-maritime-midnight mb-4">
+              <h2 className="text-3xl font-bold text-[#843c5c] mb-4">
                 Recognition & Awards
               </h2>
-              <p className="text-maritime-slate-600 max-w-3xl">
+              <p className="text-[#843c5c]/80 max-w-3xl">
                 Our commitment to excellence in sailing, training, and community service
                 has been recognized with numerous awards and accolades.
               </p>
@@ -478,28 +485,28 @@ const ClubPage = () => {
                   ref={el => awardRefs.current[index] = el}
                   data-id={index}
                   data-type="award"
-                  className={`${
+                  className={`$${
                     visibleSections.includes(index) 
                       ? 'wave-reveal-card revealed' 
                       : 'wave-reveal-card'
                   } ${rippleActiveCards.has(index) ? 'wave-ripple ripple-active' : 'wave-ripple'} wave-stagger-${(index % 5) + 1}`}
                 >
-                  <div className="card-luxury p-6 hover-lift">
+                  <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl border border-[#843c5c]/10">
                     <div className="flex items-center gap-4">
-                      <div className="bg-maritime-gold-500 text-white p-3 rounded-full">
+                      <div className="bg-[#843c5c] text-white p-3 rounded-full">
                         <Award size={24} />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <span className="bg-maritime-deep-navy text-white text-sm font-bold px-3 py-1 rounded-full">
+                          <span className="bg-[#843c5c] text-white text-sm font-bold px-3 py-1 rounded-full">
                             {award.year}
                           </span>
                         </div>
-                        <h3 className="font-display text-lg font-semibold text-maritime-midnight">
+                        <h3 className="text-lg font-semibold text-[#843c5c]">
                           {award.award}
                         </h3>
                       </div>
-                      <ChevronRight size={20} className="text-maritime-gold-500" />
+                      <ChevronRight size={20} className="text-[#843c5c]" />
                     </div>
                   </div>
                 </div>
@@ -509,30 +516,30 @@ const ClubPage = () => {
         )}
 
         {/* Contact Section */}
-        <div className="mt-16 pt-16 border-t border-maritime-silver/30">
-          <div className="card-luxury p-8 text-center">
-            <h2 className="font-display text-2xl font-bold text-maritime-midnight mb-4">
+        <div className="mt-16 pt-16 border-t border-[#843c5c]/20">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-[#843c5c]/10">
+            <h2 className="text-2xl font-bold text-[#843c5c] mb-4">
               Visit East Down Yacht Club
             </h2>
-            <p className="text-maritime-slate-600 mb-6 max-w-2xl mx-auto">
+            <p className="text-[#843c5c]/80 mb-6 max-w-2xl mx-auto">
               Come and experience our facilities, meet our members, and discover
               why EDYC is the premier sailing destination on Strangford Lough.
             </p>
             <div className="flex flex-col md:flex-row justify-center gap-6 mb-8">
-              <div className="flex items-center gap-3 text-maritime-slate-700">
-                <MapPin size={18} className="text-maritime-gold-500" />
+              <div className="flex items-center gap-3 text-[#843c5c]/80">
+                <MapPin size={18} className="text-[#843c5c]" />
                 <span className="text-sm">Quoile Road, Downpatrick, BT30 7JB</span>
               </div>
-              <div className="flex items-center gap-3 text-maritime-slate-700">
-                <Phone size={18} className="text-maritime-gold-500" />
+              <div className="flex items-center gap-3 text-[#843c5c]/80">
+                <Phone size={18} className="text-[#843c5c]" />
                 <span className="text-sm">028 4461 2266</span>
               </div>
-              <div className="flex items-center gap-3 text-maritime-slate-700">
-                <Mail size={18} className="text-maritime-gold-500" />
+              <div className="flex items-center gap-3 text-[#843c5c]/80">
+                <Mail size={18} className="text-[#843c5c]" />
                 <span className="text-sm">info@eastdownyc.co.uk</span>
               </div>
             </div>
-            <Link to="/join" className="btn-primary-luxury">
+            <Link to="/join" className="bg-[#843c5c] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#a05a7a] transition-colors">
               Join Our Community
             </Link>
           </div>

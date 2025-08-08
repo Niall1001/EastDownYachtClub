@@ -65,25 +65,42 @@ const NewsletterPage = () => {
       </div>;
   }
   return <div className="bg-white">
-      {/* Page Header */}
-      <div className="bg-cover bg-center h-64 md:h-80 relative" style={{
-      backgroundImage: `url(${newsletter.image})`,
-      backgroundBlendMode: 'overlay',
-      backgroundColor: 'rgba(0,0,0,0.4)'
-    }}>
-        <div className="absolute inset-0 flex items-center">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl text-white">
-              <div className="flex items-center text-sm mb-3">
-                <CalendarIcon size={16} className="mr-1" />
-                <span>{newsletter.date}</span>
-              </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2">
-                {newsletter.title}
-              </h1>
-              <p className="text-lg md:text-xl">East Down Yacht Club</p>
-            </div>
+      {/* Page Header with Wave Animation */}
+      <div className="bg-gradient-to-br from-[#843c5c] via-[#843c5c] to-[#843c5c]/90 text-white py-16 relative overflow-hidden">
+        {/* Background Wave Pattern */}
+        <div className="absolute inset-0 opacity-10 animate-fade-in">
+          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="newsletter-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M10 2L18 18L2 18Z" fill="currentColor" opacity="0.3"/>
+              </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#newsletter-pattern)"/>
+          </svg>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              Newsletter Signup
+            </h1>
+            <p className="text-lg md:text-xl mb-12 text-white/90">
+              Stay connected with the latest news, events, and updates from East Down Yacht Club
+            </p>
           </div>
+        </div>
+        {/* Enhanced Wave decoration with animation */}
+        <div className="relative h-16 mt-12">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 1440 100" 
+            className="absolute bottom-0 w-full h-auto animate-wave"
+          >
+            <path 
+              fill="#ffffff" 
+              fillOpacity="1" 
+              d="M0,64L60,53.3C120,43,240,21,360,21.3C480,21,600,43,720,53.3C840,64,960,64,1080,58.7C1200,53,1320,43,1380,37.3L1440,32L1440,100L1380,100C1320,100,1200,100,1080,100C960,100,840,100,720,100C600,100,480,100,360,100C240,100,120,100,60,100L0,100Z"
+            />
+          </svg>
         </div>
       </div>
       <div className="container mx-auto px-4 py-8">
@@ -116,7 +133,7 @@ const NewsletterPage = () => {
                 <p className="text-gray-600">{newsletter.commodoreMessage}</p>
               </div>
               {/* Preview Image */}
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+              <h3 className="text-xl font-semibold text-[#1e3a8f] mb-3">
                 Newsletter Preview
               </h3>
               <div className="bg-gray-100 p-4 rounded-lg mb-6 text-center">

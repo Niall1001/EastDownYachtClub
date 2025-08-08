@@ -7,7 +7,9 @@
       "Bash(pkill:*)",
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

@@ -16,7 +16,7 @@
   }
   
   body {
-    @apply font-elegant text-maritime-slate-700 antialiased;
+    @apply font-elegant text-yacht-gray-700 antialiased;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -31,7 +31,47 @@
 
 /* Premium Components */
 @layer components {
-  /* Luxury Button Styles */
+  /* Yacht Club Button Styles */
+  .btn-primary-yacht {
+    @apply relative overflow-hidden bg-yacht-primary text-white font-semibold px-8 py-4 rounded-xl;
+    @apply shadow-premium hover:shadow-luxury transition-all duration-500 ease-out;
+    @apply border border-yacht-primary-light hover:border-yacht-primary-dark;
+    background: linear-gradient(135deg, #843c5c 0%, #a14d6b 100%);
+    box-shadow: 0 10px 25px rgba(132, 60, 92, 0.25);
+  }
+  
+  .btn-primary-yacht:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(132, 60, 92, 0.35);
+  }
+  
+  .btn-primary-yacht::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: all 0.6s ease;
+  }
+  
+  .btn-primary-yacht:hover::before {
+    @apply opacity-20;
+    animation: shimmer 0.6s ease;
+  }
+  
+  .btn-secondary-yacht {
+    @apply relative overflow-hidden bg-white text-yacht-primary font-semibold px-8 py-4 rounded-xl;
+    @apply shadow-elegant hover:shadow-premium transition-all duration-500 ease-out;
+    @apply border border-yacht-gray-200 hover:border-yacht-primary;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
+    backdrop-filter: blur(10px);
+  }
+  
+  .btn-secondary-yacht:hover {
+    transform: translateY(-2px);
+    @apply text-yacht-primary-dark border-yacht-primary;
+  }
+  
+  /* Legacy maritime button for backward compatibility */
   .btn-primary-luxury {
     @apply relative overflow-hidden bg-maritime-gold-500 text-white font-semibold px-8 py-4 rounded-xl;
     @apply shadow-premium hover:shadow-luxury transition-all duration-500 ease-out;
@@ -103,7 +143,38 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
   
+  /* Yacht Club Card Styles */
+  .card-yacht {
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-elegant;
+    @apply border border-yacht-gray-200 hover:border-yacht-primary;
+    @apply transition-all duration-500 ease-out hover:shadow-premium;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
+  }
+  
+  .card-yacht:hover {
+    transform: translateY(-8px);
+  }
+  
+  .card-yacht-accent {
+    @apply bg-yacht-primary/90 backdrop-blur-sm rounded-2xl shadow-luxury;
+    @apply border border-yacht-primary-light hover:border-yacht-primary-dark;
+    @apply transition-all duration-500 ease-out;
+    background: linear-gradient(135deg, rgba(132, 60, 92, 0.95) 0%, rgba(161, 77, 107, 0.9) 100%);
+  }
+  
+  .card-yacht-accent:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 30px rgba(132, 60, 92, 0.3);
+  }
+
   /* Premium Text Gradients */
+  .text-gradient-yacht {
+    background: linear-gradient(135deg, #843c5c 0%, #a14d6b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
   .text-gradient-gold {
     background: linear-gradient(135deg, #D69E2E 0%, #F6C577 100%);
     -webkit-background-clip: text;

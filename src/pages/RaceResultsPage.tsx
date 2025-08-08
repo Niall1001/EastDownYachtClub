@@ -549,6 +549,7 @@ const RaceResultsPage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
+  // Update status and type color helpers to use #843c5c and white
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Completed':
@@ -567,22 +568,22 @@ const RaceResultsPage: React.FC = () => {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'Championship':
-        return 'bg-gold-100 text-gold-800';
+        return 'bg-[#843c5c]/10 text-[#843c5c]';
       case 'Series':
-        return 'bg-maritime-royal/10 text-maritime-royal';
+        return 'bg-[#843c5c]/10 text-[#843c5c]';
       case 'Fun Race':
         return 'bg-green-100 text-green-800';
       case 'Regatta':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-[#843c5c]/10 text-[#843c5c]';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-maritime-mist/20 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#843c5c]/10 to-white">
       {/* Premium Header */}
-      <div className="relative bg-ocean-gradient text-white overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#843c5c] via-[#843c5c] to-[#843c5c]/90 text-white overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -599,36 +600,35 @@ const RaceResultsPage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center">
             {/* Premium Badge */}
             <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-white/20">
-              <Trophy className="w-5 h-5 mr-2 text-maritime-gold-400" />
+              <Trophy className="w-5 h-5 mr-2 text-white" />
               <span className="text-sm font-medium">Race Results</span>
             </div>
 
-            <h1 className="font-display text-display-lg font-bold mb-6 text-shadow-luxury">
-              Competition 
-              <span className="text-gradient-gold"> Results</span>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Competition <span className="bg-gradient-to-r from-white to-white bg-clip-text text-transparent">Results</span>
             </h1>
 
-            <p className="text-xl text-maritime-silver/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
               Discover race results, performance statistics, and championship standings from all our sailing competitions
             </p>
 
             {/* Premium Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="glass-luxury rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="text-3xl font-display font-bold text-maritime-gold-400 mb-2">{raceResults.length}</div>
-                <div className="text-maritime-silver/80 text-sm">Events Completed</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="text-3xl font-bold text-white mb-2">{raceResults.length}</div>
+                <div className="text-white/80 text-sm">Events Completed</div>
               </div>
-              <div className="glass-luxury rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="text-3xl font-display font-bold text-maritime-gold-400 mb-2">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="text-3xl font-bold text-white mb-2">
                   {raceResults.reduce((sum, event) => sum + event.participants, 0)}
                 </div>
-                <div className="text-maritime-silver/80 text-sm">Total Participants</div>
+                <div className="text-white/80 text-sm">Total Participants</div>
               </div>
-              <div className="glass-luxury rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="text-3xl font-display font-bold text-maritime-gold-400 mb-2">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="text-3xl font-bold text-white mb-2">
                   {uniqueClasses.length}
                 </div>
-                <div className="text-maritime-silver/80 text-sm">Race Classes</div>
+                <div className="text-white/80 text-sm">Race Classes</div>
               </div>
             </div>
           </div>
@@ -637,18 +637,18 @@ const RaceResultsPage: React.FC = () => {
         {/* Wave decoration */}
         <div className="absolute bottom-0 left-0 right-0 h-20">
           <svg viewBox="0 0 1440 120" className="w-full h-full" preserveAspectRatio="none">
-            <path fill="#f8fafc" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,112C1200,117,1320,107,1380,101.3L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"/>
+            <path fill="#fff" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,112C1200,117,1320,107,1380,101.3L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"/>
           </svg>
         </div>
       </div>
 
       <div className="container mx-auto px-4 -mt-12 relative z-20">
         {/* Search and Filter Section */}
-        <div className="card-luxury p-8 mb-8 shadow-luxury">
+        <div className="bg-white rounded-2xl p-8 mb-8 shadow-lg border border-[#843c5c]/10">
           <div className="flex flex-col lg:flex-row lg:items-center gap-6">
             {/* Search Bar */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-maritime-slate-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#843c5c]/60" size={20} />
               <input
                 type="text"
                 placeholder="Search races, boats, or skippers..."
@@ -657,7 +657,7 @@ const RaceResultsPage: React.FC = () => {
                   setSearchTerm(e.target.value);
                   handleFilterChange('search', e.target.value);
                 }}
-                className="w-full pl-12 pr-4 py-3 border border-maritime-silver rounded-lg focus:ring-2 focus:ring-maritime-gold-400/20 focus:border-maritime-gold-400 transition-all"
+                className="w-full pl-12 pr-4 py-3 border border-[#843c5c]/20 rounded-lg focus:ring-2 focus:ring-[#843c5c]/20 focus:border-[#843c5c] transition-all"
               />
             </div>
 
@@ -665,7 +665,7 @@ const RaceResultsPage: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-maritime-deep-navy text-white rounded-lg hover:bg-maritime-midnight transition-all duration-300"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#843c5c] text-white rounded-lg hover:bg-[#a05a7a] transition-all duration-300"
               >
                 <Filter size={18} />
                 <span>Filters</span>
@@ -677,18 +677,18 @@ const RaceResultsPage: React.FC = () => {
 
               {/* Filter Dropdown */}
               {isFilterOpen && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-luxury border border-maritime-silver/20 z-30 p-6">
+                <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-[#843c5c]/20 z-30 p-6">
                   <div className="space-y-4">
                     {/* Event Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-maritime-slate-700 mb-2">Event</label>
+                      <label className="block text-sm font-medium text-[#843c5c] mb-2">Event</label>
                       <select
                         value={selectedEvent}
                         onChange={(e) => {
                           setSelectedEvent(e.target.value);
                           handleFilterChange('event', e.target.value);
                         }}
-                        className="w-full p-2 border border-maritime-silver rounded-lg focus:ring-2 focus:ring-maritime-gold-400/20 focus:border-maritime-gold-400 transition-all"
+                        className="w-full p-2 border border-[#843c5c]/20 rounded-lg focus:ring-2 focus:ring-[#843c5c]/20 focus:border-[#843c5c] transition-all"
                       >
                         <option value="">All Events</option>
                         {uniqueEvents.map(event => (
@@ -699,14 +699,14 @@ const RaceResultsPage: React.FC = () => {
 
                     {/* Class Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-maritime-slate-700 mb-2">Class</label>
+                      <label className="block text-sm font-medium text-[#843c5c] mb-2">Class</label>
                       <select
                         value={selectedClass}
                         onChange={(e) => {
                           setSelectedClass(e.target.value);
                           handleFilterChange('class', e.target.value);
                         }}
-                        className="w-full p-2 border border-maritime-silver rounded-lg focus:ring-2 focus:ring-maritime-gold-400/20 focus:border-maritime-gold-400 transition-all"
+                        className="w-full p-2 border border-[#843c5c]/20 rounded-lg focus:ring-2 focus:ring-[#843c5c]/20 focus:border-[#843c5c] transition-all"
                       >
                         <option value="">All Classes</option>
                         {uniqueClasses.map(cls => (
@@ -717,14 +717,14 @@ const RaceResultsPage: React.FC = () => {
 
                     {/* Type Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-maritime-slate-700 mb-2">Type</label>
+                      <label className="block text-sm font-medium text-[#843c5c] mb-2">Type</label>
                       <select
                         value={selectedType}
                         onChange={(e) => {
                           setSelectedType(e.target.value);
                           handleFilterChange('type', e.target.value);
                         }}
-                        className="w-full p-2 border border-maritime-silver rounded-lg focus:ring-2 focus:ring-maritime-gold-400/20 focus:border-maritime-gold-400 transition-all"
+                        className="w-full p-2 border border-[#843c5c]/20 rounded-lg focus:ring-2 focus:ring-[#843c5c]/20 focus:border-[#843c5c] transition-all"
                       >
                         <option value="">All Types</option>
                         {uniqueTypes.map(type => (
@@ -739,7 +739,7 @@ const RaceResultsPage: React.FC = () => {
                         clearFilters();
                         setIsFilterOpen(false);
                       }}
-                      className="w-full px-4 py-2 text-maritime-gold-600 hover:bg-maritime-gold-50 rounded-lg transition-colors duration-200"
+                      className="w-full px-4 py-2 text-[#843c5c] hover:bg-[#843c5c]/10 rounded-lg transition-colors duration-200"
                     >
                       Clear All Filters
                     </button>
@@ -751,15 +751,15 @@ const RaceResultsPage: React.FC = () => {
 
           {/* Active Filters Display */}
           {(searchTerm || selectedEvent || selectedClass || selectedType) && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-maritime-silver/20">
-              <span className="text-sm text-maritime-slate-600 mr-2">Active filters:</span>
+            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-[#843c5c]/10">
+              <span className="text-sm text-[#843c5c] mr-2">Active filters:</span>
               {searchTerm && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-maritime-gold-100 text-maritime-gold-800 text-xs rounded-full">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#843c5c]/10 text-[#843c5c] text-xs rounded-full">
                   Search: "{searchTerm}"
                 </span>
               )}
               {selectedEvent && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-maritime-royal/10 text-maritime-royal text-xs rounded-full">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#843c5c]/10 text-[#843c5c] text-xs rounded-full">
                   Event: {selectedEvent}
                 </span>
               )}
@@ -769,7 +769,7 @@ const RaceResultsPage: React.FC = () => {
                 </span>
               )}
               {selectedType && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#843c5c]/10 text-[#843c5c] text-xs rounded-full">
                   Type: {selectedType}
                 </span>
               )}
@@ -780,23 +780,17 @@ const RaceResultsPage: React.FC = () => {
         {/* Results List */}
         <div className="space-y-8">
           {filteredResults.map((event, index) => (
-            <div key={event.id} className="card-luxury shadow-luxury overflow-hidden animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
+            <div key={event.id} className="bg-white rounded-2xl shadow-lg border border-[#843c5c]/10 overflow-hidden animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
               {/* Event Header */}
-              <div className="bg-gradient-to-r from-maritime-deep-navy to-maritime-royal text-white p-6">
+              <div className="bg-gradient-to-r from-[#843c5c] to-[#843c5c]/80 text-white p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(event.type)}`}>
-                        {event.type}
-                      </span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
-                        {event.status}
-                      </span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(event.type)}`}>{event.type}</span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>{event.status}</span>
                     </div>
-                    
-                    <h2 className="text-2xl font-display font-bold mb-2">{event.title}</h2>
-                    
-                    <div className="flex flex-wrap items-center gap-6 text-maritime-silver/90">
+                    <h2 className="text-2xl font-bold mb-2">{event.title}</h2>
+                    <div className="flex flex-wrap items-center gap-6 text-white/80">
                       <div className="flex items-center gap-2">
                         <CalendarIcon size={16} />
                         <span className="text-sm">{event.date}</span>
@@ -815,26 +809,25 @@ const RaceResultsPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-
                   {/* Weather Conditions */}
                   {event.weather && (
-                    <div className="glass-luxury rounded-xl p-4 border border-white/20">
+                    <div className="bg-white/10 rounded-xl p-4 border border-white/20">
                       <h4 className="font-medium mb-3 text-white">Conditions</h4>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div className="flex items-center gap-2">
-                          <Wind size={14} className="text-maritime-gold-400" />
+                          <Wind size={14} className="text-white" />
                           <span>{event.weather.windSpeed}kt {event.weather.windDirection}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Thermometer size={14} className="text-maritime-gold-400" />
+                          <Thermometer size={14} className="text-white" />
                           <span>{event.weather.temperature}°C</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Eye size={14} className="text-maritime-gold-400" />
+                          <Eye size={14} className="text-white" />
                           <span>{event.weather.visibility}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Compass size={14} className="text-maritime-gold-400" />
+                          <Compass size={14} className="text-white" />
                           <span>Good</span>
                         </div>
                       </div>
@@ -847,8 +840,8 @@ const RaceResultsPage: React.FC = () => {
               <div className="p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div>
-                    <h4 className="font-semibold text-maritime-midnight mb-2">Event Details</h4>
-                    <div className="space-y-1 text-sm text-maritime-slate-600">
+                    <h4 className="font-semibold text-[#843c5c] mb-2">Event Details</h4>
+                    <div className="space-y-1 text-sm text-[#843c5c]/80">
                       <div><span className="font-medium">Organizer:</span> {event.organizer}</div>
                       {event.officer && <div><span className="font-medium">Officer of the Day:</span> {event.officer}</div>}
                       <div><span className="font-medium">Classes:</span> {event.classes.length}</div>
@@ -858,7 +851,7 @@ const RaceResultsPage: React.FC = () => {
                   <div className="flex items-center justify-end gap-3">
                     <Link
                       to={`/events/${event.eventId}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-maritime-gold-600 hover:text-maritime-gold-700 font-medium transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-[#843c5c] hover:text-[#a05a7a] font-medium transition-colors"
                     >
                       View Event
                       <ArrowRight size={16} />
@@ -868,7 +861,7 @@ const RaceResultsPage: React.FC = () => {
                         href={event.documents.results}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-maritime-deep-navy text-white rounded-lg hover:bg-maritime-midnight transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#843c5c] text-white rounded-lg hover:bg-[#a05a7a] transition-colors"
                       >
                         <Download size={16} />
                         Download Results
@@ -880,13 +873,13 @@ const RaceResultsPage: React.FC = () => {
                 {/* Race Classes and Results */}
                 <div className="space-y-8">
                   {event.classes.map((raceClass, classIndex) => (
-                    <div key={classIndex} className="border border-maritime-silver/20 rounded-lg overflow-hidden">
+                    <div key={classIndex} className="border border-[#843c5c]/10 rounded-lg overflow-hidden">
                       {/* Class Header */}
-                      <div className="bg-maritime-mist/30 px-6 py-4 border-b border-maritime-silver/20">
+                      <div className="bg-[#843c5c]/5 px-6 py-4 border-b border-[#843c5c]/10">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                           <div>
-                            <h4 className="text-lg font-semibold text-maritime-midnight">{raceClass.name}</h4>
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-maritime-slate-600 mt-1">
+                            <h4 className="text-lg font-semibold text-[#843c5c]">{raceClass.name}</h4>
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-[#843c5c]/80 mt-1">
                               {raceClass.startTime && <span>Start: {raceClass.startTime}</span>}
                               {raceClass.course && <span>Course: {raceClass.course}</span>}
                               {raceClass.distance && <span>Distance: {raceClass.distance} nm</span>}
@@ -899,52 +892,52 @@ const RaceResultsPage: React.FC = () => {
                       {/* Results Table */}
                       <div className="overflow-x-auto">
                         <table className="w-full">
-                          <thead className="bg-maritime-slate-50">
+                          <thead className="bg-[#843c5c]/10">
                             <tr>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Position</th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Boat</th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Skipper</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Position</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Boat</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Skipper</th>
                               {raceClass.results.some(r => r.sailNumber) && (
-                                <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Sail Number</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Sail Number</th>
                               )}
                               {raceClass.results.some(r => r.finishTime) && (
-                                <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Finish Time</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Finish Time</th>
                               )}
                               {raceClass.results.some(r => r.correctedTime) && (
-                                <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Corrected Time</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Corrected Time</th>
                               )}
-                              <th className="px-6 py-3 text-left text-xs font-medium text-maritime-slate-500 uppercase tracking-wider">Points</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-[#843c5c]/80 uppercase tracking-wider">Points</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-maritime-silver/20">
+                          <tbody className="divide-y divide-[#843c5c]/10">
                             {raceClass.results.map((result, resultIndex) => (
-                              <tr key={resultIndex} className={`hover:bg-maritime-mist/20 transition-colors ${result.position <= 3 ? 'bg-maritime-gold-50/50' : ''}`}>
+                              <tr key={resultIndex} className={`hover:bg-[#843c5c]/5 transition-colors ${result.position <= 3 ? 'bg-[#843c5c]/10' : ''}`}>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                   <div className="flex items-center">
                                     <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
                                       result.position === 1 ? 'bg-yellow-100 text-yellow-800 border-2 border-yellow-300' :
                                       result.position === 2 ? 'bg-gray-100 text-gray-800 border-2 border-gray-300' :
                                       result.position === 3 ? 'bg-orange-100 text-orange-800 border-2 border-orange-300' :
-                                      'bg-white text-maritime-slate-700 border border-maritime-silver'
+                                      'bg-white text-[#843c5c] border border-[#843c5c]/20'
                                     }`}>
                                       {result.position}
                                     </span>
-                                    {result.position <= 3 && <Star size={16} className="ml-2 text-maritime-gold-500" />}
+                                    {result.position <= 3 && <Star size={16} className="ml-2 text-[#843c5c]" />}
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap font-medium text-maritime-midnight">{result.boat}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-maritime-slate-700">{result.skipper}</td>
+                                <td className="px-6 py-4 whitespace-nowrap font-medium text-[#843c5c]">{result.boat}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-[#843c5c]/80">{result.skipper}</td>
                                 {raceClass.results.some(r => r.sailNumber) && (
-                                  <td className="px-6 py-4 whitespace-nowrap text-maritime-slate-600">{result.sailNumber || '-'}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-[#843c5c]/60">{result.sailNumber || '-'}</td>
                                 )}
                                 {raceClass.results.some(r => r.finishTime) && (
-                                  <td className="px-6 py-4 whitespace-nowrap text-maritime-slate-600">{result.finishTime || '-'}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-[#843c5c]/60">{result.finishTime || '-'}</td>
                                 )}
                                 {raceClass.results.some(r => r.correctedTime) && (
-                                  <td className="px-6 py-4 whitespace-nowrap text-maritime-slate-600">{result.correctedTime || '-'}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-[#843c5c]/60">{result.correctedTime || '-'}</td>
                                 )}
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-maritime-royal/10 text-maritime-royal">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#843c5c]/10 text-[#843c5c]">
                                     {result.points}
                                   </span>
                                 </td>
@@ -963,15 +956,15 @@ const RaceResultsPage: React.FC = () => {
 
         {/* No Results */}
         {filteredResults.length === 0 && (
-          <div className="card-luxury p-12 text-center">
-            <Trophy size={64} className="mx-auto text-maritime-slate-300 mb-6" />
-            <h3 className="text-xl font-semibold text-maritime-midnight mb-4">No Results Found</h3>
-            <p className="text-maritime-slate-600 mb-6">
+          <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-[#843c5c]/10">
+            <Trophy size={64} className="mx-auto text-[#843c5c]/20 mb-6" />
+            <h3 className="text-xl font-semibold text-[#843c5c] mb-4">No Results Found</h3>
+            <p className="text-[#843c5c]/80 mb-6">
               No race results match your current search criteria. Try adjusting your filters or search terms.
             </p>
             <button
               onClick={clearFilters}
-              className="btn-primary-luxury"
+              className="bg-[#843c5c] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#a05a7a] transition-colors"
             >
               Clear All Filters
             </button>
@@ -979,19 +972,19 @@ const RaceResultsPage: React.FC = () => {
         )}
 
         {/* External Results Link */}
-        <div className="card-luxury p-8 text-center mt-8">
+        <div className="bg-white rounded-2xl p-8 text-center mt-8 shadow-lg border border-[#843c5c]/10">
           <div className="max-w-2xl mx-auto">
-            <h3 className="text-xl font-semibold text-maritime-midnight mb-4">
+            <h3 className="text-xl font-semibold text-[#843c5c] mb-4">
               View Complete Results Archive
             </h3>
-            <p className="text-maritime-slate-600 mb-6">
+            <p className="text-[#843c5c]/80 mb-6">
               Access comprehensive race results, statistics, and historical data through our Hall Sailing integration.
             </p>
             <a
               href="https://hallsailing.com/club/eastdownyc"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary-luxury inline-flex items-center gap-2"
+              className="bg-[#843c5c] text-white px-6 py-3 rounded-lg font-semibold inline-flex items-center gap-2 hover:bg-[#a05a7a] transition-colors"
             >
               Hall Sailing Results
               <ArrowRight size={18} />

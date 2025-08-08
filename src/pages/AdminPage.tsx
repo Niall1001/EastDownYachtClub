@@ -949,15 +949,15 @@ const AdminPage = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#1e3a8a]">Admin Console</h1>
+              <h1 className="text-2xl font-bold text-[#843c5c]">Admin Console</h1>
               <p className="text-gray-600 mt-1">
-                Manage stories and events • Logged in as <span className="font-medium text-[#1e3a8a]">{user?.name}</span>
+                Manage stories and events • Logged in as <span className="font-medium text-[#843c5c]">{user?.name}</span>
               </p>
             </div>
             {activeSection === 'list' && (
               <button
                 onClick={handleNewItem}
-                className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
+                className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-4 py-2 rounded-lg flex items-center transition-colors"
               >
                 <Plus size={20} className="mr-2" />
                 New {activeTab === 'stories' ? 'Story' : activeTab === 'events' ? 'Event' : 'Race Result'}
@@ -981,7 +981,7 @@ const AdminPage = () => {
                 onClick={() => handleTabSwitch('stories')}
                 className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'stories'
-                    ? 'bg-white text-[#1e3a8a] shadow-sm'
+                    ? 'bg-white text-[#843c5c] shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -992,7 +992,7 @@ const AdminPage = () => {
                 onClick={() => handleTabSwitch('events')}
                 className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'events'
-                    ? 'bg-white text-[#1e3a8a] shadow-sm'
+                    ? 'bg-white text-[#843c5c] shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -1003,7 +1003,7 @@ const AdminPage = () => {
                 onClick={() => handleTabSwitch('results')}
                 className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'results'
-                    ? 'bg-white text-[#1e3a8a] shadow-sm'
+                    ? 'bg-white text-[#843c5c] shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -1029,7 +1029,7 @@ const AdminPage = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-3">
-                        <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                        <span className="bg-[#843c5c] text-white text-sm px-3 py-1 rounded-full">
                           {story.category}
                         </span>
                         <div className="flex items-center text-sm text-gray-500">
@@ -1041,7 +1041,7 @@ const AdminPage = () => {
                           {story.author}
                         </div>
                       </div>
-                      <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{story.title}</h3>
+                      <h3 className="text-lg font-semibold text-[#843c5c] mb-2">{story.title}</h3>
                       <p className="text-gray-600 mb-4 line-clamp-2">{story.excerpt}</p>
                     </div>
                     {story.image && (
@@ -1055,7 +1055,7 @@ const AdminPage = () => {
                   <div className="flex items-center gap-3 pt-4 border-t">
                     <button
                       onClick={() => handleEditStory(story)}
-                      className="text-[#0284c7] hover:text-blue-700 text-sm font-medium flex items-center"
+                      className="text-[#843c5c] hover:text-[#a05a7a] text-sm font-medium flex items-center"
                     >
                       <Eye size={14} className="mr-1" />
                       Edit
@@ -1087,7 +1087,7 @@ const AdminPage = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-3">
-                        <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                        <span className="bg-[#843c5c] text-white text-sm px-3 py-1 rounded-full">
                           {event.category}
                         </span>
                         <div className="flex items-center text-sm text-gray-500">
@@ -1104,7 +1104,7 @@ const AdminPage = () => {
                           </span>
                         )}
                       </div>
-                      <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{event.title}</h3>
+                      <h3 className="text-lg font-semibold text-[#843c5c] mb-2">{event.title}</h3>
                       <p className="text-gray-600 mb-2 line-clamp-2">{event.description}</p>
                       <div className="flex items-center text-sm text-gray-500">
                         <MapPin size={14} className="mr-1" />
@@ -1122,7 +1122,7 @@ const AdminPage = () => {
                   <div className="flex items-center gap-3 pt-4 border-t">
                     <button
                       onClick={() => handleEditEvent(event)}
-                      className="text-[#0284c7] hover:text-blue-700 text-sm font-medium flex items-center"
+                      className="text-[#843c5c] hover:text-[#a05a7a] text-sm font-medium flex items-center"
                     >
                       <Eye size={14} className="mr-1" />
                       Edit
@@ -1169,7 +1169,7 @@ const AdminPage = () => {
                           </div>
                         )}
                       </div>
-                      <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">
+                      <h3 className="text-lg font-semibold text-[#843c5c] mb-2">
                         Race Results - {new Date(result.date).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
@@ -1186,7 +1186,7 @@ const AdminPage = () => {
                   <div className="flex items-center gap-3 pt-4 border-t">
                     <button
                       onClick={() => handleEditResult(result)}
-                      className="text-[#0284c7] hover:text-blue-700 text-sm font-medium flex items-center"
+                      className="text-[#843c5c] hover:text-[#a05a7a] text-sm font-medium flex items-center"
                     >
                       <Edit size={14} className="mr-1" />
                       Edit
@@ -1230,7 +1230,7 @@ const AdminPage = () => {
                   name="title"
                   value={storyFormData.title}
                   onChange={handleStoryInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="Enter story title..."
                   required
                 />
@@ -1245,7 +1245,7 @@ const AdminPage = () => {
                   value={storyFormData.excerpt}
                   onChange={handleStoryInputChange}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="Brief summary of the story..."
                   required
                 />
@@ -1260,7 +1260,7 @@ const AdminPage = () => {
                   value={storyFormData.content}
                   onChange={handleStoryInputChange}
                   rows={10}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="Full story content..."
                   required
                 />
@@ -1276,7 +1276,7 @@ const AdminPage = () => {
                     name="author"
                     value={storyFormData.author}
                     onChange={handleStoryInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder="Author name..."
                     required
                   />
@@ -1290,7 +1290,7 @@ const AdminPage = () => {
                     name="category"
                     value={storyFormData.category}
                     onChange={handleStoryInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     required
                   >
                     {storyCategories.map(category => (
@@ -1311,7 +1311,7 @@ const AdminPage = () => {
                   name="image"
                   value={storyFormData.image}
                   onChange={handleStoryInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="https://example.com/image.jpg"
                 />
                 <p className="text-sm text-gray-500 mt-1">
@@ -1322,7 +1322,7 @@ const AdminPage = () => {
               <div className="flex items-center gap-4 pt-6 border-t">
                 <button
                   type="submit"
-                  className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors"
+                  className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-6 py-2 rounded-lg flex items-center transition-colors"
                 >
                   <Save size={18} className="mr-2" />
                   {editingStory ? 'Update Story' : 'Publish Story'}
@@ -1368,7 +1368,7 @@ const AdminPage = () => {
                   name="title"
                   value={eventFormData.title}
                   onChange={handleEventInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="Enter event title..."
                   required
                 />
@@ -1383,7 +1383,7 @@ const AdminPage = () => {
                   value={eventFormData.description}
                   onChange={handleEventInputChange}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="Event description..."
                   required
                 />
@@ -1398,7 +1398,7 @@ const AdminPage = () => {
                     name="category"
                     value={eventFormData.category}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     required
                   >
                     {eventCategories.map(category => (
@@ -1418,7 +1418,7 @@ const AdminPage = () => {
                     name="date"
                     value={eventFormData.date}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder={eventFormData.isRecurring ? "e.g., 'Every Wednesday'" : ''}
                     required
                   />
@@ -1433,7 +1433,7 @@ const AdminPage = () => {
                     name="time"
                     value={eventFormData.time}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder="e.g., '10:00 AM - 4:00 PM'"
                     required
                   />
@@ -1449,7 +1449,7 @@ const AdminPage = () => {
                   name="location"
                   value={eventFormData.location}
                   onChange={handleEventInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                   placeholder="Event location..."
                   required
                 />
@@ -1465,7 +1465,7 @@ const AdminPage = () => {
                     name="image"
                     value={eventFormData.image}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>
@@ -1479,7 +1479,7 @@ const AdminPage = () => {
                     name="resultsUrl"
                     value={eventFormData.resultsUrl}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder="https://example.com/results"
                   />
                 </div>
@@ -1495,7 +1495,7 @@ const AdminPage = () => {
                     name="noticeOfRacePdf"
                     value={eventFormData.noticeOfRacePdf}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder="https://example.com/notice-of-race.pdf"
                   />
                 </div>
@@ -1509,7 +1509,7 @@ const AdminPage = () => {
                     name="sailingInstructionsPdf"
                     value={eventFormData.sailingInstructionsPdf}
                     onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     placeholder="https://example.com/sailing-instructions.pdf"
                   />
                 </div>
@@ -1549,7 +1549,7 @@ const AdminPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowBoatEntryForm(!showBoatEntryForm)}
-                    className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center text-sm"
+                    className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-4 py-2 rounded-lg flex items-center text-sm"
                   >
                     <Plus size={16} className="mr-1" />
                     {editingBoatEntryIndex !== null ? 'Edit Entry' : 'Add Boat'}
@@ -1569,7 +1569,7 @@ const AdminPage = () => {
                           name="boat"
                           value={currentBoatEntry.boat}
                           onChange={handleBoatEntryInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-[#843c5c]"
                           placeholder="e.g., Sea Sprite"
                           required
                         />
@@ -1583,7 +1583,7 @@ const AdminPage = () => {
                           name="skipper"
                           value={currentBoatEntry.skipper}
                           onChange={handleBoatEntryInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-[#843c5c]"
                           placeholder="Skipper name"
                           required
                         />
@@ -1597,7 +1597,7 @@ const AdminPage = () => {
                           name="sailNumber"
                           value={currentBoatEntry.sailNumber}
                           onChange={handleBoatEntryInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-[#843c5c]"
                           placeholder="e.g., IRL123"
                         />
                       </div>
@@ -1609,7 +1609,7 @@ const AdminPage = () => {
                           name="class"
                           value={currentBoatEntry.class}
                           onChange={handleBoatEntryInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-[#843c5c]"
                           required
                         >
                           <option value="">Select a class</option>
@@ -1626,7 +1626,7 @@ const AdminPage = () => {
                       <button
                         type="button"
                         onClick={handleAddBoatEntry}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+                        className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-4 py-2 rounded text-sm"
                       >
                         {editingBoatEntryIndex !== null ? 'Update Entry' : 'Add Entry'}
                       </button>
@@ -1708,7 +1708,7 @@ const AdminPage = () => {
               <div className="flex items-center gap-4 pt-6 border-t">
                 <button
                   type="submit"
-                  className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors"
+                  className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-6 py-2 rounded-lg flex items-center transition-colors"
                 >
                   <Save size={18} className="mr-2" />
                   {editingEvent ? 'Update Event' : 'Create Event'}
@@ -1746,7 +1746,7 @@ const AdminPage = () => {
                       name="eventId"
                       value={resultFormData.eventId || ''}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                     >
                       <option value="">Select an event (optional)</option>
                       {events
@@ -1771,7 +1771,7 @@ const AdminPage = () => {
                       name="date"
                       value={resultFormData.date}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                       required
                     />
                   </div>
@@ -1785,7 +1785,7 @@ const AdminPage = () => {
                       name="organizer"
                       value={resultFormData.organizer}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                       placeholder="Event organizer..."
                       required
                     />
@@ -1800,7 +1800,7 @@ const AdminPage = () => {
                       name="officer"
                       value={resultFormData.officer}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                       placeholder="Officer name..."
                     />
                   </div>
@@ -1839,7 +1839,7 @@ const AdminPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowClassForm(!showClassForm)}
-                    className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center text-sm"
+                    className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-4 py-2 rounded-lg flex items-center text-sm"
                   >
                     <Plus size={16} className="mr-1" />
                     {editingClassIndex !== null ? 'Edit Class' : 'Add Class'}
@@ -1858,7 +1858,7 @@ const AdminPage = () => {
                           name="name"
                           value={currentClass.name}
                           onChange={handleClassInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-[#843c5c]"
                           required
                         >
                           <option value="">Select a class</option>
@@ -1880,6 +1880,7 @@ const AdminPage = () => {
                         {editingClassIndex !== null ? 'Update Class' : 'Add Class'}
                       </button>
                       <button
+                       
                         type="button"
                         onClick={() => {
                           setShowClassForm(false);
@@ -2212,7 +2213,7 @@ const AdminPage = () => {
                       name="documents.results"
                       value={resultFormData.documents.results}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                       placeholder="https://example.com/results.pdf"
                     />
                   </div>
@@ -2226,7 +2227,7 @@ const AdminPage = () => {
                       name="documents.photos"
                       value={resultFormData.documents.photos}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                       placeholder="https://example.com/gallery"
                     />
                   </div>
@@ -2240,7 +2241,7 @@ const AdminPage = () => {
                       name="documents.report"
                       value={resultFormData.documents.report}
                       onChange={handleResultInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#843c5c] focus:border-transparent"
                       placeholder="https://example.com/report"
                     />
                   </div>
@@ -2251,7 +2252,7 @@ const AdminPage = () => {
               <div className="flex items-center gap-4 pt-6 border-t">
                 <button
                   type="submit"
-                  className="bg-[#0284c7] hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors"
+                  className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-6 py-2 rounded-lg flex items-center transition-colors"
                 >
                   <Save size={18} className="mr-2" />
                   {editingResult ? 'Update Race Result' : 'Publish Race Result'}

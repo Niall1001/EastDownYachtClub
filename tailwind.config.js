@@ -6,16 +6,58 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Premium maritime color palette
+        // Premium yacht club color palette
+        yacht: {
+          // Primary burgundy/wine tones
+          'primary': '#843c5c',
+          'primary-light': '#a14d6b',
+          'primary-dark': '#6b3048',
+          'primary-darker': '#522634',
+          
+          // Burgundy/wine color variations
+          'wine': {
+            50: '#fdf2f5',
+            100: '#fce7ed',
+            200: '#fbcfdc',
+            300: '#f7aac0',
+            400: '#f2759a',
+            500: '#e93d78',
+            600: '#d61e5c',
+            700: '#b8154a',
+            800: '#972040',
+            900: '#843c5c'
+          },
+          
+          // Accent colors
+          'accent': '#843c5c',
+          'accent-light': '#a14d6b',
+          'accent-dark': '#6b3048',
+          
+          // Premium whites and grays
+          'white': '#ffffff',
+          'off-white': '#fefefe',
+          'light-gray': '#f8f9fa',
+          'gray': {
+            50: '#f8f9fa',
+            100: '#f1f3f4',
+            200: '#e8eaed',
+            300: '#dadce0',
+            400: '#bdc1c6',
+            500: '#9aa0a6',
+            600: '#80868b',
+            700: '#5f6368',
+            800: '#3c4043',
+            900: '#202124'
+          }
+        },
+        
+        // Legacy maritime colors for backward compatibility
         maritime: {
-          // Deep ocean blues - luxury navy tones
           'midnight': '#0B1426',
           'deep-navy': '#1E3A5F',
           'admiral': '#2C5282',
           'royal': '#3182CE',
           'regatta': '#4299E1',
-          
-          // Sophisticated accent colors
           'gold': {
             50: '#FFFBF0',
             100: '#FEF5E7',
@@ -28,8 +70,6 @@ export default {
             800: '#744210',
             900: '#553209'
           },
-          
-          // Premium whites and grays
           'pearl': '#FEFEFE',
           'mist': '#F8FAFC',
           'silver': '#E2E8F0',
@@ -85,6 +125,14 @@ export default {
       },
       
       backgroundImage: {
+        // New yacht club gradients
+        'yacht-gradient': 'linear-gradient(135deg, #843c5c 0%, #a14d6b 50%, #843c5c 100%)',
+        'yacht-light-gradient': 'linear-gradient(135deg, #a14d6b 0%, #843c5c 100%)',
+        'yacht-dark-gradient': 'linear-gradient(135deg, #6b3048 0%, #522634 100%)',
+        'yacht-accent-gradient': 'linear-gradient(135deg, #843c5c 0%, #ffffff 100%)',
+        'white-gradient': 'linear-gradient(135deg, #ffffff 0%, #fefefe 100%)',
+        
+        // Legacy maritime gradients for backward compatibility
         'maritime-gradient': 'linear-gradient(135deg, #1E3A5F 0%, #2C5282 50%, #3182CE 100%)',
         'gold-gradient': 'linear-gradient(135deg, #D69E2E 0%, #F6C577 100%)',
         'premium-gradient': 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)',
