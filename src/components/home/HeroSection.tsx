@@ -3,22 +3,22 @@ import { Anchor, Award, Users, Calendar, Star, Compass } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative min-h-screen bg-maritime-gradient overflow-hidden">
+    <section className="relative min-h-screen bg-yacht-gradient overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-wave-pattern opacity-30"></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-maritime-midnight/20 to-maritime-midnight/40"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yacht-primary-dark/20 to-yacht-primary-darker/40"></div>
       
       {/* Floating Maritime Elements */}
-      <div className="absolute top-20 left-10 text-maritime-gold-400/20 animate-float">
+      <div className="absolute top-20 left-10 text-white/20 animate-float">
         <Anchor size={32} />
       </div>
-      <div className="absolute top-32 right-20 text-maritime-gold-400/20 animate-float" style={{animationDelay: '1s'}}>
+      <div className="absolute top-32 right-20 text-white/20 animate-float" style={{animationDelay: '1s'}}>
         <Star size={24} />
       </div>
-      <div className="absolute bottom-40 left-20 text-maritime-gold-400/20 animate-float" style={{animationDelay: '2s'}}>
+      <div className="absolute bottom-40 left-20 text-white/20 animate-float" style={{animationDelay: '2s'}}>
         <Compass size={28} />
       </div>
-      <div className="absolute bottom-60 right-10 text-maritime-gold-400/20 animate-float" style={{animationDelay: '3s'}}>
+      <div className="absolute bottom-60 right-10 text-white/20 animate-float" style={{animationDelay: '3s'}}>
         <Award size={30} />
       </div>
       
@@ -28,29 +28,29 @@ const HeroSection: React.FC = () => {
           <div className="text-center mb-16 animate-fade-in">
             {/* Premium Badge */}
             <div className="inline-flex items-center gap-2 glass-luxury rounded-full px-6 py-3 mb-8 text-white">
-              <Award size={20} className="text-maritime-gold-400" />
+              <Award size={20} className="text-white" />
               <span className="text-sm font-medium">Established 1928 • RYA Training Centre</span>
             </div>
             
             {/* Main Heading */}
             <h1 className="font-display text-responsive-xl font-bold mb-6 text-white text-shadow-luxury">
               East Down{' '}
-              <span className="text-gradient-gold bg-clip-text text-transparent bg-gradient-to-r from-maritime-gold-400 to-maritime-gold-300">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80">
                 Yacht Club
               </span>
             </h1>
             
             {/* Elegant Tagline */}
-            <p className="text-responsive-lg text-maritime-mist/90 font-light mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-responsive-lg text-white/90 font-light mb-12 max-w-3xl mx-auto leading-relaxed">
               Set sail with excellence on the pristine waters of Strangford Lough.
-              <span className="block mt-2 text-maritime-silver/80 text-lg">
+              <span className="block mt-2 text-white/80 text-lg">
                 Where maritime tradition meets modern luxury.
               </span>
             </p>
             
             {/* Premium CTAs */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <button className="btn-primary-luxury group">
+              <button className="btn-secondary-yacht group">
                 <span className="relative z-10 flex items-center gap-3">
                   Discover Membership
                   <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +59,7 @@ const HeroSection: React.FC = () => {
                 </span>
               </button>
               
-              <button className="btn-secondary-luxury group">
+              <button className="btn-secondary-yacht group">
                 <span className="flex items-center gap-3">
                   Explore Events
                   <Calendar size={18} className="transition-transform group-hover:scale-110" />
@@ -71,32 +71,32 @@ const HeroSection: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="glass-luxury rounded-2xl p-6 hover-lift">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="bg-maritime-gold-500/20 p-3 rounded-full">
-                    <Award size={24} className="text-maritime-gold-400" />
+                  <div className="bg-white/20 p-3 rounded-full">
+                    <Award size={24} className="text-white" />
                   </div>
                 </div>
                 <div className="text-2xl font-display font-bold text-white mb-1">95+</div>
-                <div className="text-maritime-silver/80 text-sm">Years of Excellence</div>
+                <div className="text-white/80 text-sm">Years of Excellence</div>
               </div>
               
               <div className="glass-luxury rounded-2xl p-6 hover-lift">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="bg-maritime-gold-500/20 p-3 rounded-full">
-                    <Users size={24} className="text-maritime-gold-400" />
+                  <div className="bg-white/20 p-3 rounded-full">
+                    <Users size={24} className="text-white" />
                   </div>
                 </div>
                 <div className="text-2xl font-display font-bold text-white mb-1">300+</div>
-                <div className="text-maritime-silver/80 text-sm">Active Members</div>
+                <div className="text-white/80 text-sm">Active Members</div>
               </div>
               
               <div className="glass-luxury rounded-2xl p-6 hover-lift">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="bg-maritime-gold-500/20 p-3 rounded-full">
-                    <Calendar size={24} className="text-maritime-gold-400" />
+                  <div className="bg-white/20 p-3 rounded-full">
+                    <Calendar size={24} className="text-white" />
                   </div>
                 </div>
                 <div className="text-2xl font-display font-bold text-white mb-1">50+</div>
-                <div className="text-maritime-silver/80 text-sm">Annual Events</div>
+                <div className="text-white/80 text-sm">Annual Events</div>
               </div>
             </div>
           </div>

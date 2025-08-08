@@ -342,9 +342,9 @@ const EventsPage = () => {
         </div>
       </div>;
   };
-  return <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+  return <div className="bg-gradient-to-br from-white to-[#843c5c]/10 min-h-screen">
       {/* Premium Hero Section */}
-      <div className="relative bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#0284c7] text-white overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#843c5c] via-[#843c5c] to-[#843c5c]/90 text-white overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -356,7 +356,6 @@ const EventsPage = () => {
             <rect width="100" height="100" fill="url(#sailing-pattern)"/>
           </svg>
         </div>
-        
         <div className="container mx-auto px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-32 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             {/* Premium Badge */}
@@ -364,42 +363,39 @@ const EventsPage = () => {
               <Anchor className="w-5 h-5 mr-2" />
               <span className="text-sm font-medium">East Down Yacht Club</span>
             </div>
-            
             <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 leading-tight px-2">
-              On The <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Water</span>
+              On The <span className="bg-gradient-to-r from-[#fff] to-[#fff] bg-clip-text text-transparent">Water</span>
             </h1>
-            
             <p className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 text-white/90 max-w-3xl mx-auto leading-relaxed px-4">
               Discover racing events, training programs, and sailing opportunities
             </p>
-            
             {/* Premium Quick Stats with Animations */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12">
               <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{recentResults.length}</div>
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-[#fff] to-[#fff] bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{recentResults.length}</div>
                   <div className="text-xs md:text-sm text-white/90 font-medium">Recent Results</div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
               </div>
               
               <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{trainingPrograms.length}</div>
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-[#fff] to-[#fff] bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">{trainingPrograms.length}</div>
                   <div className="text-xs md:text-sm text-white/90 font-medium">Training Programs</div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
               </div>
               
               <div className="group relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">15+</div>
+                  <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-[#fff] to-[#fff] bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">15+</div>
                   <div className="text-xs md:text-sm text-white/90 font-medium">Club Boats</div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -408,7 +404,7 @@ const EventsPage = () => {
         {/* Modern Wave Decoration */}
         <div className="absolute bottom-0 left-0 right-0 h-20">
           <svg viewBox="0 0 1440 120" className="w-full h-full" preserveAspectRatio="none">
-            <path fill="#f8fafc" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,112C1200,117,1320,107,1380,101.3L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"/>
+            <path fill="#fff" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,112C1200,117,1320,107,1380,101.3L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"/>
           </svg>
         </div>
       </div>
@@ -417,7 +413,7 @@ const EventsPage = () => {
         {todaysEvents.length > 0 && (
           <div className="mb-12 sm:mb-16">
             <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
-              <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] p-4 sm:p-6">
+              <div className="bg-gradient-to-r from-[#843c5c] to-[#843c5c]/90 p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center">
                     <div className="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
@@ -446,7 +442,7 @@ const EventsPage = () => {
                   {todaysEvents.map(event => (
                     <div key={`featured-${event.id}`} className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3 sm:gap-0">
-                        <div className="bg-[#1e3a8a] text-white px-3 py-1 rounded-full text-sm font-medium self-start">
+                        <div className="bg-[#843c5c] text-white px-3 py-1 rounded-full text-sm font-medium self-start">
                           {event.category}
                         </div>
                         {event.hasResults && (
@@ -504,7 +500,7 @@ const EventsPage = () => {
         {/* Calendar Section */}
         <div className="mb-12 sm:mb-16">
           <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0284c7] p-4 sm:p-6">
+            <div className="bg-gradient-to-r from-[#843c5c] to-[#843c5c]/90 p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center">
                   <div className="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">

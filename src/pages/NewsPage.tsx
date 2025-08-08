@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
 import { Calendar, Search, Filter, ChevronRight, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 const NewsPage = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,7 +86,7 @@ const NewsPage = () => {
   }];
   return <div className="bg-white">
       {/* Page Header - Moved wave down for better visibility */}
-      <div className="bg-[#1e3a8a] text-white py-16">
+      <div className="bg-[#843c5c] text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
@@ -108,7 +108,7 @@ const NewsPage = () => {
       <div className="container mx-auto px-4 py-12">
         {/* Featured Article */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6">
+          <h2 className="text-2xl font-bold text-[#843c5c] mb-6">
             Featured Story
           </h2>
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -121,15 +121,15 @@ const NewsPage = () => {
                   <Calendar size={14} className="mr-1" />
                   <span>{featuredArticle.date}</span>
                   <span className="mx-2">•</span>
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                  <span className="bg-[#843c5c] text-white text-xs px-2 py-1 rounded">
                     {featuredArticle.category}
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold text-[#1e3a8a] mb-3">
+                <h3 className="text-2xl font-bold text-[#843c5c] mb-3">
                   {featuredArticle.title}
                 </h3>
                 <p className="text-gray-600 mb-4">{featuredArticle.excerpt}</p>
-                <Link to={`/news/${featuredArticle.id}`} className="inline-block bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
+                <Link to={`/news/${featuredArticle.id}`} className="inline-block bg-[#843c5c] hover:bg-[#a05a7a] text-white px-4 py-2 rounded transition-colors">
                   Read Full Story
                 </Link>
               </div>
@@ -145,7 +145,7 @@ const NewsPage = () => {
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto">
               <Filter size={18} className="text-gray-500 flex-shrink-0" />
-              {categories.map(category => <button key={category} onClick={() => setActiveCategory(category)} className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${activeCategory === category ? 'bg-[#1e3a8a] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+              {categories.map(category => <button key={category} onClick={() => setActiveCategory(category)} className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${activeCategory === category ? 'bg-[#843c5c] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                   {category}
                 </button>)}
             </div>
@@ -163,17 +163,17 @@ const NewsPage = () => {
                     <Calendar size={14} className="mr-1" />
                     <span>{article.date}</span>
                   </div>
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                  <span className="bg-[#843c5c] text-white text-xs px-2 py-1 rounded">
                     {article.category}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold text-[#1e3a8a] mb-2">
+                <h3 className="text-xl font-bold text-[#843c5c] mb-2">
                   {article.title}
                 </h3>
                 <p className="text-gray-600 mb-4 line-clamp-3">
                   {article.excerpt}
                 </p>
-                <Link to={`/news/${article.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
+                <Link to={`/news/${article.id}`} className="text-[#843c5c] font-medium hover:text-[#a05a7a] inline-flex items-center">
                   Read More
                   <ChevronRight size={16} className="ml-1" />
                 </Link>
@@ -184,7 +184,7 @@ const NewsPage = () => {
         <div className="bg-gray-50 rounded-lg p-8 mb-16">
           <div className="md:flex justify-between items-center">
             <div className="md:w-2/3 mb-6 md:mb-0">
-              <h3 className="text-2xl font-bold text-[#1e3a8a] mb-2">
+              <h3 className="text-2xl font-bold text-[#843c5c] mb-2">
                 Subscribe to Our Newsletter
               </h3>
               <p className="text-gray-600">
@@ -194,8 +194,8 @@ const NewsPage = () => {
             </div>
             <div className="md:w-1/3">
               <div className="flex">
-                <input type="email" placeholder="Your email address" className="flex-grow px-4 py-2 rounded-l-lg border-y border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button className="bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg transition-colors flex items-center">
+                <input type="email" placeholder="Your email address" className="flex-grow px-4 py-2 rounded-l-lg border-y border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#843c5c]" />
+                <button className="bg-[#843c5c] hover:bg-[#a05a7a] text-white px-4 py-2 rounded-r-lg transition-colors flex items-center">
                   <Mail size={18} className="mr-2" /> Subscribe
                 </button>
               </div>
@@ -204,7 +204,7 @@ const NewsPage = () => {
         </div>
         {/* Newsletter Archive */}
         <div>
-          <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6">
+          <h2 className="text-2xl font-bold text-[#843c5c] mb-6">
             Newsletter Archive
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -217,14 +217,14 @@ const NewsPage = () => {
                     <Calendar size={14} className="mr-1" />
                     <span>{newsletter.date}</span>
                   </div>
-                  <h3 className="font-bold text-[#1e3a8a]">
+                  <h3 className="font-bold text-[#843c5c]">
                     {newsletter.title}
                   </h3>
                   <div className="flex justify-between items-center mt-3">
-                    <span className="text-[#0284c7] text-sm font-medium">
+                    <span className="text-[#843c5c] text-sm font-medium">
                       View Newsletter
                     </span>
-                    <ChevronRight size={16} className="text-[#0284c7]" />
+                    <ChevronRight size={16} className="text-[#843c5c]" />
                   </div>
                 </div>
               </Link>)}

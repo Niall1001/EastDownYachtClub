@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
 const Footer = () => {
-  return <footer className="bg-[#1e3a8a] text-white">
+  return <footer className="bg-yacht-primary text-white">
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Club Info */}
@@ -12,13 +12,13 @@ const Footer = () => {
               Sailing on the beautiful waters of Strangford Lough since 1928.
             </p>
             <div className="flex space-x-3 mb-4">
-              <a href="#" className="hover:text-[#0284c7] transition-colors">
+              <a href="#" className="hover:text-white/80 transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="hover:text-[#0284c7] transition-colors">
+              <a href="#" className="hover:text-white/80 transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="hover:text-[#0284c7] transition-colors">
+              <a href="#" className="hover:text-white/80 transition-colors">
                 <Twitter size={20} />
               </a>
             </div>
@@ -28,27 +28,27 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="hover:text-[#0284c7] transition-colors">
+                <Link to="/" className="hover:text-white/80 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/events" className="hover:text-[#0284c7] transition-colors">
+                <Link to="/events" className="hover:text-white/80 transition-colors">
                   Events
                 </Link>
               </li>
               <li>
-                <Link to="/club" className="hover:text-[#0284c7] transition-colors">
+                <Link to="/club" className="hover:text-white/80 transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/news" className="hover:text-[#0284c7] transition-colors">
+                <Link to="/news" className="hover:text-white/80 transition-colors">
                   News
                 </Link>
               </li>
               <li>
-                <Link to="/join" className="hover:text-[#0284c7] transition-colors">
+                <Link to="/join" className="hover:text-white/80 transition-colors">
                   Membership
                 </Link>
               </li>
@@ -82,17 +82,17 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="border-t border-blue-700 mt-8 pt-6 text-sm text-center">
+        <div className="border-t border-yacht-primary-light mt-8 pt-6 text-sm text-center">
           <p>
             &copy; {new Date().getFullYear()} East Down Yacht Club. All rights
             reserved.
           </p>
           <p className="mt-1">
-            <Link to="#" className="hover:text-[#0284c7] transition-colors">
+            <Link to="#" className="hover:text-white/80 transition-colors">
               Privacy Policy
             </Link>{' '}
             |
-            <Link to="#" className="hover:text-[#0284c7] transition-colors ml-2">
+            <Link to="#" className="hover:text-white/80 transition-colors ml-2">
               Terms of Service
             </Link>
           </p>

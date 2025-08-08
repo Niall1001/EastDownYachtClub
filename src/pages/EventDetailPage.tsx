@@ -55,7 +55,7 @@ const EventDetailPage = () => {
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl text-white">
-              <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded mb-3 inline-block">
+              <span className="bg-[#843c5c] text-white text-xs px-2 py-1 rounded mb-3 inline-block">
                 {eventData.category}
               </span>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2">
@@ -70,7 +70,7 @@ const EventDetailPage = () => {
       </div>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link to="/events" className="inline-flex items-center text-[#0284c7] hover:text-blue-700">
+          <Link to="/events" className="inline-flex items-center text-[#843c5c] hover:text-[#a05a7a]">
             <ChevronLeft size={16} className="mr-1" />
             Back to Events
           </Link>
@@ -79,12 +79,12 @@ const EventDetailPage = () => {
           {/* Main Content */}
           <div className="md:col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-              <h2 className="text-2xl font-bold text-[#1e3a8a] mb-4">
+              <h2 className="text-2xl font-bold text-[#843c5c] mb-4">
                 Event Details
               </h2>
               <p className="text-gray-600 mb-6">{eventData.description}</p>
               {/* Schedule */}
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+              <h3 className="text-xl font-semibold text-[#843c5c] mb-3">
                 Schedule
               </h3>
               <div className="space-y-2 mb-6">
@@ -96,33 +96,33 @@ const EventDetailPage = () => {
                   </div>)}
               </div>
               {/* Classes */}
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+              <h3 className="text-xl font-semibold text-[#843c5c] mb-3">
                 Classes
               </h3>
               <div className="flex flex-wrap gap-2 mb-6">
-                {eventData.classes.map((cls, index) => <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                {eventData.classes.map((cls, index) => <span key={index} className="bg-[#843c5c]/10 text-[#843c5c] px-3 py-1 rounded-full text-sm">
                     {cls}
                   </span>)}
               </div>
               {/* Additional Information */}
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+              <h3 className="text-xl font-semibold text-[#843c5c] mb-3">
                 Additional Information
               </h3>
               <p className="text-gray-600 mb-6">{eventData.additionalInfo}</p>
               {/* Documents Section */}
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+              <h3 className="text-xl font-semibold text-[#843c5c] mb-3">
                 Event Documents
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <a href={eventData.noticeOfRacePdf} download className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <FileText size={20} className="mr-3 text-[#0284c7]" />
+                <a href={eventData.noticeOfRacePdf} download className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-[#843c5c]/10">
+                  <FileText size={20} className="mr-3 text-[#843c5c]" />
                   <div>
                     <span className="block font-medium">Notice of Race</span>
                     <span className="text-sm text-gray-500">PDF Document</span>
                   </div>
                 </a>
-                <a href={eventData.sailingInstructionsPdf} download className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <FileText size={20} className="mr-3 text-[#0284c7]" />
+                <a href={eventData.sailingInstructionsPdf} download className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-[#843c5c]/10">
+                  <FileText size={20} className="mr-3 text-[#843c5c]" />
                   <div>
                     <span className="block font-medium">
                       Sailing Instructions
@@ -132,8 +132,8 @@ const EventDetailPage = () => {
                 </a>
               </div>
               {/* Results Link */}
-              {eventData.hasResults && <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
-                  <h3 className="font-semibold text-[#1e3a8a] mb-2">
+              {eventData.hasResults && <div className="bg-[#843c5c]/10 border border-[#843c5c]/20 rounded-lg p-4 mb-6">
+                  <h3 className="font-semibold text-[#843c5c] mb-2">
                     Race Results
                   </h3>
                   <p className="text-gray-600 mb-4">
@@ -142,7 +142,7 @@ const EventDetailPage = () => {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Link 
                       to={`/results?event=${encodeURIComponent(eventData.title)}`}
-                      className="inline-flex items-center justify-center px-4 py-2 bg-[#1e3a8a] text-white font-medium rounded-lg hover:bg-blue-900 transition-colors duration-200"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-[#843c5c] text-white font-medium rounded-lg hover:bg-[#a05a7a] transition-colors duration-200"
                     >
                       View Race Results
                     </Link>
@@ -150,7 +150,7 @@ const EventDetailPage = () => {
                       href={eventData.resultsUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-flex items-center justify-center px-4 py-2 text-[#0284c7] font-medium border border-[#0284c7] rounded-lg hover:bg-[#0284c7] hover:text-white transition-colors duration-200"
+                      className="inline-flex items-center justify-center px-4 py-2 text-[#843c5c] font-medium border border-[#843c5c] rounded-lg hover:bg-[#843c5c] hover:text-white transition-colors duration-200"
                     >
                       Hall Sailing
                       <ExternalLink size={16} className="ml-2" />
@@ -158,8 +158,8 @@ const EventDetailPage = () => {
                   </div>
                 </div>}
               {/* Wednesday Racing Special Section */}
-              {isWednesdayRacing && <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-[#1e3a8a] mb-3">
+              {isWednesdayRacing && <div className="bg-[#843c5c]/5 border border-[#843c5c]/10 rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-[#843c5c] mb-3">
                     About Wednesday Club Racing
                   </h3>
                   <p className="text-gray-600 mb-4">
@@ -171,26 +171,26 @@ const EventDetailPage = () => {
                   </p>
                   <div className="space-y-3 mb-4">
                     <div className="flex items-start">
-                      <span className="text-[#0284c7] mr-2 font-bold">•</span>
+                      <span className="text-[#843c5c] mr-2 font-bold">•</span>
                       <span className="text-gray-600">
                         Series runs from April to September
                       </span>
                     </div>
                     <div className="flex items-start">
-                      <span className="text-[#0284c7] mr-2 font-bold">•</span>
+                      <span className="text-[#843c5c] mr-2 font-bold">•</span>
                       <span className="text-gray-600">
                         Points accumulate throughout the season for series
                         prizes
                       </span>
                     </div>
                     <div className="flex items-start">
-                      <span className="text-[#0284c7] mr-2 font-bold">•</span>
+                      <span className="text-[#843c5c] mr-2 font-bold">•</span>
                       <span className="text-gray-600">
                         Social gathering in the clubhouse after racing
                       </span>
                     </div>
                     <div className="flex items-start">
-                      <span className="text-[#0284c7] mr-2 font-bold">•</span>
+                      <span className="text-[#843c5c] mr-2 font-bold">•</span>
                       <span className="text-gray-600">
                         Separate starts for keelboats and dinghies
                       </span>
@@ -209,7 +209,7 @@ const EventDetailPage = () => {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Share this event:</span>
                 <div className="flex space-x-3">
-                  <button className="text-gray-500 hover:text-[#1e3a8a]">
+                  <button className="text-gray-500 hover:text-[#843c5c]">
                     <Share2 size={18} />
                   </button>
                 </div>
@@ -219,26 +219,26 @@ const EventDetailPage = () => {
           {/* Sidebar */}
           <div className="md:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6 sticky top-4">
-              <h3 className="text-xl font-semibold text-[#1e3a8a] mb-4">
+              <h3 className="text-xl font-semibold text-[#843c5c] mb-4">
                 Event Information
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start">
-                  <CalendarIcon size={18} className="mr-3 text-[#0284c7] flex-shrink-0 mt-1" />
+                  <CalendarIcon size={18} className="mr-3 text-[#843c5c] flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-medium">Date</p>
                     <p className="text-gray-600">{eventData.date}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <Clock size={18} className="mr-3 text-[#0284c7] flex-shrink-0 mt-1" />
+                  <Clock size={18} className="mr-3 text-[#843c5c] flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-medium">Time</p>
                     <p className="text-gray-600">{eventData.time}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <MapPin size={18} className="mr-3 text-[#0284c7] flex-shrink-0 mt-1" />
+                  <MapPin size={18} className="mr-3 text-[#843c5c] flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-medium">Location</p>
                     <p className="text-gray-600">{eventData.location}</p>
@@ -250,7 +250,7 @@ const EventDetailPage = () => {
                 </div>
                 <div>
                   <p className="font-medium">Contact</p>
-                  <a href={`mailto:${eventData.contact}`} className="text-[#0284c7] hover:text-blue-700">
+                  <a href={`mailto:${eventData.contact}`} className="text-[#843c5c] hover:text-[#a05a7a]">
                     {eventData.contact}
                   </a>
                 </div>
@@ -261,31 +261,31 @@ const EventDetailPage = () => {
               </div>
               {/* Call to action button */}
               <div className="mt-6">
-                <Link to="/join" className="block w-full bg-[#dc2626] hover:bg-red-700 text-white text-center px-4 py-2 rounded transition-colors">
+                <Link to="/join" className="block w-full bg-[#843c5c] hover:bg-[#a05a7a] text-white text-center px-4 py-2 rounded transition-colors">
                   Join to Participate
                 </Link>
               </div>
             </div>
             {/* Related Events */}
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <h3 className="font-semibold text-[#1e3a8a] mb-3">
+            <div className="bg-[#843c5c]/5 rounded-lg p-6 border border-[#843c5c]/10">
+              <h3 className="font-semibold text-[#843c5c] mb-3">
                 Upcoming Events
               </h3>
               <div className="space-y-3">
-                <Link to="/events/5" className="block hover:bg-gray-100 p-2 rounded">
-                  <p className="font-medium text-[#1e3a8a]">
+                <Link to="/events/5" className="block hover:bg-[#843c5c]/10 p-2 rounded">
+                  <p className="font-medium text-[#843c5c]">
                     Autumn Series Racing
                   </p>
                   <p className="text-sm text-gray-500">October 8, 2023</p>
                 </Link>
-                <Link to="/events/3" className="block hover:bg-gray-100 p-2 rounded">
-                  <p className="font-medium text-[#1e3a8a]">
+                <Link to="/events/3" className="block hover:bg-[#843c5c]/10 p-2 rounded">
+                  <p className="font-medium text-[#843c5c]">
                     End of Summer BBQ
                   </p>
                   <p className="text-sm text-gray-500">September 23, 2023</p>
                 </Link>
-                <Link to="/events/6" className="block hover:bg-gray-100 p-2 rounded">
-                  <p className="font-medium text-[#1e3a8a]">
+                <Link to="/events/6" className="block hover:bg-[#843c5c]/10 p-2 rounded">
+                  <p className="font-medium text-[#843c5c]">
                     Cruising Group Meeting
                   </p>
                   <p className="text-sm text-gray-500">October 12, 2023</p>

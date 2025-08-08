@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { FileText, Mail, Phone, MapPin, Lock, User } from 'lucide-react';
+import { useState } from 'react';
 const JoinPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const handleLogin = e => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // This is a simple simulation of login
     // In a real app, you would validate against a backend
@@ -50,7 +49,7 @@ const JoinPage = () => {
   }];
   return <div className="bg-white">
       {/* Page Header - Moved wave down for better visibility */}
-      <div className="bg-[#1e3a8a] text-white py-16">
+      <div className="bg-[#843c5c] text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
@@ -72,7 +71,7 @@ const JoinPage = () => {
       <div className="container mx-auto px-4 py-12">
         {/* Intro Section */}
         <div className="max-w-4xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold text-[#1e3a8a] mb-4">
+          <h2 className="text-3xl font-bold text-[#843c5c] mb-4">
             Join Our Community
           </h2>
           <p className="text-lg text-gray-600 mb-6">
@@ -82,37 +81,37 @@ const JoinPage = () => {
             membership category that's right for you.
           </p>
           <div className="bg-blue-50 rounded-lg p-6 border border-blue-100">
-            <h3 className="font-bold text-lg text-[#1e3a8a] mb-2">
+            <h3 className="font-bold text-lg text-[#843c5c] mb-2">
               Membership Benefits
             </h3>
             <ul className="space-y-2">
               <li className="flex items-start">
-                <span className="text-[#0284c7] mr-2">✓</span>
+                <span className="text-[#843c5c] mr-2">✓</span>
                 <span className="text-gray-600">
                   Access to club facilities including slipways, moorings, and
                   clubhouse
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#0284c7] mr-2">✓</span>
+                <span className="text-[#843c5c] mr-2">✓</span>
                 <span className="text-gray-600">
                   Participation in club racing and social events
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#0284c7] mr-2">✓</span>
+                <span className="text-[#843c5c] mr-2">✓</span>
                 <span className="text-gray-600">
                   Discounted training courses and RYA certifications
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#0284c7] mr-2">✓</span>
+                <span className="text-[#843c5c] mr-2">✓</span>
                 <span className="text-gray-600">
                   Club boat rental opportunities
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#0284c7] mr-2">✓</span>
+                <span className="text-[#843c5c] mr-2">✓</span>
                 <span className="text-gray-600">
                   Monthly newsletter and exclusive member communications
                 </span>
@@ -126,21 +125,21 @@ const JoinPage = () => {
             <div className="lg:col-span-2">
               {/* Membership Types */}
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6">
+                <h2 className="text-2xl font-bold text-[#843c5c] mb-6">
                   Membership Options
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {membershipTypes.map((type, index) => <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                      <h3 className="text-xl font-semibold text-[#1e3a8a] mb-2">
+                  {membershipTypes.map((type, index) => <div key={index} className="bg-white rounded-lg shadow-sm border border-[#843c5c]/10 p-6">
+                      <h3 className="text-xl font-semibold text-[#843c5c] mb-2">
                         {type.title}
                       </h3>
                       <p className="text-gray-600 mb-3">{type.description}</p>
-                      <p className="text-[#0284c7] font-bold mb-4">
+                      <p className="text-[#843c5c] font-bold mb-4">
                         {type.price}
                       </p>
                       <ul className="space-y-2 mb-4">
                         {type.features.map((feature, i) => <li key={i} className="flex items-start">
-                            <span className="text-[#0284c7] mr-2">✓</span>
+                            <span className="text-[#843c5c] mr-2">✓</span>
                             <span className="text-gray-600">{feature}</span>
                           </li>)}
                       </ul>
@@ -149,7 +148,7 @@ const JoinPage = () => {
               </div>
               {/* Application Process */}
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-[#1e3a8a] mb-4">
+                <h2 className="text-2xl font-bold text-[#843c5c] mb-4">
                   How to Apply
                 </h2>
                 <p className="text-gray-600 mb-4">
@@ -175,7 +174,7 @@ const JoinPage = () => {
                   </li>
                 </ol>
                 <div className="flex justify-center">
-                  <a href="/membership/application_form.pdf" download className="inline-flex items-center bg-[#dc2626] hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors">
+                  <a href="/membership/application_form.pdf" download className="inline-flex items-center bg-[#843c5c] hover:bg-[#a05a7a] text-white px-6 py-3 rounded-lg transition-colors">
                     <FileText size={20} className="mr-2" />
                     Download Application Form
                   </a>
@@ -183,12 +182,12 @@ const JoinPage = () => {
               </div>
               {/* FAQ Section */}
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-[#1e3a8a] mb-4">
+                <h2 className="text-2xl font-bold text-[#843c5c] mb-4">
                   Frequently Asked Questions
                 </h2>
                 <div className="space-y-6">
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                    <h3 className="font-bold text-[#1e3a8a] mb-2">
+                    <h3 className="font-bold text-[#843c5c] mb-2">
                       Do I need to own a boat to join?
                     </h3>
                     <p className="text-gray-600">
@@ -199,7 +198,7 @@ const JoinPage = () => {
                     </p>
                   </div>
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                    <h3 className="font-bold text-[#1e3a8a] mb-2">
+                    <h3 className="font-bold text-[#843c5c] mb-2">
                       What are the current membership fees?
                     </h3>
                     <p className="text-gray-600">
@@ -209,7 +208,7 @@ const JoinPage = () => {
                     </p>
                   </div>
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                    <h3 className="font-bold text-[#1e3a8a] mb-2">
+                    <h3 className="font-bold text-[#843c5c] mb-2">
                       Is there training available for beginners?
                     </h3>
                     <p className="text-gray-600">
@@ -225,7 +224,7 @@ const JoinPage = () => {
             <div className="lg:col-span-1">
               {/* Members Area */}
               <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 sticky top-4 mb-8">
-                <h3 className="text-xl font-bold text-[#1e3a8a] mb-4 flex items-center">
+                <h3 className="text-xl font-bold text-[#843c5c] mb-4 flex items-center">
                   <Lock size={20} className="mr-2" />
                   Members Area
                 </h3>
@@ -256,7 +255,7 @@ const JoinPage = () => {
                           <Lock size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         </div>
                       </div>
-                      <button type="submit" className="w-full bg-[#1e3a8a] hover:bg-blue-800 text-white py-2 px-4 rounded transition-colors">
+                      <button type="submit" className="w-full bg-[#843c5c] hover:bg-[#a05a7a] text-white py-2 px-4 rounded transition-colors">
                         Log In
                       </button>
                       <div className="mt-3 text-center">
@@ -304,7 +303,7 @@ const JoinPage = () => {
               </div>
               {/* Contact box */}
               <div className="bg-blue-50 rounded-lg p-6 border border-blue-100">
-                <h3 className="font-bold text-lg text-[#1e3a8a] mb-3">
+                <h3 className="font-bold text-lg text-[#843c5c] mb-3">
                   Contact Membership Secretary
                 </h3>
                 <div className="space-y-3">
