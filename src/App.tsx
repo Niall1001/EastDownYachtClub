@@ -10,6 +10,7 @@ import RaceResultsPage from './pages/RaceResultsPage';
 import ClubPage from './pages/ClubPage';
 import NewsPage from './pages/NewsPage';
 import NewsletterPage from './pages/NewsletterPage';
+import StoryDetailPage from './pages/StoryDetailPage';
 import JoinPage from './pages/JoinPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
@@ -29,6 +30,7 @@ export function App() {
               <Route path="/results" element={<RaceResultsPage />} />
               <Route path="/club" element={<ClubPage />} />
               <Route path="/news" element={<NewsPage />} />
+              <Route path="/news/:id" element={<StoryDetailPage />} />
               <Route path="/newsletters/:id" element={<NewsletterPage />} />
               <Route path="/join" element={<JoinPage />} />
               <Route path="/login" element={<LoginPage />} />
