@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model flyway_schema_history {
+  installed_rank Int      @id(map: "flyway_schema_history_pk")
+  version        String?  @db.VarChar(50)
+  description    String   @db.VarChar(200)
+  type           String   @db.VarChar(20)
+  script         String   @db.VarChar(1000)
+  checksum       Int?
+  installed_by   String   @db.VarChar(100)
+  installed_on   DateTime @default(now()) @db.Timestamp(6)
+  execution_time Int
+  success        Boolean
+
+  @@index([success], map: "flyway_schema_history_s_idx")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model event_documents {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  event_id        String    @db.Uuid
+  document_name   String    @db.VarChar(200)
+  document_type   String?   @db.VarChar(50)
+  file_url        String
+  file_size_bytes Int?
+  mime_type       String?   @db.VarChar(100)
+  uploaded_at     DateTime? @default(now()) @db.Timestamptz(6)
+  events          events    @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([event_id], map: "idx_event_documents_event")
+  @@index([document_type], map: "idx_event_documents_type")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model events {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title           String            @db.VarChar(200)
+  description     String?
+  event_type      String            @db.VarChar(20)
+  start_date      DateTime          @db.Date
+  end_date        DateTime?         @db.Date
+  start_time      DateTime?         @db.Time(6)
+  location        String?           @db.VarChar(200)
+  created_at      DateTime?         @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?         @default(now()) @db.Timestamptz(6)
+  event_documents event_documents[]
+  races           races[]
+  series_results  series_results[]
+  stories         stories[]
+
+  @@index([start_date, end_date], map: "idx_events_date_range")
+  @@index([event_type, start_date], map: "idx_events_type_date")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model race_results {
+  id             String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  race_id        String                   @db.Uuid
+  sail_number    String                   @db.VarChar(20)
+  yacht_name     String?                  @db.VarChar(100)
+  helm_name      String?                  @db.VarChar(100)
+  crew_names     String?
+  finish_time    DateTime?                @db.Time(6)
+  elapsed_time   Unsupported("interval")?
+  corrected_time Unsupported("interval")?
+  position       Int?
+  points         Int?
+  disqualified   Boolean?                 @default(false)
+  dns            Boolean?                 @default(false)
+  dnf            Boolean?                 @default(false)
+  retired        Boolean?                 @default(false)
+  notes          String?
+  created_at     DateTime?                @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?                @default(now()) @db.Timestamptz(6)
+  races          races                    @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([race_id, sail_number])
+  @@index([helm_name], map: "idx_race_results_helm")
+  @@index([race_id, position], map: "idx_race_results_race_position")
+  @@index([sail_number], map: "idx_race_results_sail_number")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model races {
+  id             String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  event_id       String         @db.Uuid
+  yacht_class_id String         @db.Uuid
+  race_number    Int            @default(1)
+  race_date      DateTime       @db.Date
+  start_time     DateTime?      @db.Time(6)
+  wind_direction String?        @db.VarChar(100)
+  wind_speed     Int?           @default(0)
+  notes          String?
+  created_at     DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?      @default(now()) @db.Timestamptz(6)
+  race_results   race_results[]
+  events         events         @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  yacht_classes  yacht_classes  @relation(fields: [yacht_class_id], references: [id], onUpdate: NoAction)
+
+  @@unique([event_id, yacht_class_id, race_number])
+  @@index([yacht_class_id, race_date], map: "idx_races_class_date")
+  @@index([event_id, yacht_class_id], map: "idx_races_event_class")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model series_results {
+  id               String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  event_id         String        @db.Uuid
+  yacht_class_id   String        @db.Uuid
+  sail_number      String        @db.VarChar(20)
+  yacht_name       String?       @db.VarChar(100)
+  helm_name        String?       @db.VarChar(100)
+  crew_names       String?
+  races_completed  Int?          @default(0)
+  total_points     Int?          @default(0)
+  discards_applied Int?          @default(0)
+  net_points       Int?          @default(0)
+  position         Int?
+  last_updated     DateTime?     @default(now()) @db.Timestamptz(6)
+  events           events        @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  yacht_classes    yacht_classes @relation(fields: [yacht_class_id], references: [id], onUpdate: NoAction)
+
+  @@unique([event_id, yacht_class_id, sail_number])
+  @@index([event_id, yacht_class_id], map: "idx_series_results_event_class")
+  @@index([event_id, yacht_class_id, position], map: "idx_series_results_position")
+  @@index([sail_number], map: "idx_series_results_sail_number")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model stories {
+  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title              String    @db.VarChar(300)
+  slug               String?   @unique @db.VarChar(300)
+  excerpt            String?
+  content            String
+  story_type         String?   @default("news") @db.VarChar(20)
+  featured_image_url String?
+  gallery_images     Json?
+  author_name        String?   @db.VarChar(100)
+  published          Boolean?  @default(false)
+  publish_date       DateTime? @db.Timestamptz(6)
+  event_id           String?   @db.Uuid
+  tags               String[]
+  created_at         DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime? @default(now()) @db.Timestamptz(6)
+  events             events?   @relation(fields: [event_id], references: [id], onUpdate: NoAction)
+
+  @@index([publish_date], map: "idx_stories_publish_date")
+  @@index([tags], map: "idx_stories_tags", type: Gin)
+  @@index([story_type], map: "idx_stories_type")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model yacht_classes {
+  id              String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String           @unique @db.VarChar(100)
+  handicap_system String?          @db.VarChar(50)
+  created_at      DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?        @default(now()) @db.Timestamptz(6)
+  races           races[]
+  series_results  series_results[]
+
+  @@index([handicap_system], map: "idx_yacht_classes_handicap")
+}
