@@ -13,29 +13,41 @@ const NewsPage = () => {
     limit: 50
   });
   // Transform stories to match expected format
-  const transformStory = (story: any) => ({
-    id: story.id,
-    title: story.title,
-    excerpt: story.excerpt || story.content.substring(0, 200) + '...',
-    content: story.content,
-    date: new Date(story.createdAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long', 
-      day: 'numeric'
-    }),
-    author: story.authorName || 'Club Admin',
-    category: story.storyType.charAt(0).toUpperCase() + story.storyType.slice(1),
-    image: story.featuredImageUrl || `https://images.unsplash.com/photo-${
-      story.storyType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
-      story.storyType === 'training' ? '1534438097545-a2c22c57f2ad' :
-      story.storyType === 'social' ? '1511578314322-379afb476865' :
-      story.storyType === 'announcements' ? '1500627965408-b5f2c5f9168a' :
-      '1540541338287-41700207dee6'
-    }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
-    slug: story.slug
-  });
+  const transformStory = (story: any) => {
+    if (!story || typeof story !== 'object') {
+      return null;
+    }
 
-  const transformedStories = stories?.map(transformStory) || [];
+    // Safely handle story fields with database snake_case fallbacks
+    const storyType = story.story_type || story.storyType || 'news';
+    const createdAt = story.created_at || story.createdAt || new Date();
+    const featuredImageUrl = story.featured_image_url || story.featuredImageUrl;
+    const authorName = story.author_name || story.authorName || 'Club Admin';
+
+    return {
+      id: story.id,
+      title: story.title || 'Untitled Story',
+      excerpt: story.excerpt || story.content?.substring(0, 200) + '...' || 'No excerpt available',
+      content: story.content || '',
+      date: new Date(createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long', 
+        day: 'numeric'
+      }),
+      author: authorName,
+      category: storyType.charAt(0).toUpperCase() + storyType.slice(1),
+      image: featuredImageUrl || `https://images.unsplash.com/photo-${
+        storyType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
+        storyType === 'training' ? '1534438097545-a2c22c57f2ad' :
+        storyType === 'social' ? '1511578314322-379afb476865' :
+        storyType === 'announcements' ? '1500627965408-b5f2c5f9168a' :
+        '1540541338287-41700207dee6'
+      }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+      slug: story.slug
+    };
+  };
+
+  const transformedStories = stories?.map(transformStory).filter(Boolean) || []; // Remove null entries
   const featuredArticle = transformedStories.length > 0 ? transformedStories[0] : null;
   const newsArticles = transformedStories.slice(1); // All except the first one (featured)
   const filteredArticles = newsArticles.filter(article => {

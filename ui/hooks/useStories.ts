@@ -158,10 +158,10 @@ export const useStories = (initialParams?: QueryParams): UseStoriesReturn => {
     await fetchStories(lastParams);
   }, [fetchStories, lastParams]);
 
-  // Initial fetch
+  // Initial fetch - Fixed infinite loop by serializing params for comparison
   useEffect(() => {
     fetchStories(initialParams);
-  }, [fetchStories, initialParams]);
+  }, [fetchStories, JSON.stringify(initialParams)]);
 
   return {
     stories,

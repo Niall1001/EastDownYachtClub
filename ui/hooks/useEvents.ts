@@ -151,10 +151,10 @@ export const useEvents = (initialParams?: QueryParams): UseEventsReturn => {
     await fetchEvents(lastParams);
   }, [fetchEvents, lastParams]);
 
-  // Initial fetch
+  // Initial fetch - Fixed infinite loop by serializing params for comparison
   useEffect(() => {
     fetchEvents(initialParams);
-  }, [fetchEvents, initialParams]);
+  }, [fetchEvents, JSON.stringify(initialParams)]);
 
   return {
     events,

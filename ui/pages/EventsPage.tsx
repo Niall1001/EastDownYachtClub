@@ -2,6 +2,36 @@ import { useState } from 'react';
 import { Calendar as CalendarIcon, Clock, MapPin, Users, ChevronLeft, ChevronRight, Sailboat, LifeBuoy, Trophy, GraduationCap, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
+
+/**
+ * EventsPage Component
+ * 
+ * This component displays yacht club events with:
+ * - A calendar view showing events from the events API
+ * - Event listings with details from real API data
+ * - Proper handling of database snake_case vs TypeScript camelCase
+ * - Type-safe event transformations and null checks
+ * - Navigation to individual event detail pages
+ * 
+ * The calendar only displays events fetched from the backend API,
+ * removing any hardcoded or recurring event logic.
+ */
+
+// Interface for transformed event data used in this component
+interface TransformedEvent {
+  id: string;
+  title: string;
+  description: string;
+  eventType: string;
+  date: string;
+  startDate: Date;
+  endDate: Date | null;
+  time: string;
+  location: string;
+  category: string;
+  image: string;
+  hasResults: boolean;
+}
 const EventsPage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
@@ -13,34 +43,54 @@ const EventsPage = () => {
     limit: 50
   });
 
-  // Transform events to match the expected format (only if events are loaded)
-  const upcomingEvents = events?.map((event) => ({
-    id: parseInt(event.id),
-    title: event.title,
-    description: event.description || 'No description available.',
-    date: new Date(event.startDate).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }),
-    dateObj: new Date(event.startDate),
-    time: event.startTime ? `${event.startTime}${event.endDate ? ' - ' + new Date(event.endDate).toLocaleDateString() : ''}` : 'Time TBD',
-    location: event.location || 'Location TBD',
-    category: event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1),
-    image: `https://images.unsplash.com/photo-${
-      event.eventType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
-      event.eventType === 'training' ? '1534438097545-a2c22c57f2ad' :
-      event.eventType === 'social' ? '1470337458703-46ad1756a187' :
-      event.eventType === 'cruising' ? '1541789094913-f3809a8f3ba5' :
-      '1540946485063-a40da27545f8'
-    }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
-    hasResults: false, // Will be determined by race data later
-    resultsUrl: '',
-    isRecurring: false
-  })) || [];
+  // Transform events from API to display format
+  const transformedEvents: TransformedEvent[] = events?.map((event) => {
+    // Safety check for event object
+    if (!event || typeof event !== 'object') {
+      return null;
+    }
 
-  // Use real events data with fallback behavior for loading/error states
-  const finalEvents = isLoading || error || upcomingEvents.length === 0 ? [] : upcomingEvents;
+    // Handle database fields (snake_case) and TypeScript types (camelCase)
+    const eventData = event as any; // Type assertion to handle database vs TypeScript mismatch
+    const eventType = eventData.event_type || event.eventType || 'general';
+    const safeEventType = typeof eventType === 'string' ? eventType : 'general';
+    
+    // Safely handle dates
+    const startDateStr = eventData.start_date || event.startDate;
+    const endDateStr = eventData.end_date || event.endDate;
+    const startTimeStr = eventData.start_time || event.startTime;
+    
+    const startDate = startDateStr ? new Date(startDateStr) : new Date();
+    const endDate = endDateStr ? new Date(endDateStr) : null;
+    
+    return {
+      id: event.id,
+      title: event.title || 'Untitled Event',
+      description: event.description || 'No description available.',
+      eventType: safeEventType,
+      date: startDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      startDate: startDate,
+      endDate: endDate,
+      time: startTimeStr ? `${startTimeStr}${endDate ? ' - ' + endDate.toLocaleDateString() : ''}` : 'Time TBD',
+      location: event.location || 'Location TBD',
+      category: safeEventType.charAt(0).toUpperCase() + safeEventType.slice(1),
+      image: `https://images.unsplash.com/photo-${
+        safeEventType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
+        safeEventType === 'training' ? '1534438097545-a2c22c57f2ad' :
+        safeEventType === 'social' ? '1470337458703-46ad1756a187' :
+        safeEventType === 'cruising' ? '1541789094913-f3809a8f3ba5' :
+        '1540946485063-a40da27545f8'
+      }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+      hasResults: false
+    };
+  }).filter((event): event is TransformedEvent => event !== null) || []; // Type-safe filter
+
+  // Use only real API events data
+  const finalEvents = Array.isArray(transformedEvents) ? transformedEvents : [];
   const trainingPrograms = [{
     id: 1,
     title: 'RYA Level 1 & 2 - Start Sailing',
@@ -70,12 +120,8 @@ const EventsPage = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Set to start of day for comparison
   const todaysEvents = finalEvents.filter(event => {
-    if (event.isRecurring) {
-      // For recurring events, check if today is the recurring day
-      // For Wednesday Club Racing
-      return today.getDay() === 3; // 3 is Wednesday
-    } else if (event.dateObj) {
-      const eventDate = new Date(event.dateObj);
+    if (event.startDate) {
+      const eventDate = new Date(event.startDate);
       eventDate.setHours(0, 0, 0, 0);
       return eventDate.getTime() === today.getTime();
     }
@@ -103,17 +149,14 @@ const EventsPage = () => {
     const monthName = currentMonth.toLocaleString('default', {
       month: 'long'
     });
-    // Create array of dates with events
+    // Create array of dates with events from API
     const datesWithEvents = finalEvents.map(event => {
-      if (event.isRecurring) {
-        // For Wednesday Club Racing, mark all Wednesdays
-        return null; // We'll handle this separately
-      } else if (event.dateObj) {
-        const date = new Date(event.dateObj);
+      if (event.startDate) {
+        const date = new Date(event.startDate);
         return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
       }
       return null;
-    }).filter(Boolean);
+    }).filter(Boolean) as string[];
     // Generate calendar grid
     const days = [];
     // Add empty cells for days before the first day of the month
@@ -124,25 +167,21 @@ const EventsPage = () => {
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const dateStr = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-      // Check if this date has events
+      // Check if this date has events from API
       const hasEvent = datesWithEvents.includes(dateStr);
-      // Check if this is a Wednesday (for recurring Wednesday Club Racing)
-      const isWednesday = date.getDay() === 3;
-      const hasRecurringEvent = isWednesday;
       const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+      
       days.push(<div key={day} className={`h-12 border border-gray-100 relative flex items-center justify-center cursor-pointer
-            ${hasEvent || hasRecurringEvent ? 'bg-blue-50' : ''}
+            ${hasEvent ? 'bg-blue-50' : ''}
             ${isToday ? 'border-2 border-[#0284c7]' : ''}
             hover:bg-gray-50
           `} onClick={() => {
-        if (hasEvent || hasRecurringEvent) {
+        if (hasEvent) {
           // Find the event for this date and navigate to its detail page
           const clickedDate = new Date(year, month, day);
           const eventsForDate = finalEvents.filter(event => {
-            if (event.isRecurring && clickedDate.getDay() === 3) {
-              return true; // Wednesday Club Racing
-            } else if (event.dateObj) {
-              const eventDate = new Date(event.dateObj);
+            if (event && event.startDate) {
+              const eventDate = new Date(event.startDate);
               eventDate.setHours(0, 0, 0, 0);
               clickedDate.setHours(0, 0, 0, 0);
               return eventDate.getTime() === clickedDate.getTime();
@@ -150,14 +189,14 @@ const EventsPage = () => {
             return false;
           });
           
-          if (eventsForDate.length > 0) {
+          if (eventsForDate.length > 0 && eventsForDate[0]) {
             // Navigate to the first event's detail page
             navigate(`/events/${eventsForDate[0].id}`);
           }
         }
       }}>
           <span className="text-sm">{day}</span>
-          {(hasEvent || hasRecurringEvent) && <div className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0284c7]`}></div>}
+          {hasEvent && <div className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0284c7]`}></div>}
         </div>);
     }
     return <div className="mb-8">
@@ -325,7 +364,7 @@ const EventsPage = () => {
               
               <div className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                  {todaysEvents.map(event => (
+                  {todaysEvents.filter(Boolean).map(event => (
                     <div key={`featured-${event.id}`} className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3 sm:gap-0">
                         <div className="bg-[#1e3a8a] text-white px-3 py-1 rounded-full text-sm font-medium self-start">
@@ -346,7 +385,7 @@ const EventsPage = () => {
                         <div className="flex items-center text-gray-600">
                           <CalendarIcon size={18} className="mr-3 text-[#0284c7] flex-shrink-0" />
                           <span className="text-sm font-medium">
-                            {event.isRecurring ? event.date : event.date}
+                            {event.date}
                           </span>
                         </div>
                         <div className="flex items-center text-gray-600">

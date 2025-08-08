@@ -24,24 +24,31 @@ const HomePage: React.FC = () => {
   });
 
   // Transform stories to match the expected format (only if stories are loaded)
-  const featuredNews = stories?.map((story, index) => ({
-    id: story.id,
-    title: story.title,
-    excerpt: story.excerpt || story.content.substring(0, 150) + '...',
-    date: new Date(story.createdAt).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }),
-    category: story.storyType.charAt(0).toUpperCase() + story.storyType.slice(1),
-    image: story.featuredImageUrl || `https://images.unsplash.com/photo-${
-      index === 0 ? '1565194481104-39d1ee1b8bcc' : 
-      index === 1 ? '1534438097545-a2c22c57f2ad' : 
-      '1540541338287-41700207dee6'
-    }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
-    readTime: Math.max(1, Math.ceil(story.content.length / 1000)), // Rough reading time calculation
-    slug: story.slug
-  })) || [];
+  const featuredNews = stories?.map((story, index) => {
+    // Safely handle story fields with database snake_case fallbacks
+    const storyType = story.story_type || story.storyType || 'news';
+    const createdAt = story.created_at || story.createdAt || new Date();
+    const featuredImageUrl = story.featured_image_url || story.featuredImageUrl;
+    
+    return {
+      id: story.id,
+      title: story.title || 'Untitled Story',
+      excerpt: story.excerpt || story.content?.substring(0, 150) + '...' || 'No excerpt available',
+      date: new Date(createdAt).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }),
+      category: storyType.charAt(0).toUpperCase() + storyType.slice(1),
+      image: featuredImageUrl || `https://images.unsplash.com/photo-${
+        index === 0 ? '1565194481104-39d1ee1b8bcc' : 
+        index === 1 ? '1534438097545-a2c22c57f2ad' : 
+        '1540541338287-41700207dee6'
+      }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+      readTime: Math.max(1, Math.ceil((story.content?.length || 0) / 1000)), // Rough reading time calculation
+      slug: story.slug
+    };
+  }) || [];
 
   return (
     <div className="min-h-screen bg-white">
@@ -129,7 +136,7 @@ const HomePage: React.FC = () => {
                         <div className="flex-1">
                           <h4 className="font-semibold text-sm mb-1">{event.title}</h4>
                           <p className="text-maritime-silver/80 text-xs">
-                            {new Date(event.startDate).toLocaleDateString('en-US', { 
+                            {new Date(event.start_date || event.startDate).toLocaleDateString('en-US', { 
                               year: 'numeric', 
                               month: 'long', 
                               day: 'numeric' 

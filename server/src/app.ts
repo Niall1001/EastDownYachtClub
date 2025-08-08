@@ -4,10 +4,11 @@ import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
-import authRoutes from './routes/auth';
+import { specs } from './config/swagger';
 import eventRoutes from './routes/events';
 import storyRoutes from './routes/stories';
 import uploadRoutes from './routes/upload';
@@ -34,9 +35,35 @@ app.use(helmet({
 }));
 app.use(limiter);
 
-// CORS configuration for frontend
+// CORS configuration for frontend - Allow multiple development URLs
+const allowedOrigins = [
+  'http://localhost:5173', // Vite default
+  'http://localhost:3000', // React dev server
+  'http://localhost:5174', // Vite alternative
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // In development, be more permissive with localhost origins
+    if (process.env.NODE_ENV !== 'production') {
+      if (origin && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) {
+        return callback(null, true);
+      }
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      logger.warn(`CORS blocked origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -58,7 +85,70 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint
+// Swagger Documentation
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'East Down Yacht Club API Documentation',
+    swaggerOptions: {
+      docExpansion: 'list',
+      filter: true,
+      showRequestDuration: true,
+    }
+  }));
+  
+  // Swagger JSON endpoint
+  app.get('/api-docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
+  });
+  
+  logger.info('Swagger UI available at /api-docs');
+}
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Check the health status of the API server
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: Server is healthy and running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "healthy"
+ *                   description: Health status of the server
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-04-15T10:30:00.000Z"
+ *                   description: Current server timestamp
+ *                 version:
+ *                   type: string
+ *                   example: "1.0.0"
+ *                   description: API version
+ *               required:
+ *                 - status
+ *                 - timestamp
+ *                 - version
+ *             examples:
+ *               healthy:
+ *                 summary: Healthy server response
+ *                 value:
+ *                   status: "healthy"
+ *                   timestamp: "2024-04-15T10:30:00.000Z"
+ *                   version: "1.0.0"
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
@@ -68,7 +158,6 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/upload', uploadRoutes);

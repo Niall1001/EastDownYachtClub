@@ -12,7 +12,12 @@
       "Bash(npm install)",
       "Bash(mv:*)",
       "Bash(npm test)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(true)",
+      "Bash(node:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
