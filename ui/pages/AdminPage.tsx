@@ -3,6 +3,8 @@ import { Plus, Save, X, Eye, Calendar, User, ArrowLeft, MapPin, Clock, Sailboat,
 import { useAuth } from '../contexts/AuthContext';
 import { useStories } from '../hooks/useStories';
 import { useEvents } from '../hooks/useEvents';
+import { storyService, CreateStoryRequest, UpdateStoryRequest } from '../services/storyService';
+import { eventService, CreateEventRequest, UpdateEventRequest } from '../services/eventService';
 
 interface Story {
   id: string;
@@ -47,6 +49,10 @@ const AdminPage = () => {
   const [activeSection, setActiveSection] = useState<'list' | 'new' | 'edit'>('list');
   const [editingStory, setEditingStory] = useState<Story | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  
+  // Loading states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   // Fetch stories and events from API
   const { stories, isLoading: storiesLoading, error: storiesError } = useStories({ 
@@ -134,7 +140,7 @@ const AdminPage = () => {
     setStoryFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleStorySubmit = (e: React.FormEvent) => {
+  const handleStorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!storyFormData.title || !storyFormData.excerpt || !storyFormData.content || !storyFormData.author) {
@@ -142,26 +148,51 @@ const AdminPage = () => {
       return;
     }
 
-    const newStory: Story = {
-      id: editingStory ? editingStory.id : Date.now(),
-      title: storyFormData.title,
-      excerpt: storyFormData.excerpt,
-      content: storyFormData.content,
-      author: storyFormData.author,
-      category: storyFormData.category,
-      date: new Date().toISOString().split('T')[0],
-      image: storyFormData.image || 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-    };
-
-    if (editingStory) {
-      setStories(prev => prev.map(story => story.id === editingStory.id ? newStory : story));
-    } else {
-      setStories(prev => [newStory, ...prev]);
+    setIsSubmitting(true);
+    try {
+      if (editingStory) {
+        // Update existing story
+        const updateData: UpdateStoryRequest = {
+          title: storyFormData.title,
+          excerpt: storyFormData.excerpt,
+          content: storyFormData.content,
+          authorName: storyFormData.author,
+          storyType: storyFormData.category.toLowerCase().replace(' ', '_'),
+          featuredImageUrl: storyFormData.image || undefined,
+          published: true
+        };
+        
+        await storyService.updateStory(editingStory.id, updateData);
+        alert('Story updated successfully!');
+      } else {
+        // Create new story
+        const createData: CreateStoryRequest = {
+          title: storyFormData.title,
+          excerpt: storyFormData.excerpt,
+          content: storyFormData.content,
+          authorName: storyFormData.author,
+          storyType: storyFormData.category.toLowerCase().replace(' ', '_'),
+          featuredImageUrl: storyFormData.image || undefined,
+          published: true
+        };
+        
+        await storyService.createStory(createData);
+        alert('Story created successfully!');
+      }
+      
+      resetStoryForm();
+      setEditingStory(null);
+      setActiveSection('list');
+      
+      // Refresh the stories list
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error saving story:', error);
+      alert('Failed to save story. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    resetStoryForm();
-    setEditingStory(null);
-    setActiveSection('list');
   };
 
   // Event handlers
@@ -181,65 +212,75 @@ const AdminPage = () => {
     }
   };
 
-  const handleEventSubmit = (e: React.FormEvent) => {
+  const handleEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleEventSubmit called with:', { eventFormData, editingEvent });
     
-    if (!eventFormData.title || !eventFormData.description || !eventFormData.date || !eventFormData.time || !eventFormData.location) {
-      console.error('Form validation failed:', {
-        title: eventFormData.title,
-        description: eventFormData.description,
-        date: eventFormData.date,
-        time: eventFormData.time,
-        location: eventFormData.location
-      });
+    if (!eventFormData.title || !eventFormData.description || !eventFormData.date || !eventFormData.location) {
       alert('Please fill in all required fields');
       return;
     }
 
-    const eventDate = eventFormData.isRecurring ? null : new Date(eventFormData.date);
-    const displayDate = eventFormData.isRecurring 
-      ? eventFormData.date 
-      : new Date(eventFormData.date).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
+    setIsSubmitting(true);
+    try {
+      // Convert time from "10:00 AM" format to "10:00:00" format
+      let startTime: string | undefined;
+      if (eventFormData.time) {
+        const timeMatch = eventFormData.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (timeMatch) {
+          let hours = parseInt(timeMatch[1]);
+          const minutes = timeMatch[2];
+          const period = timeMatch[3].toUpperCase();
+          
+          if (period === 'PM' && hours !== 12) hours += 12;
+          if (period === 'AM' && hours === 12) hours = 0;
+          
+          startTime = `${hours.toString().padStart(2, '0')}:${minutes}:00`;
+        } else {
+          startTime = eventFormData.time;
+        }
+      }
 
-    const newEvent: Event = {
-      id: editingEvent ? editingEvent.id : Date.now(),
-      title: eventFormData.title,
-      description: eventFormData.description,
-      date: displayDate,
-      dateObj: eventDate,
-      time: eventFormData.time,
-      location: eventFormData.location,
-      category: eventFormData.category,
-      image: eventFormData.image || 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-      hasResults: eventFormData.hasResults,
-      resultsUrl: eventFormData.resultsUrl || undefined,
-      isRecurring: eventFormData.isRecurring,
-      noticeOfRacePdf: eventFormData.noticeOfRacePdf || undefined,
-      sailingInstructionsPdf: eventFormData.sailingInstructionsPdf || undefined,
-      boatEntries: eventFormData.boatEntries
-    };
-    
-    console.log('Created newEvent:', newEvent);
-    if (editingEvent) {
-      console.log('Updating existing event with id:', editingEvent.id);
-      setEvents(prev => {
-        const updated = prev.map(event => event.id === editingEvent.id ? newEvent : event);
-        console.log('Updated events array:', updated);
-        return updated;
-      });
-    } else {
-      console.log('Creating new event');
-      setEvents(prev => [newEvent, ...prev]);
+      if (editingEvent) {
+        // Update existing event
+        const updateData: UpdateEventRequest = {
+          title: eventFormData.title,
+          description: eventFormData.description,
+          eventType: eventFormData.category.toLowerCase().replace(' ', '_'),
+          startDate: eventFormData.date,
+          startTime: startTime,
+          location: eventFormData.location
+        };
+        
+        await eventService.updateEvent(editingEvent.id, updateData);
+        alert('Event updated successfully!');
+      } else {
+        // Create new event
+        const createData: CreateEventRequest = {
+          title: eventFormData.title,
+          description: eventFormData.description,
+          eventType: eventFormData.category.toLowerCase().replace(' ', '_'),
+          startDate: eventFormData.date,
+          startTime: startTime,
+          location: eventFormData.location
+        };
+        
+        await eventService.createEvent(createData);
+        alert('Event created successfully!');
+      }
+      
+      resetEventForm();
+      setEditingEvent(null);
+      setActiveSection('list');
+      
+      // Refresh the events list
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error saving event:', error);
+      alert('Failed to save event. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    resetEventForm();
-    setEditingEvent(null);
-    setActiveSection('list');
   };
 
   const handleEditStory = (story: Story) => {
@@ -297,17 +338,37 @@ const AdminPage = () => {
     setActiveSection('edit');
   };
 
-  const handleDeleteStory = (id: string) => {
+  const handleDeleteStory = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this story?')) {
-      // In a real app, this would call the API to delete the story
-      alert('Delete functionality would be implemented with API call');
+      setIsDeleting(id);
+      try {
+        await storyService.deleteStory(id);
+        alert('Story deleted successfully!');
+        // Refresh the page to update the list
+        window.location.reload();
+      } catch (error) {
+        console.error('Error deleting story:', error);
+        alert('Failed to delete story. Please try again.');
+      } finally {
+        setIsDeleting(null);
+      }
     }
   };
 
-  const handleDeleteEvent = (id: string) => {
+  const handleDeleteEvent = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
-      // In a real app, this would call the API to delete the event
-      alert('Delete functionality would be implemented with API call');
+      setIsDeleting(id);
+      try {
+        await eventService.deleteEvent(id);
+        alert('Event deleted successfully!');
+        // Refresh the page to update the list
+        window.location.reload();
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        alert('Failed to delete event. Please try again.');
+      } finally {
+        setIsDeleting(null);
+      }
     }
   };
 
@@ -537,10 +598,15 @@ const AdminPage = () => {
                       </button>
                       <button
                         onClick={() => handleDeleteEvent(event.id)}
-                        className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+                        disabled={isDeleting === event.id}
+                        className={`text-sm font-medium flex items-center ${
+                          isDeleting === event.id
+                            ? 'text-gray-400 cursor-not-allowed'
+                            : 'text-red-600 hover:text-red-700'
+                        }`}
                       >
                         <X size={14} className="mr-1" />
-                        Delete
+                        {isDeleting === event.id ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </div>

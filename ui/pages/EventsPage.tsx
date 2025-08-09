@@ -63,6 +63,22 @@ const EventsPage = () => {
     const startDate = startDateStr ? new Date(startDateStr) : new Date();
     const endDate = endDateStr ? new Date(endDateStr) : null;
     
+    // Format the start time properly
+    let formattedTime = 'Time TBD';
+    if (startTimeStr) {
+      try {
+        const timeDate = new Date(startTimeStr);
+        formattedTime = timeDate.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (error) {
+        console.warn('Failed to parse start time:', startTimeStr);
+        formattedTime = 'Time TBD';
+      }
+    }
+    
     return {
       id: event.id,
       title: event.title || 'Untitled Event',
@@ -75,7 +91,7 @@ const EventsPage = () => {
       }),
       startDate: startDate,
       endDate: endDate,
-      time: startTimeStr ? `${startTimeStr}${endDate ? ' - ' + endDate.toLocaleDateString() : ''}` : 'Time TBD',
+      time: formattedTime + (endDate ? ' - ' + endDate.toLocaleDateString() : ''),
       location: event.location || 'Location TBD',
       category: safeEventType.charAt(0).toUpperCase() + safeEventType.slice(1),
       image: `https://images.unsplash.com/photo-${
