@@ -6,13 +6,9 @@ import { logger } from '../utils/logger';
 import { generateSlug } from '../utils/slug';
 
 export const getStories = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const { type, published = 'true', limit = '10', offset = '0' } = req.query;
+  const { type, limit = '10', offset = '0' } = req.query;
   
   const where: any = {};
-  
-  if (published === 'true') {
-    where.published = true;
-  }
   
   if (type && typeof type === 'string') {
     where.story_type = type;
@@ -83,15 +79,7 @@ export const getStory = asyncHandler(async (req: AuthRequest, res: Response, nex
     return;
   }
 
-  // Only return published stories unless user is admin
-  if (!story.published && (!req.user || req.user.role !== 'admin')) {
-    const response: ApiResponse = {
-      success: false,
-      error: 'Story not found',
-    };
-    res.status(404).json(response);
-    return;
-  }
+  // Return all stories - published constraint removed
 
   const response: ApiResponse = {
     success: true,

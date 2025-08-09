@@ -5,12 +5,12 @@ import { useStories } from '../hooks/useStories';
 const NewsPage = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const categories = ['All', 'News', 'Racing', 'Training', 'Social', 'Announcements'];
+  const categories = ['All', 'News', 'Racing', 'Training', 'Social', 'Announcement'];
 
-  // Fetch real stories data
+  // Fetch real stories data with dynamic filtering
   const { stories, isLoading, error } = useStories({ 
-    published: true,
-    limit: 50
+    limit: 50,
+    type: activeCategory === 'All' ? undefined : activeCategory.toLowerCase()
   });
   // Transform stories to match expected format
   const transformStory = (story: any) => {
@@ -40,7 +40,7 @@ const NewsPage = () => {
         storyType === 'racing' ? '1565194481104-39d1ee1b8bcc' :
         storyType === 'training' ? '1534438097545-a2c22c57f2ad' :
         storyType === 'social' ? '1511578314322-379afb476865' :
-        storyType === 'announcements' ? '1500627965408-b5f2c5f9168a' :
+        storyType === 'announcement' ? '1500627965408-b5f2c5f9168a' :
         '1540541338287-41700207dee6'
       }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
       slug: story.slug
@@ -50,12 +50,13 @@ const NewsPage = () => {
   const transformedStories = stories?.map(transformStory).filter(Boolean) || []; // Remove null entries
   const featuredArticle = transformedStories.length > 0 ? transformedStories[0] : null;
   const newsArticles = transformedStories.slice(1); // All except the first one (featured)
+  
+  // Client-side filtering for search only (type filtering is handled by API)
   const filteredArticles = newsArticles.filter(article => {
-    const matchesCategory = activeCategory === 'All' || 
-      article.category.toLowerCase() === activeCategory.toLowerCase();
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = searchQuery === '' || 
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
       article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesSearch;
   });
   const newsletters = [{
     id: 1,

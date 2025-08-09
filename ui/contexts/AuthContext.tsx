@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const authHook = useAuthHook();
 
-  // Check for existing session on mount
+  // Check for existing session on mount - run only once
   useEffect(() => {
     const initializeAuth = async () => {
       const savedUser = localStorage.getItem('yacht_club_user');
@@ -33,19 +33,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const parsedUser = JSON.parse(savedUser);
           setUser(parsedUser);
           
-          // Verify the user is still valid by fetching current user info
-          try {
-            const currentUser = await authHook.getCurrentUser();
-            if (currentUser) {
-              setUser(currentUser);
-            }
-          } catch (error) {
-            // If verification fails, clear stored data
-            console.error('Failed to verify stored user:', error);
-            localStorage.removeItem('yacht_club_user');
-            localStorage.removeItem('yacht_club_token');
-            setUser(null);
-          }
+          // Don't verify on initial load to prevent infinite loop
+          // User verification can happen on specific actions instead
         } catch (error) {
           console.error('Error parsing saved user:', error);
           localStorage.removeItem('yacht_club_user');
@@ -56,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-  }, [authHook]);
+  }, []); // Empty dependency array - run only once on mount
 
   const login = async (username: string, password: string): Promise<boolean> => {
     const success = await authHook.login({ username, password });

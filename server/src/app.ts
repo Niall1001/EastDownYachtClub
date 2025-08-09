@@ -13,6 +13,7 @@ import eventRoutes from './routes/events';
 import storyRoutes from './routes/stories';
 import uploadRoutes from './routes/upload';
 import raceRoutes from './routes/races';
+import authRoutes from './routes/auth';
 
 // Load environment variables
 dotenv.config();
@@ -20,13 +21,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Rate limiting
+// Rate limiting - more lenient in development and skip OPTIONS requests
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: process.env.NODE_ENV === 'production' ? 100 : 500, // More lenient in development
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for CORS preflight requests
+    if (req.method === 'OPTIONS') return true;
+    
+    // Skip rate limiting for auth endpoints in development to prevent infinite loop issues
+    if (process.env.NODE_ENV !== 'production' && req.path.startsWith('/api/auth')) {
+      return true;
+    }
+    
+    return false;
+  },
 });
 
 // Security middleware
@@ -76,12 +88,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Compression
 app.use(compression());
 
-// Request logging
+// Request logging with CORS debugging
 app.use((req, res, next) => {
+  const origin = req.get('Origin');
   logger.info(`${req.method} ${req.path}`, {
     ip: req.ip,
     userAgent: req.get('User-Agent'),
+    origin: origin
   });
+  
+  // Debug CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    logger.info('CORS preflight request', { origin });
+  }
+  
   next();
 });
 
@@ -158,6 +178,7 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/upload', uploadRoutes);

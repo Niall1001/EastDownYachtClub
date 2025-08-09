@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Save, X, Eye, Calendar, User, ArrowLeft, MapPin, Clock, Sailboat, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useStories } from '../hooks/useStories';
+import { useEvents } from '../hooks/useEvents';
 
 interface Story {
-  id: number;
+  id: string;
   title: string;
   excerpt: string;
   content: string;
-  author: string;
-  category: string;
-  date: string;
-  image: string;
+  author_name?: string;
+  story_type: string;
+  created_at: string;
+  featured_image_url?: string;
+  published?: boolean;
 }
 
 interface BoatEntry {
@@ -22,22 +25,16 @@ interface BoatEntry {
 }
 
 interface Event {
-  id: number;
+  id: string;
   title: string;
-  description: string;
-  date: string;
-  dateObj: Date | null;
-  time: string;
-  location: string;
-  category: string;
-  image: string;
-  hasResults: boolean;
-  resultsUrl?: string;
-  isRecurring: boolean;
-  recurringFrequency?: string;
-  noticeOfRacePdf?: string;
-  sailingInstructionsPdf?: string;
-  boatEntries: BoatEntry[];
+  description?: string;
+  event_type: string;
+  start_date: string;
+  end_date?: string;
+  start_time?: string;
+  location?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 
@@ -51,182 +48,18 @@ const AdminPage = () => {
   const [editingStory, setEditingStory] = useState<Story | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
-  // Stories state
-  const [stories, setStories] = useState<Story[]>([
-    {
-      id: 1,
-      title: 'East Down Yacht Club Hosts Successful Strangford Lough Regatta',
-      excerpt: "This year's Strangford Lough Regatta was a tremendous success with record participation and perfect sailing conditions throughout the weekend.",
-      content: "This year's Strangford Lough Regatta was a tremendous success with record participation and perfect sailing conditions throughout the weekend. Over 50 boats competed across multiple classes, with sailors traveling from across Ireland to participate in one of the most anticipated events in the Northern Irish sailing calendar.\n\nThe event kicked off on Saturday morning with a skipper's briefing, followed by three races throughout the day.",
-      author: 'Sarah Thompson',
-      category: 'Racing',
-      date: '2023-08-15',
-      image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-    },
-    {
-      id: 2,
-      title: 'New Training Courses Announced for Spring Season',
-      excerpt: "We're excited to announce our spring training schedule, featuring courses for all skill levels from beginners to advanced racers.",
-      content: "We're excited to announce our comprehensive spring training schedule, featuring courses designed for all skill levels from complete beginners to advanced competitive racers. Our certified instructors will guide participants through progressive learning modules.",
-      author: 'Mike Johnson',
-      category: 'Training',
-      date: '2023-08-10',
-      image: 'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-    }
-  ]);
+  // Fetch stories and events from API
+  const { stories, isLoading: storiesLoading, error: storiesError } = useStories({ 
+    limit: 50 // Get all stories for admin view
+  });
+  
+  const { events, isLoading: eventsLoading, error: eventsError } = useEvents({ 
+    limit: 50 // Get all events for admin view
+  });
 
 
 
-  // Load events from localStorage with migration
-  const loadEvents = (): Event[] => {
-    try {
-      const stored = localStorage.getItem('adminEvents');
-      if (!stored) return [];
-      
-      const events = JSON.parse(stored);
-      
-      // Migrate old event format
-      return events.map((event: any) => ({
-        ...event,
-        boatEntries: event.boatEntries || []
-      }));
-    } catch (error) {
-      console.error('Error loading events:', error);
-      return [];
-    }
-  };
-
-  const saveEvents = (events: Event[]) => {
-    try {
-      localStorage.setItem('adminEvents', JSON.stringify(events));
-    } catch (error) {
-      console.error('Error saving events:', error);
-    }
-  };
-
-
-
-
-
-  // Initialize events from localStorage or use default
-  const initializeEvents = (): Event[] => {
-    const storedEvents = loadEvents();
-    if (storedEvents.length > 0) {
-      return storedEvents;
-    }
-    
-    // Default events with comprehensive dummy data
-    return [
-      {
-        id: 1,
-        title: 'Strangford Lough Championship',
-        description: 'Annual championship race featuring multiple classes. Premium racing event with IRC rated boats, cruisers, and dinghies competing across Strangford Lough.',
-        date: 'August 15, 2024',
-        dateObj: new Date(2024, 7, 15),
-        time: '10:00 AM - 5:00 PM',
-        location: 'Strangford Lough, Main Race Area',
-        category: 'Racing',
-        image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-        hasResults: true,
-        resultsUrl: 'https://hallsailing.com/results/event1',
-        isRecurring: false,
-        boatEntries: [
-          // IRC Class 1
-          { id: '1', boat: 'Storm Petrel', skipper: 'James Morrison', sailNumber: 'IRL4217', class: 'IRC Class 1' },
-          { id: '2', boat: 'Checkmate', skipper: 'Sarah Thompson', sailNumber: 'IRL3845', class: 'IRC Class 1' },
-          { id: '3', boat: 'Wild Spirit', skipper: 'Michael O\'Brien', sailNumber: 'IRL5621', class: 'IRC Class 1' },
-          { id: '4', boat: 'Artemis', skipper: 'David Wilson', sailNumber: 'IRL2978', class: 'IRC Class 1' },
-          
-          // IRC Class 2
-          { id: '5', boat: 'Sea Dreams', skipper: 'Emma Clarke', sailNumber: 'IRL1234', class: 'IRC Class 2' },
-          { id: '6', boat: 'Celtic Warrior', skipper: 'Patrick Kelly', sailNumber: 'IRL5678', class: 'IRC Class 2' },
-          { id: '7', boat: 'Northern Light', skipper: 'Rachel Hughes', sailNumber: 'IRL9012', class: 'IRC Class 2' },
-          { id: '8', boat: 'Maverick', skipper: 'Thomas Reid', sailNumber: 'IRL3456', class: 'IRC Class 2' },
-          { id: '9', boat: 'Windchaser', skipper: 'Jennifer Adams', sailNumber: 'IRL7890', class: 'IRC Class 2' },
-          
-          // Cruiser Class
-          { id: '10', boat: 'Morning Mist', skipper: 'Robert Anderson', sailNumber: 'IRL246', class: 'Cruiser Class' },
-          { id: '11', boat: 'Serendipity', skipper: 'Catherine Murphy', sailNumber: 'IRL135', class: 'Cruiser Class' },
-          { id: '12', boat: 'Blue Horizon', skipper: 'Mark Stewart', sailNumber: 'IRL579', class: 'Cruiser Class' },
-          { id: '13', boat: 'Ocean Breeze', skipper: 'Lisa Campbell', sailNumber: 'IRL864', class: 'Cruiser Class' }
-        ]
-      },
-      {
-        id: 2,
-        title: 'Wednesday Evening Series',
-        description: 'Weekly club racing series every Wednesday evening. Mixed fleet racing with handicap starts for all classes.',
-        date: 'Every Wednesday',
-        dateObj: null,
-        time: '6:30 PM - 9:00 PM',
-        location: 'Strangford Lough, Club Waters',
-        category: 'Racing',
-        image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-        hasResults: false,
-        isRecurring: true,
-        boatEntries: [
-          // IRC Class 2
-          { id: '14', boat: 'Seaspray', skipper: 'Alan Foster', sailNumber: 'IRL4321', class: 'IRC Class 2' },
-          { id: '15', boat: 'Mistral', skipper: 'Helen Douglas', sailNumber: 'IRL8765', class: 'IRC Class 2' },
-          
-          // Cruiser Class  
-          { id: '16', boat: 'Fair Winds', skipper: 'George Patterson', sailNumber: 'IRL975', class: 'Cruiser Class' },
-          { id: '17', boat: 'Tranquility', skipper: 'Mary O\'Connor', sailNumber: 'IRL531', class: 'Cruiser Class' },
-          { id: '18', boat: 'Starlight', skipper: 'Kevin Brady', sailNumber: 'IRL642', class: 'Cruiser Class' },
-          
-          // Dinghy Class
-          { id: '19', boat: 'Lightning', skipper: 'Sophie Turner', sailNumber: '14257', class: 'Dinghy Class' },
-          { id: '20', boat: 'Quicksilver', skipper: 'Jamie Collins', sailNumber: '16834', class: 'Dinghy Class' },
-          { id: '21', boat: 'Zephyr', skipper: 'Alex Murray', sailNumber: '19246', class: 'Dinghy Class' }
-        ]
-      },
-      {
-        id: 3,
-        title: 'Junior Sailing Program',
-        description: 'Our popular junior sailing program continues with sessions for beginners, improvers and advanced young sailors aged 8-16.',
-        date: 'September 17, 2024',
-        dateObj: new Date(2024, 8, 17),
-        time: '9:00 AM - 1:00 PM',
-        location: 'East Down YC Training Area',
-        category: 'Training',
-        image: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-        hasResults: false,
-        isRecurring: false,
-        boatEntries: []
-      },
-      {
-        id: 4,
-        title: 'Classic Yacht Regatta',
-        description: 'Special regatta for classic and vintage yachts. A celebration of traditional sailing with boats built before 1975.',
-        date: 'July 20, 2024',
-        dateObj: new Date(2024, 6, 20),
-        time: '11:00 AM - 6:00 PM',
-        location: 'Strangford Lough, Heritage Waters',
-        category: 'Racing',
-        image: 'https://images.unsplash.com/photo-1565194481104-39d1ee1b8bcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-        hasResults: true,
-        resultsUrl: 'https://hallsailing.com/results/classic2024',
-        isRecurring: false,
-        boatEntries: [
-          // Classic Class
-          { id: '22', boat: 'Shamrock', skipper: 'Declan O\'Sullivan', sailNumber: 'IRL1947', class: 'Classic Class' },
-          { id: '23', boat: 'Erin\'s Dream', skipper: 'Brendan Fitzgerald', sailNumber: 'IRL1962', class: 'Classic Class' },
-          { id: '24', boat: 'Heritage', skipper: 'Norah McBride', sailNumber: 'IRL1955', class: 'Classic Class' },
-          { id: '25', boat: 'Vintage Rose', skipper: 'Conor Gallagher', sailNumber: 'IRL1968', class: 'Classic Class' },
-          { id: '26', boat: 'Celtic Cross', skipper: 'Siobhan Walsh', sailNumber: 'IRL1971', class: 'Classic Class' }
-        ]
-      }
-    ];
-  };
-
-  // Events state
-  const [events, setEvents] = useState<Event[]>(initializeEvents);
-
-
-
-  // Save events to localStorage when state changes
-  useEffect(() => {
-    saveEvents(events);
-  }, [events]);
+  // Note: Events now loaded from API via useEvents hook above
 
   // Story form state
   const [storyFormData, setStoryFormData] = useState({
@@ -413,11 +246,11 @@ const AdminPage = () => {
     setEditingStory(story);
     setStoryFormData({
       title: story.title,
-      excerpt: story.excerpt,
+      excerpt: story.excerpt || '',
       content: story.content,
-      author: story.author,
-      category: story.category,
-      image: story.image
+      author: story.author_name || '',
+      category: story.story_type?.charAt(0).toUpperCase() + story.story_type?.slice(1) || 'Club News',
+      image: story.featured_image_url || ''
     });
     setActiveTab('stories'); // Ensure we're on the stories tab
     setActiveSection('edit');
@@ -427,23 +260,16 @@ const AdminPage = () => {
     console.log('handleEditEvent called with event:', event);
     setEditingEvent(event);
     
-    // Improved date handling with better fallbacks
+    // Convert start_date to YYYY-MM-DD format for date input
     let dateValue = '';
-    if (event.isRecurring) {
-      dateValue = event.date || '';
-    } else if (event.dateObj && event.dateObj instanceof Date) {
-      dateValue = event.dateObj.toISOString().split('T')[0];
-    } else if (event.date && !event.isRecurring) {
-      // Try to parse the display date back to YYYY-MM-DD format
+    if (event.start_date) {
       try {
-        const parsedDate = new Date(event.date);
-        if (!isNaN(parsedDate.getTime())) {
-          dateValue = parsedDate.toISOString().split('T')[0];
-        } else {
-          dateValue = '';
+        const date = new Date(event.start_date);
+        if (!isNaN(date.getTime())) {
+          dateValue = date.toISOString().split('T')[0];
         }
       } catch (error) {
-        console.warn('Could not parse event date:', event.date);
+        console.warn('Could not parse event start_date:', event.start_date);
         dateValue = '';
       }
     }
@@ -452,17 +278,17 @@ const AdminPage = () => {
       title: event.title || '',
       description: event.description || '',
       date: dateValue,
-      time: event.time || '',
+      time: event.start_time || '',
       location: event.location || '',
-      category: event.category || 'Racing',
-      image: event.image || '',
-      hasResults: event.hasResults || false,
-      resultsUrl: event.resultsUrl || '',
-      isRecurring: event.isRecurring || false,
-      recurringFrequency: event.recurringFrequency || '',
-      noticeOfRacePdf: event.noticeOfRacePdf || '',
-      sailingInstructionsPdf: event.sailingInstructionsPdf || '',
-      boatEntries: event.boatEntries || []
+      category: event.event_type || 'Racing',
+      image: '',
+      hasResults: false,
+      resultsUrl: '',
+      isRecurring: false,
+      recurringFrequency: '',
+      noticeOfRacePdf: '',
+      sailingInstructionsPdf: '',
+      boatEntries: []
     };
     
     console.log('Setting eventFormData:', formData);
@@ -471,15 +297,17 @@ const AdminPage = () => {
     setActiveSection('edit');
   };
 
-  const handleDeleteStory = (id: number) => {
+  const handleDeleteStory = (id: string) => {
     if (window.confirm('Are you sure you want to delete this story?')) {
-      setStories(prev => prev.filter(story => story.id !== id));
+      // In a real app, this would call the API to delete the story
+      alert('Delete functionality would be implemented with API call');
     }
   };
 
-  const handleDeleteEvent = (id: number) => {
+  const handleDeleteEvent = (id: string) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
-      setEvents(prev => prev.filter(event => event.id !== id));
+      // In a real app, this would call the API to delete the event
+      alert('Delete functionality would be implemented with API call');
     }
   };
 
@@ -584,33 +412,42 @@ const AdminPage = () => {
         {activeSection === 'list' && activeTab === 'stories' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-800">Published Stories ({stories.length})</h2>
+              <h2 className="text-xl font-semibold text-gray-800">All Stories ({stories.length})</h2>
             </div>
             
-            <div className="grid gap-6">
-              {stories.map(story => (
+            {storiesLoading ? (
+              <div className="text-center py-12">
+                <div className="text-maritime-slate-600">Loading stories...</div>
+              </div>
+            ) : storiesError ? (
+              <div className="text-center py-12">
+                <div className="text-red-600">Error loading stories: {storiesError}</div>
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                {stories.map(story => (
                 <div key={story.id} className="bg-white rounded-lg shadow-sm p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-3">
                         <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                          {story.category}
+                          {story.story_type?.charAt(0).toUpperCase() + story.story_type?.slice(1)}
                         </span>
                         <div className="flex items-center text-sm text-gray-500">
                           <Calendar size={14} className="mr-1" />
-                          {story.date}
+                          {new Date(story.created_at).toLocaleDateString()}
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
                           <User size={14} className="mr-1" />
-                          {story.author}
+                          {story.author_name || 'Club Admin'}
                         </div>
                       </div>
                       <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{story.title}</h3>
                       <p className="text-gray-600 mb-4 line-clamp-2">{story.excerpt}</p>
                     </div>
-                    {story.image && (
+                    {story.featured_image_url && (
                       <img
-                        src={story.image}
+                        src={story.featured_image_url}
                         alt={story.title}
                         className="w-24 h-16 object-cover rounded ml-4 flex-shrink-0"
                       />
@@ -633,8 +470,9 @@ const AdminPage = () => {
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -645,63 +483,70 @@ const AdminPage = () => {
               <h2 className="text-xl font-semibold text-gray-800">Published Events ({events.length})</h2>
             </div>
             
-            <div className="grid gap-6">
-              {events.map(event => (
-                <div key={event.id} className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-                          {event.category}
-                        </span>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Calendar size={14} className="mr-1" />
-                          {event.date}
-                        </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Clock size={14} className="mr-1" />
-                          {event.time}
-                        </div>
-                        {event.isRecurring && (
-                          <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
-                            Recurring
+            {eventsLoading ? (
+              <div className="text-center py-12">
+                <div className="text-maritime-slate-600">Loading events...</div>
+              </div>
+            ) : eventsError ? (
+              <div className="text-center py-12">
+                <div className="text-red-600">Error loading events: {eventsError}</div>
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                {events.map(event => (
+                  <div key={event.id} className="bg-white rounded-lg shadow-sm p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                          <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                            {event.event_type?.charAt(0).toUpperCase() + event.event_type?.slice(1) || 'Event'}
                           </span>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Calendar size={14} className="mr-1" />
+                            {new Date(event.start_date).toLocaleDateString()}
+                            {event.end_date && event.end_date !== event.start_date && (
+                              <span> - {new Date(event.end_date).toLocaleDateString()}</span>
+                            )}
+                          </div>
+                          {event.start_time && (
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Clock size={14} className="mr-1" />
+                              {event.start_time}
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{event.title}</h3>
+                        {event.description && (
+                          <p className="text-gray-600 mb-2 line-clamp-2">{event.description}</p>
+                        )}
+                        {event.location && (
+                          <div className="flex items-center text-sm text-gray-500">
+                            <MapPin size={14} className="mr-1" />
+                            {event.location}
+                          </div>
                         )}
                       </div>
-                      <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{event.title}</h3>
-                      <p className="text-gray-600 mb-2 line-clamp-2">{event.description}</p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin size={14} className="mr-1" />
-                        {event.location}
-                      </div>
                     </div>
-                    {event.image && (
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-24 h-16 object-cover rounded ml-4 flex-shrink-0"
-                      />
-                    )}
+                    <div className="flex items-center gap-3 pt-4 border-t">
+                      <button
+                        onClick={() => handleEditEvent(event)}
+                        className="text-[#0284c7] hover:text-blue-700 text-sm font-medium flex items-center"
+                      >
+                        <Eye size={14} className="mr-1" />
+                        View Details
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEvent(event.id)}
+                        className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+                      >
+                        <X size={14} className="mr-1" />
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 pt-4 border-t">
-                    <button
-                      onClick={() => handleEditEvent(event)}
-                      className="text-[#0284c7] hover:text-blue-700 text-sm font-medium flex items-center"
-                    >
-                      <Eye size={14} className="mr-1" />
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteEvent(event.id)}
-                      className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
-                    >
-                      <X size={14} className="mr-1" />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

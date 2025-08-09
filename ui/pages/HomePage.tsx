@@ -13,9 +13,7 @@ import { useEvents } from '../hooks/useEvents';
 const HomePage: React.FC = () => {
   // Fetch real stories and events data
   const { stories, isLoading: storiesLoading, error: storiesError } = useStories({ 
-    published: true, 
-    limit: 3,
-    type: 'news'
+    limit: 3
   });
   
   const { events, isLoading: eventsLoading, error: eventsError } = useEvents({ 
@@ -91,7 +89,7 @@ const HomePage: React.FC = () => {
                 </div>
               ) : featuredNews.length === 0 ? (
                 <div className="col-span-full text-center py-12">
-                  <div className="text-maritime-slate-600">No published stories available.</div>
+                  <div className="text-maritime-slate-600">No stories available.</div>
                 </div>
               ) : (
                 featuredNews.map((article) => (
