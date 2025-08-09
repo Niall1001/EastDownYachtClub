@@ -82,6 +82,7 @@ const AdminPage = () => {
     title: '',
     description: '',
     date: '',
+    endDate: '',
     time: '',
     location: '',
     category: 'Racing',
@@ -118,6 +119,7 @@ const AdminPage = () => {
       title: '',
       description: '',
       date: '',
+      endDate: '',
       time: '',
       location: '',
       category: 'Racing',
@@ -247,6 +249,7 @@ const AdminPage = () => {
           description: eventFormData.description,
           eventType: eventFormData.category.toLowerCase().replace(' ', '_'),
           startDate: eventFormData.date,
+          endDate: eventFormData.endDate || undefined,
           startTime: startTime,
           location: eventFormData.location
         };
@@ -260,6 +263,7 @@ const AdminPage = () => {
           description: eventFormData.description,
           eventType: eventFormData.category.toLowerCase().replace(' ', '_'),
           startDate: eventFormData.date,
+          endDate: eventFormData.endDate || undefined,
           startTime: startTime,
           location: eventFormData.location
         };
@@ -301,38 +305,106 @@ const AdminPage = () => {
     console.log('handleEditEvent called with event:', event);
     setEditingEvent(event);
     
-    // Convert start_date to YYYY-MM-DD format for date input
+    // Handle both snake_case (API format) and camelCase (transformed format)
+    const startDateField = event.start_date || event.startDate;
+    const endDateField = event.end_date || event.endDate;
+    const startTimeField = event.start_time || event.startTime;
+    const eventTypeField = event.event_type || event.eventType;
+    
+    // Convert startDate to YYYY-MM-DD format for date input
     let dateValue = '';
-    if (event.start_date) {
+    if (startDateField) {
       try {
-        const date = new Date(event.start_date);
+        const date = new Date(startDateField);
         if (!isNaN(date.getTime())) {
           dateValue = date.toISOString().split('T')[0];
         }
       } catch (error) {
-        console.warn('Could not parse event start_date:', event.start_date);
+        console.warn('Could not parse event startDate:', startDateField);
         dateValue = '';
       }
     }
     
+    // Convert endDate to YYYY-MM-DD format for date input
+    let endDateValue = '';
+    if (endDateField) {
+      try {
+        const endDate = new Date(endDateField);
+        if (!isNaN(endDate.getTime())) {
+          endDateValue = endDate.toISOString().split('T')[0];
+        }
+      } catch (error) {
+        console.warn('Could not parse event endDate:', endDateField);
+        endDateValue = '';
+      }
+    }
+    
+    // Convert start_time to display format (e.g., "11:00 AM")
+    let timeValue = '';
+    if (startTimeField) {
+      try {
+        const timeDate = new Date(startTimeField);
+        if (!isNaN(timeDate.getTime())) {
+          timeValue = timeDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+      } catch (error) {
+        console.warn('Could not parse event start_time:', startTimeField);
+        timeValue = '';
+      }
+    }
+    
+    // Determine frequency based on existing event data
+    let recurringFrequency = '';
+    if (endDateField && startDateField) {
+      try {
+        const startDate = new Date(startDateField);
+        const endDate = new Date(endDateField);
+        
+        if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+          const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          // For now, assume weekly since that's what our current implementation supports
+          // In the future, we could enhance this based on actual event pattern analysis
+          if (diffDays >= 7) {
+            recurringFrequency = 'weekly';
+          }
+        }
+      } catch (error) {
+        console.warn('Could not determine frequency for recurring event');
+      }
+    }
+
     const formData = {
       title: event.title || '',
       description: event.description || '',
       date: dateValue,
-      time: event.start_time || '',
+      endDate: endDateValue,
+      time: timeValue,
       location: event.location || '',
-      category: event.event_type || 'Racing',
+      category: eventTypeField ? eventTypeField.charAt(0).toUpperCase() + eventTypeField.slice(1) : 'Racing',
       image: '',
       hasResults: false,
       resultsUrl: '',
-      isRecurring: false,
-      recurringFrequency: '',
+      isRecurring: !!endDateField, // If there's an end date, it's recurring
+      recurringFrequency: recurringFrequency,
       noticeOfRacePdf: '',
       sailingInstructionsPdf: '',
       boatEntries: []
     };
     
-    console.log('Setting eventFormData:', formData);
+    console.log('Raw event data:', event);
+    console.log('Extracted fields:', {
+      startDateField,
+      endDateField,
+      startTimeField,
+      eventTypeField
+    });
+    console.log('Formatted form data:', formData);
     setEventFormData(formData);
     setActiveTab('events'); // Ensure we're on the events tab
     setActiveSection('edit');
@@ -780,7 +852,7 @@ const AdminPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category *
@@ -798,20 +870,6 @@ const AdminPage = () => {
                       </option>
                     ))}
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date *
-                  </label>
-                  <input
-                    type="date"
-                    name="date"
-                    value={eventFormData.date}
-                    onChange={handleEventInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
                 </div>
 
                 <div>
@@ -840,6 +898,40 @@ const AdminPage = () => {
                   </select>
                 </div>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date *
+                  </label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={eventFormData.date}
+                    onChange={handleEventInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    End Date {eventFormData.category === 'Series' ? '*' : '(Optional)'}
+                  </label>
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={eventFormData.endDate}
+                    onChange={handleEventInputChange}
+                    min={eventFormData.date}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required={eventFormData.category === 'Series'}
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    {eventFormData.category === 'Series' ? 'Required for series events' : 'Leave empty for single-day events'}
+                  </p>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -855,6 +947,46 @@ const AdminPage = () => {
                   required
                 />
               </div>
+
+              {/* Recurring Frequency Selection */}
+              {eventFormData.endDate && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Recurring Frequency *
+                  </label>
+                  <select
+                    name="recurringFrequency"
+                    value={eventFormData.recurringFrequency}
+                    onChange={handleEventInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required={!!eventFormData.endDate}
+                  >
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">
+                    How often should this event repeat between the start and end dates?
+                  </p>
+                </div>
+              )}
+
+              {/* Recurring Event Indicator */}
+              {eventFormData.endDate && eventFormData.recurringFrequency && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <Calendar size={20} className="text-blue-600 mr-3" />
+                    <div>
+                      <h4 className="font-medium text-blue-900">Recurring Event Series</h4>
+                      <p className="text-sm text-blue-700 mt-1">
+                        This event will repeat {eventFormData.recurringFrequency} from {eventFormData.date} to {eventFormData.endDate}.
+                        Each occurrence will appear as a separate entry on the calendar.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -900,54 +1032,6 @@ const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="flex items-center mb-4">
-                    <input
-                      type="checkbox"
-                      name="isRecurring"
-                      checked={eventFormData.isRecurring}
-                      onChange={handleEventInputChange}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">Recurring Event</span>
-                  </label>
-                  
-                  {eventFormData.isRecurring && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Frequency *
-                      </label>
-                      <select
-                        name="recurringFrequency"
-                        value={eventFormData.recurringFrequency || ''}
-                        onChange={handleEventInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required={eventFormData.isRecurring}
-                      >
-                        <option value="">Select frequency</option>
-                        <option value="1 week">Every Week</option>
-                        <option value="2 weeks">Every 2 Weeks</option>
-                        <option value="3 weeks">Every 3 Weeks</option>
-                        <option value="1 month">Every Month</option>
-                      </select>
-                    </div>
-                  )}
-                </div>
-                
-                <div>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="hasResults"
-                      checked={eventFormData.hasResults}
-                      onChange={handleEventInputChange}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">Has Results</span>
-                  </label>
-                </div>
-              </div>
 
 
               <div className="flex items-center gap-4 pt-6 border-t">

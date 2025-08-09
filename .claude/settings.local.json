@@ -20,7 +20,9 @@
       "Bash(rm:*)",
       "Bash(curl:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": []
   }

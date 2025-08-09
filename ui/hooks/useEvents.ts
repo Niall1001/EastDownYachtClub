@@ -50,7 +50,20 @@ export const useEvents = (initialParams?: QueryParams): UseEventsReturn => {
       const response: PaginatedResponse<Event> = await apiClient.get(endpoint);
       
       if (response.success && response.data) {
-        setEvents(response.data);
+        // Transform API response (snake_case) to frontend format (camelCase)
+        const transformedEvents = response.data.map((rawEvent: any): Event => ({
+          id: rawEvent.id,
+          title: rawEvent.title,
+          description: rawEvent.description,
+          eventType: rawEvent.event_type || rawEvent.eventType,
+          startDate: rawEvent.start_date || rawEvent.startDate,
+          endDate: rawEvent.end_date || rawEvent.endDate,
+          startTime: rawEvent.start_time || rawEvent.startTime,
+          location: rawEvent.location,
+          createdAt: rawEvent.created_at || rawEvent.createdAt,
+          updatedAt: rawEvent.updated_at || rawEvent.updatedAt
+        }));
+        setEvents(transformedEvents);
         if (response.pagination) {
           setTotalPages(response.pagination.totalPages);
           setCurrentPage(response.pagination.page);
@@ -191,7 +204,21 @@ export const useEvent = (id?: string): UseEventReturn => {
       const response: ApiResponse<Event> = await apiClient.get(`/events/${eventId}`);
       
       if (response.success && response.data) {
-        setEvent(response.data);
+        // Transform API response (snake_case) to frontend format (camelCase)
+        const rawEvent = response.data as any;
+        const transformedEvent: Event = {
+          id: rawEvent.id,
+          title: rawEvent.title,
+          description: rawEvent.description,
+          eventType: rawEvent.event_type || rawEvent.eventType,
+          startDate: rawEvent.start_date || rawEvent.startDate,
+          endDate: rawEvent.end_date || rawEvent.endDate,
+          startTime: rawEvent.start_time || rawEvent.startTime,
+          location: rawEvent.location,
+          createdAt: rawEvent.created_at || rawEvent.createdAt,
+          updatedAt: rawEvent.updated_at || rawEvent.updatedAt
+        };
+        setEvent(transformedEvent);
       } else {
         setError(response.error || 'Failed to fetch event');
       }
