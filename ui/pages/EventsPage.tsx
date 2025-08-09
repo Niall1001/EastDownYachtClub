@@ -43,15 +43,15 @@ const EventsPage = () => {
     limit: 50
   });
 
-  // Transform events from API to display format
-  const transformedEvents: TransformedEvent[] = events?.map((event) => {
+  // Helper function to generate recurring event instances for series events
+  const generateRecurringEvents = (event: any): TransformedEvent[] => {
     // Safety check for event object
     if (!event || typeof event !== 'object') {
-      return null;
+      return [];
     }
 
     // Handle database fields (snake_case) and TypeScript types (camelCase)
-    const eventData = event as any; // Type assertion to handle database vs TypeScript mismatch
+    const eventData = event as any;
     const eventType = eventData.event_type || event.eventType || 'general';
     const safeEventType = typeof eventType === 'string' ? eventType : 'general';
     
@@ -79,19 +79,15 @@ const EventsPage = () => {
       }
     }
     
-    return {
+    const baseEvent: TransformedEvent = {
       id: event.id,
       title: event.title || 'Untitled Event',
       description: event.description || 'No description available.',
       eventType: safeEventType,
-      date: startDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }),
+      date: '', // Will be set for each occurrence
       startDate: startDate,
       endDate: endDate,
-      time: formattedTime + (endDate ? ' - ' + endDate.toLocaleDateString() : ''),
+      time: formattedTime,
       location: event.location || 'Location TBD',
       category: safeEventType.charAt(0).toUpperCase() + safeEventType.slice(1),
       image: `https://images.unsplash.com/photo-${
@@ -103,6 +99,49 @@ const EventsPage = () => {
       }?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
       hasResults: false
     };
+
+    // Check if this is a recurring event (has both start and end date)
+    if (endDate && endDate > startDate) {
+      const occurrences: TransformedEvent[] = [];
+      const currentDate = new Date(startDate);
+      
+      // Generate weekly occurrences between start and end date
+      while (currentDate <= endDate) {
+        const occurrence: TransformedEvent = {
+          ...baseEvent,
+          id: `${event.id}-${currentDate.toISOString().split('T')[0]}`, // Unique ID for each occurrence
+          startDate: new Date(currentDate),
+          endDate: new Date(currentDate), // Set end date to same day for individual occurrence
+          date: currentDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        };
+        
+        occurrences.push(occurrence);
+        
+        // Move to next week
+        currentDate.setDate(currentDate.getDate() + 7);
+      }
+      
+      return occurrences;
+    } else {
+      // Single occurrence event
+      return [{
+        ...baseEvent,
+        date: startDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }];
+    }
+  };
+
+  // Transform events from API to display format with recurring event support
+  const transformedEvents: TransformedEvent[] = events?.flatMap((event) => {
+    return generateRecurringEvents(event);
   }).filter((event): event is TransformedEvent => event !== null) || []; // Type-safe filter
 
   // Use only real API events data

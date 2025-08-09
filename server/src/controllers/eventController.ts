@@ -4,6 +4,18 @@ import { asyncHandler } from '../middleware/errorHandler';
 import { prisma } from '../utils/prisma';
 import { logger } from '../utils/logger';
 
+// Helper function to parse time string into Date object for database storage
+const parseTimeString = (timeString: string): Date => {
+  // Handle formats like "11:00", "11:00:00", "11:00:00.000"
+  const timeParts = timeString.split(':');
+  const hour = timeParts[0] || '00';
+  const minute = timeParts[1] || '00';
+  const second = timeParts[2] || '00';
+  
+  // Create a Date object with a fixed date (1970-01-01) and the provided time
+  return new Date(`1970-01-01T${hour}:${minute}:${second}Z`);
+};
+
 export const getEvents = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { type, startDate, endDate, published = 'true' } = req.query;
   
@@ -51,8 +63,22 @@ export const getEvents = asyncHandler(async (req: AuthRequest, res: Response, ne
 export const getEvent = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
+  // Handle recurring event IDs (format: originalId-YYYY-MM-DD)
+  let eventId = id;
+  let specificDate: string | null = null;
+  
+  if (id.includes('-') && id.split('-').length > 5) {
+    // This is a recurring event ID, extract the original event ID and date
+    const parts = id.split('-');
+    // UUID format: 8-4-4-4-12 characters, so we need first 5 parts
+    eventId = parts.slice(0, 5).join('-');
+    specificDate = parts.slice(5).join('-'); // YYYY-MM-DD
+    
+    logger.info(`Recurring event requested - Original ID: ${eventId}, Date: ${specificDate}`);
+  }
+
   const event = await prisma.events.findUnique({
-    where: { id },
+    where: { id: eventId },
     include: {
       races: {
         include: {
@@ -84,9 +110,20 @@ export const getEvent = asyncHandler(async (req: AuthRequest, res: Response, nex
     return;
   }
 
+  // For recurring events, modify the response to show the specific occurrence date
+  let responseData = event;
+  if (specificDate) {
+    responseData = {
+      ...event,
+      start_date: new Date(specificDate),
+      end_date: new Date(specificDate), // Set end date to same as start for individual occurrence
+      id: id // Keep the synthetic ID for frontend consistency
+    };
+  }
+
   const response: ApiResponse = {
     success: true,
-    data: event,
+    data: responseData,
   };
 
   res.status(200).json(response);
@@ -102,7 +139,7 @@ export const createEvent = asyncHandler(async (req: AuthRequest, res: Response, 
       event_type: eventData.eventType,
       start_date: new Date(eventData.startDate),
       end_date: eventData.endDate ? new Date(eventData.endDate) : null,
-      start_time: eventData.startTime ? new Date(`1970-01-01T${eventData.startTime}`) : null,
+      start_time: eventData.startTime ? parseTimeString(eventData.startTime) : null,
       location: eventData.location || null,
     },
     include: {
@@ -151,7 +188,7 @@ export const updateEvent = asyncHandler(async (req: AuthRequest, res: Response, 
     updateData.end_date = eventData.endDate ? new Date(eventData.endDate) : null;
   }
   if (eventData.startTime !== undefined) {
-    updateData.start_time = eventData.startTime ? new Date(`1970-01-01T${eventData.startTime}`) : null;
+    updateData.start_time = eventData.startTime ? parseTimeString(eventData.startTime) : null;
   }
   if (eventData.location !== undefined) updateData.location = eventData.location;
 
