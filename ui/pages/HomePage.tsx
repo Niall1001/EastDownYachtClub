@@ -7,6 +7,7 @@ import {
 import { Link } from 'react-router-dom';
 import HeroSection from '../components/home/HeroSection';
 import NewsCard from '../components/home/NewsCard';
+import WeatherWidget from '../components/home/WeatherWidget';
 import { useStories } from '../hooks/useStories';
 import { useEvents } from '../hooks/useEvents';
 
@@ -156,47 +157,8 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Weather & Conditions */}
-              <div className="card-luxury p-8 lg:col-span-1">
-                <div className="flex items-center gap-3 mb-6">
-                  <Wind size={24} className="text-maritime-deep-navy" />
-                  <h3 className="font-display text-xl font-semibold text-maritime-midnight">
-                    Current Conditions
-                  </h3>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-maritime-mist/30 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Wind size={18} className="text-maritime-royal" />
-                      <span className="text-sm font-medium text-maritime-slate-700">Wind Speed</span>
-                    </div>
-                    <span className="font-semibold text-maritime-deep-navy">15 knots</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 bg-maritime-mist/30 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Navigation size={18} className="text-maritime-royal" />
-                      <span className="text-sm font-medium text-maritime-slate-700">Direction</span>
-                    </div>
-                    <span className="font-semibold text-maritime-deep-navy">SW</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 bg-maritime-mist/30 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Thermometer size={18} className="text-maritime-royal" />
-                      <span className="text-sm font-medium text-maritime-slate-700">Temperature</span>
-                    </div>
-                    <span className="font-semibold text-maritime-deep-navy">18°C</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-3 bg-maritime-mist/30 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Eye size={18} className="text-maritime-royal" />
-                      <span className="text-sm font-medium text-maritime-slate-700">Visibility</span>
-                    </div>
-                    <span className="font-semibold text-maritime-deep-navy">Excellent</span>
-                  </div>
-                </div>
+              <div className="lg:col-span-1">
+                <WeatherWidget />
               </div>
 
               {/* Membership Excellence */}
