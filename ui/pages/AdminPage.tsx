@@ -100,8 +100,32 @@ const AdminPage = () => {
 
 
 
-  const storyCategories = ['Club News', 'Racing', 'Training', 'Social', 'Announcements'];
+  const storyCategories = ['Club News', 'Racing', 'Training', 'Social', 'Announcement'];
   const eventCategories = ['Racing', 'Training', 'Social', 'Cruising', 'Committee'];
+
+  // Map display names to backend values
+  const mapCategoryToStoryType = (category: string): string => {
+    const mapping: { [key: string]: string } = {
+      'Club News': 'news',
+      'Racing': 'racing',
+      'Training': 'training',
+      'Social': 'social',
+      'Announcement': 'announcement'
+    };
+    return mapping[category] || category.toLowerCase().replace(' ', '_');
+  };
+
+  // Map backend values back to display names
+  const mapStoryTypeToCategory = (storyType: string): string => {
+    const mapping: { [key: string]: string } = {
+      'news': 'Club News',
+      'racing': 'Racing',
+      'training': 'Training',
+      'social': 'Social',
+      'announcement': 'Announcement'
+    };
+    return mapping[storyType] || storyType.charAt(0).toUpperCase() + storyType.slice(1);
+  };
 
   const resetStoryForm = () => {
     setStoryFormData({
@@ -159,7 +183,7 @@ const AdminPage = () => {
           excerpt: storyFormData.excerpt,
           content: storyFormData.content,
           authorName: storyFormData.author,
-          storyType: storyFormData.category.toLowerCase().replace(' ', '_'),
+          storyType: mapCategoryToStoryType(storyFormData.category),
           featuredImageUrl: storyFormData.image || undefined,
           published: true
         };
@@ -173,7 +197,7 @@ const AdminPage = () => {
           excerpt: storyFormData.excerpt,
           content: storyFormData.content,
           authorName: storyFormData.author,
-          storyType: storyFormData.category.toLowerCase().replace(' ', '_'),
+          storyType: mapCategoryToStoryType(storyFormData.category),
           featuredImageUrl: storyFormData.image || undefined,
           published: true
         };
@@ -294,7 +318,7 @@ const AdminPage = () => {
       excerpt: story.excerpt || '',
       content: story.content,
       author: story.author_name || '',
-      category: story.story_type?.charAt(0).toUpperCase() + story.story_type?.slice(1) || 'Club News',
+      category: mapStoryTypeToCategory(story.story_type || 'news'),
       image: story.featured_image_url || ''
     });
     setActiveTab('stories'); // Ensure we're on the stories tab

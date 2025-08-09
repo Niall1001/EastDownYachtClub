@@ -75,7 +75,7 @@ export interface Story {
   slug: string;
   excerpt?: string;
   content: string;
-  storyType: 'news' | 'racing' | 'training' | 'social' | 'announcements';
+  storyType: 'news' | 'racing' | 'training' | 'social' | 'announcement';
   featuredImageUrl?: string;
   galleryImages?: string[];
   authorName?: string;
@@ -90,7 +90,7 @@ export interface CreateStoryData {
   title: string;
   excerpt?: string;
   content: string;
-  storyType?: 'news' | 'racing' | 'training' | 'social' | 'announcements';
+  storyType?: 'news' | 'racing' | 'training' | 'social' | 'announcement';
   featuredImageUrl?: string;
   galleryImages?: string[];
   authorName?: string;
@@ -103,7 +103,7 @@ export interface UpdateStoryData {
   title?: string;
   excerpt?: string;
   content?: string;
-  storyType?: 'news' | 'racing' | 'training' | 'social' | 'announcements';
+  storyType?: 'news' | 'racing' | 'training' | 'social' | 'announcement';
   featuredImageUrl?: string;
   galleryImages?: string[];
   authorName?: string;

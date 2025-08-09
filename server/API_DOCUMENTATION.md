@@ -184,7 +184,7 @@ The API uses standard HTTP status codes:
 - `racing` - Racing reports
 - `training` - Training updates
 - `social` - Social event coverage
-- `announcements` - Official announcements
+- `announcement` - Official announcement
 
 ### Race Result Flags
 - `disqualified` - Boat was disqualified

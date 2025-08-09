@@ -27,7 +27,7 @@ const router = Router();
  *         required: false
  *         schema:
  *           type: string
- *           enum: [news, racing, training, social, announcements]
+ *           enum: [news, racing, training, social, announcement]
  *       - $ref: '#/components/parameters/PublishedParam'
  *       - name: tags
  *         in: query

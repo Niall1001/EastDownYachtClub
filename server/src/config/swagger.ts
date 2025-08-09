@@ -316,7 +316,7 @@ const options: Options = {
             },
             story_type: {
               type: 'string',
-              enum: ['news', 'racing', 'training', 'social', 'announcements'],
+              enum: ['news', 'racing', 'training', 'social', 'announcement'],
               default: 'news',
               description: 'Type of story'
             },
@@ -398,7 +398,7 @@ const options: Options = {
             },
             storyType: {
               type: 'string',
-              enum: ['news', 'racing', 'training', 'social', 'announcements'],
+              enum: ['news', 'racing', 'training', 'social', 'announcement'],
               description: 'Type of story'
             },
             featuredImageUrl: {
