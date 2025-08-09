@@ -74,7 +74,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
         
         {/* Premium CTA */}
         <Link 
-          to={slug ? `/news/${slug}` : `/news/${id}`}
+          to={`/news/id/${id}`}
           className="inline-flex items-center gap-2 text-maritime-gold-600 hover:text-maritime-gold-700 font-medium text-sm transition-all duration-300 group/link"
         >
           <span>Read Full Story</span>

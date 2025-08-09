@@ -62,5 +62,9 @@ export const storyService = {
 
   async getStory(id: string): Promise<ApiResponse<Story>> {
     return apiClient.get<ApiResponse<Story>>(`/stories/${id}`);
+  },
+
+  async getStoryBySlug(slug: string): Promise<ApiResponse<Story>> {
+    return apiClient.get<ApiResponse<Story>>(`/stories/${slug}`);
   }
 };

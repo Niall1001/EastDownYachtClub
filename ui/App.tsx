@@ -8,6 +8,7 @@ import EventDetailPage from './pages/EventDetailPage';
 import RaceResultsPage from './pages/RaceResultsPage';
 import ClubPage from './pages/ClubPage';
 import NewsPage from './pages/NewsPage';
+import StoryPage from './pages/StoryPage';
 import NewsletterPage from './pages/NewsletterPage';
 import JoinPage from './pages/JoinPage';
 import LoginPage from './pages/LoginPage';
@@ -28,6 +29,8 @@ export function App() {
               <Route path="/results" element={<RaceResultsPage />} />
               <Route path="/club" element={<ClubPage />} />
               <Route path="/news" element={<NewsPage />} />
+              <Route path="/news/:slug" element={<StoryPage />} />
+              <Route path="/news/id/:id" element={<StoryPage />} />
               <Route path="/newsletters/:id" element={<NewsletterPage />} />
               <Route path="/join" element={<JoinPage />} />
               <Route path="/login" element={<LoginPage />} />

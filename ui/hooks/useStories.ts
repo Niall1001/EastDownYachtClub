@@ -216,19 +216,13 @@ export const useStory = (id?: string): UseStoryReturn => {
     setError(null);
     
     try {
-      // Search for story by slug using the search query param
-      const response: any = await apiClient.get(`/stories?search=${encodeURIComponent(slug)}&limit=1`);
+      // Use the direct story endpoint which handles both ID and slug
+      const response: ApiResponse<Story> = await apiClient.get(`/stories/${slug}`);
       
-      if (response.success && response.data && response.data.stories && response.data.stories.length > 0) {
-        // Find exact slug match from search results
-        const matchingStory = response.data.stories.find((s: any) => s.slug === slug);
-        if (matchingStory) {
-          setStory(matchingStory);
-        } else {
-          setError('Story not found');
-        }
+      if (response.success && response.data) {
+        setStory(response.data);
       } else {
-        setError('Story not found');
+        setError(response.error || 'Story not found');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch story';

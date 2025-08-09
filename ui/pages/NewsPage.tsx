@@ -168,7 +168,7 @@ const NewsPage = () => {
                     {featuredArticle.title}
                   </h3>
                   <p className="text-gray-600 mb-4">{featuredArticle.excerpt}</p>
-                  <Link to={featuredArticle.slug ? `/news/${featuredArticle.slug}` : `/news/${featuredArticle.id}`} className="inline-block bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
+                  <Link to={`/news/id/${featuredArticle.id}`} className="inline-block bg-[#0284c7] hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
                     Read Full Story
                   </Link>
                 </div>
@@ -222,7 +222,7 @@ const NewsPage = () => {
                 <p className="text-gray-600 mb-4 line-clamp-3">
                   {article.excerpt}
                 </p>
-                <Link to={article.slug ? `/news/${article.slug}` : `/news/${article.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
+                <Link to={`/news/id/${article.id}`} className="text-[#0284c7] font-medium hover:text-blue-700 inline-flex items-center">
                   Read More
                   <ChevronRight size={16} className="ml-1" />
                 </Link>
